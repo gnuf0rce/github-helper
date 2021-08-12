@@ -6,7 +6,6 @@ import io.ktor.client.features.*
 import io.ktor.client.features.compression.*
 import io.ktor.client.features.json.*
 import io.ktor.client.features.json.serializer.*
-import io.ktor.client.features.observer.*
 import io.ktor.client.request.*
 import io.ktor.http.*
 import kotlinx.coroutines.*
@@ -43,6 +42,11 @@ open class GithubClient(open val token: String? = System.getenv("GITHUB_TOKEN"))
                 if (cause is ClientRequestException && "documentation_url" in cause.message.orEmpty()) {
                     throw GitHubApiException(cause)
                 }
+            }
+        }
+        RateLimit {
+            send = { _, _ ->
+                //
             }
         }
         engine {

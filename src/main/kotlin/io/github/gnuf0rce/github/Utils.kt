@@ -37,3 +37,8 @@ object OffsetDateTimeSerializer : KSerializer<OffsetDateTime> {
         encoder.encodeString(value.format(formatter))
     }
 }
+
+@Suppress("FunctionName")
+fun HttpClientConfig<*>.RateLimit(block: RateLimitFeature.Config.() -> Unit) {
+    install(RateLimitFeature, block)
+}
