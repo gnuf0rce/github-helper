@@ -38,8 +38,12 @@ open class GithubClient(open val token: String? = System.getenv("GITHUB_TOKEN"))
         defaultRequest {
             header(HttpHeaders.Authorization, token?.let { "token $it" })
         }
-        ResponseObserver {
-            // TODO record rate-limit
+        HttpResponseValidator {
+            handleResponseException { cause ->
+                if (cause is ClientRequestException && "documentation_url" in cause.message.orEmpty()) {
+                    throw GitHubApiException(cause)
+                }
+            }
         }
         engine {
             config {
