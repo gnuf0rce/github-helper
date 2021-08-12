@@ -1,6 +1,5 @@
 package io.github.gnuf0rce.github.entry
 
-import io.github.gnuf0rce.github.*
 import kotlinx.serialization.*
 import java.time.*
 
@@ -16,15 +15,15 @@ data class Issue(
     val authorAssociation: String,
     @SerialName("body")
     val body: String,
+    @Contextual
     @SerialName("closed_at")
-    @Serializable(OffsetDateTimeSerializer::class)
     override val closedAt: OffsetDateTime?,
     @SerialName("comments")
     val comments: Int,
     @SerialName("comments_url")
     val commentsUrl: String,
+    @Contextual
     @SerialName("created_at")
-    @Serializable(OffsetDateTimeSerializer::class)
     override val createdAt: OffsetDateTime,
     @SerialName("events_url")
     val eventsUrl: String,
@@ -41,7 +40,7 @@ data class Issue(
     @SerialName("milestone")
     val milestone: Milestone? = null,
     @SerialName("node_id")
-    val nodeId: String,
+    override val nodeId: String,
     @SerialName("number")
     val number: Int,
     @SerialName("pull_request")
@@ -52,11 +51,11 @@ data class Issue(
     val state: String,
     @SerialName("title")
     val title: String,
+    @Contextual
     @SerialName("updated_at")
-    @Serializable(OffsetDateTimeSerializer::class)
     override val updatedAt: OffsetDateTime,
     @SerialName("url")
     val url: String,
     @SerialName("user")
-    val user: Creator
-): LifeCycle
+    override val user: Creator
+) : Entry, LifeCycle, WithUserInfo

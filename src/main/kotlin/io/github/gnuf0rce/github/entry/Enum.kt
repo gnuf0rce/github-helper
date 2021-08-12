@@ -12,6 +12,9 @@ enum class STATE { open, closed, all }
 enum class Direction { asc, desc }
 
 @Serializable
+enum class Affiliation { outside, direct, all }
+
+@Serializable
 enum class IssueFilter { assigned, created, mentioned, subscribed, all, repos }
 
 @Serializable

@@ -1,13 +1,25 @@
 package io.github.gnuf0rce.github.entry
 
-import io.github.gnuf0rce.github.*
 import kotlinx.serialization.*
 import java.time.*
 
-interface LifeCycle {
+sealed interface LifeCycle {
     val createdAt: OffsetDateTime
     val updatedAt: OffsetDateTime
     val closedAt: OffsetDateTime?
+}
+
+interface Record {
+    val sha: String
+    val url: String
+}
+
+interface WithUserInfo {
+    val user: UserInfo
+}
+
+interface Entry {
+    val nodeId: String
 }
 
 @Serializable
@@ -70,20 +82,20 @@ data class Label(
 
 @Serializable
 data class Milestone(
+    @Contextual
     @SerialName("closed_at")
-    @Serializable(OffsetDateTimeSerializer::class)
     val closedAt: OffsetDateTime?,
     @SerialName("closed_issues")
     val closedIssues: Int,
+    @Contextual
     @SerialName("created_at")
-    @Serializable(OffsetDateTimeSerializer::class)
     val createdAt: OffsetDateTime,
     @SerialName("creator")
     val creator: Creator,
     @SerialName("description")
     val description: String,
+    @Contextual
     @SerialName("due_on")
-    @Serializable(OffsetDateTimeSerializer::class)
     val dueOn: OffsetDateTime?,
     @SerialName("html_url")
     val htmlUrl: String,
@@ -101,8 +113,8 @@ data class Milestone(
     val state: String,
     @SerialName("title")
     val title: String,
+    @Contextual
     @SerialName("updated_at")
-    @Serializable(OffsetDateTimeSerializer::class)
     val updatedAt: OffsetDateTime,
     @SerialName("url")
     val url: String
@@ -303,7 +315,7 @@ data class Repo(
     @SerialName("url")
     val url: String,
     @SerialName("visibility")
-    val visibility: Visibility = Visibility.public, // TODO Enum
+    val visibility: Visibility = Visibility.public,
     @SerialName("watchers")
     val watchers: Int,
     @SerialName("watchers_count")

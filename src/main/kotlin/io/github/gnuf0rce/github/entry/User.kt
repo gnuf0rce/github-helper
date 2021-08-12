@@ -1,7 +1,7 @@
 package io.github.gnuf0rce.github.entry
 
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
+import kotlinx.serialization.*
+import java.time.*
 
 interface UserInfo {
     val avatarUrl: String
@@ -46,3 +46,14 @@ data class Creator(
     @SerialName("url")
     val url: String
 ) : UserInfo
+
+@Serializable
+data class Author(
+    @Contextual
+    @SerialName("date")
+    val date: OffsetDateTime,
+    @SerialName("email")
+    val email: String,
+    @SerialName("name")
+    val name: String
+)

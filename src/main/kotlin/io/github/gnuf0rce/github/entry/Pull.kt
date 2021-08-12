@@ -1,7 +1,5 @@
 package io.github.gnuf0rce.github.entry
 
-import io.github.gnuf0rce.github.*
-import io.ktor.client.request.*
 import kotlinx.serialization.*
 import java.time.*
 
@@ -21,15 +19,15 @@ data class Pull(
     val base: About,
     @SerialName("body")
     val body: String,
+    @Contextual
     @SerialName("closed_at")
-    @Serializable(OffsetDateTimeSerializer::class)
     override val closedAt: OffsetDateTime?,
     @SerialName("comments_url")
     val commentsUrl: String,
     @SerialName("commits_url")
     val commitsUrl: String,
+    @Contextual
     @SerialName("created_at")
-    @Serializable(OffsetDateTimeSerializer::class)
     override val createdAt: OffsetDateTime,
     @SerialName("diff_url")
     val diffUrl: String,
@@ -51,13 +49,13 @@ data class Pull(
     val locked: Boolean,
     @SerialName("merge_commit_sha")
     val mergeCommitSha: String,
+    @Contextual
     @SerialName("merged_at")
-    @Serializable(OffsetDateTimeSerializer::class)
     val mergedAt: OffsetDateTime? = null,
     @SerialName("milestone")
     val milestone: Milestone? = null,
     @SerialName("node_id")
-    val nodeId: String,
+    override val nodeId: String,
     @SerialName("number")
     val number: Int,
     @SerialName("patch_url")
@@ -76,24 +74,11 @@ data class Pull(
     val statusesUrl: String,
     @SerialName("title")
     val title: String,
+    @Contextual
     @SerialName("updated_at")
-    @Serializable(OffsetDateTimeSerializer::class)
     override val updatedAt: OffsetDateTime,
     @SerialName("url")
     val url: String,
     @SerialName("user")
-    val user: Creator
-): LifeCycle {
-    companion object {
-
-
-        suspend fun repo(
-            owner: String,
-            repo: String,
-            number: Int,
-            github: GithubClient
-        ): Pull = github.useHttpClient { client ->
-            client.get("https://api.github.com/repos/${owner}/${repo}/pulls/${number}")
-        }
-    }
-}
+    override val user: Creator
+): Entry,  LifeCycle, WithUserInfo
