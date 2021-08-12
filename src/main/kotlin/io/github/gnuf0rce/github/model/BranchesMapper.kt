@@ -4,7 +4,10 @@ import io.github.gnuf0rce.github.*
 import io.ktor.http.*
 import kotlinx.serialization.json.*
 
-open class BranchesMapper(parent: Url, override val github: GithubClient) : GithubMapper(parent, "branches") {
+/**
+ * 1. https://api.github.com/repos/{owner}/{repo}/branches
+ */
+open class BranchesMapper(parent: Url, override val github: GitHubClient) : GitHubMapper(parent, "branches") {
     open suspend fun list(protected: Boolean, page: Int, per: Int = 30) =
         page<Map<String, Boolean>, JsonObject>(page, per, mapOf("protected" to protected))
 

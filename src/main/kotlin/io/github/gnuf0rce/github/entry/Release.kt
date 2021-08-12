@@ -17,7 +17,7 @@ data class Release(
     @SerialName("created_at")
     override val createdAt: OffsetDateTime,
     @SerialName("discussion_url")
-    val discussionUrl: String,
+    val discussionUrl: String? = null,
     @SerialName("draft")
     val draft: Boolean,
     @SerialName("html_url")
@@ -66,7 +66,7 @@ data class Release(
         @SerialName("id")
         val id: Int,
         @SerialName("label")
-        val label: String,
+        val label: String?,
         @SerialName("name")
         val name: String,
         @SerialName("node_id")

@@ -5,8 +5,8 @@ import io.ktor.http.*
 import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonObject
 
-open class CommitMapper(parent: Url, sha: String, override val github: GithubClient) :
-    GithubMapper(parent, "commits/$sha") {
+open class CommitMapper(parent: Url, sha: String, override val github: GitHubClient) :
+    GitHubMapper(parent, "commits/$sha") {
 
     open suspend fun comments(page: Int, per: Int = 30) = page<JsonObject>(page, per, "comments")
 

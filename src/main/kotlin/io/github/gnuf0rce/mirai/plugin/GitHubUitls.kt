@@ -12,7 +12,7 @@ internal val logger by GitHubHelperPlugin::logger
 
 internal val ImageFolder get() = GitHubHelperPlugin.dataFolder.resolve("image")
 
-internal val github = object : GithubClient() {
+internal val github = object : GitHubClient(null) {
 
     override val proxy: Proxy by lazy {
         GitHubConfig.proxy.takeIf { it.isNotBlank() }?.let(::Url)?.toProxy() ?: Proxy.NO_PROXY

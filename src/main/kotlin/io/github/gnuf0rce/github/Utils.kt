@@ -1,5 +1,6 @@
 package io.github.gnuf0rce.github
 
+import io.ktor.client.*
 import kotlinx.serialization.*
 import kotlinx.serialization.descriptors.*
 import kotlinx.serialization.encoding.*
@@ -10,7 +11,7 @@ import java.time.format.*
 
 fun GitHubClient() = GitHubClient(token = System.getenv("GITHUB_TOKEN"))
 
-internal val GithubJson = Json {
+internal val GitHubJson = Json {
     prettyPrint = true
     ignoreUnknownKeys = true
     isLenient = true

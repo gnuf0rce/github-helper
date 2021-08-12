@@ -7,13 +7,13 @@ import kotlinx.serialization.json.*
 
 interface WithGithubClient {
     val base: Url
-    val github: GithubClient
+    val github: GitHubClient
 }
 
-internal fun Url.path(path: String) = copy(encodedPath = encodedPath + "/${path}")
+internal fun Url.resolve(path: String) = if (path.isEmpty()) this else copy(encodedPath = encodedPath + "/${path}")
 
-abstract class GithubMapper(parent: Url, path: String) : WithGithubClient {
-    final override val base: Url = if (path.isEmpty()) parent else parent.path(path)
+abstract class GitHubMapper(parent: Url, path: String) : WithGithubClient {
+    final override val base: Url = parent.resolve(path)
 }
 
 internal suspend inline fun <reified R> WithGithubClient.rest(
@@ -21,7 +21,7 @@ internal suspend inline fun <reified R> WithGithubClient.rest(
     crossinline block: HttpRequestBuilder.() -> Unit
 ): R = github.useHttpClient { client ->
     client.request(
-        url = base.path(path),
+        url = base.resolve(path),
         block = block
     )
 }
@@ -36,16 +36,12 @@ internal suspend inline fun <reified R> WithGithubClient.page(
     page: Int,
     per: Int,
     path: String = "",
-): List<R> = rest(path) {
-    method = HttpMethod.Get
-    parameter("per_page", per)
-    parameter("page", page)
-}
+): List<R> = page<Any?, R>(page, per,  null, path)
 
 internal suspend inline fun <reified T, reified R> WithGithubClient.page(
     page: Int,
     per: Int,
-    context: T? = null,
+    context: T?,
     path: String = "",
 ): List<R> = rest(path) {
     method = HttpMethod.Get
@@ -93,11 +89,11 @@ internal suspend inline fun <reified R> WithGithubClient.open(
 
 internal inline fun <reified T> HttpRequestBuilder.context(context: T) {
     if (context == null) return
-    val json = context as? JsonObject ?: GithubJson.encodeToJsonElement(context).jsonObject
+    val json = context as? JsonObject ?: GitHubJson.encodeToJsonElement(context).jsonObject
     when (method) {
         HttpMethod.Get, HttpMethod.Delete -> {
             json.forEach { (key, element) ->
-                parameter(key, element.jsonPrimitive.content)
+                parameter(key, element.jsonPrimitive.contentOrNull)
             }
         }
         HttpMethod.Post, HttpMethod.Put, HttpMethod.Patch -> {

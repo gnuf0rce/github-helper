@@ -4,7 +4,7 @@ import io.github.gnuf0rce.github.*
 import io.ktor.http.*
 import kotlinx.serialization.json.*
 
-open class CommentsMapper(parent: Url, override val github: GithubClient) : GithubMapper(parent, "comments") {
+open class CommentsMapper(parent: Url, override val github: GitHubClient) : GitHubMapper(parent, "comments") {
 
     open suspend fun list(page: Int, per: Int = 30) = page<JsonObject>(page, per)
 

@@ -1,11 +1,14 @@
 package io.github.gnuf0rce.github.model
 
-import io.github.gnuf0rce.github.GithubClient
+import io.github.gnuf0rce.github.*
 import io.ktor.http.*
-import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.*
 
-open class BranchProtectionMapper(parent: Url, branch: String, override val github: GithubClient) :
-    GithubMapper(parent, "${branch}/protection") {
+/**
+ * 1. https://api.github.com/repos/{owner}/{repo}/branches/{branch}/protection
+ */
+open class BranchProtectionMapper(parent: Url, branch: String, override val github: GitHubClient) :
+    GitHubMapper(parent, "${branch}/protection") {
 
     open suspend fun get() = get<JsonObject>()
 

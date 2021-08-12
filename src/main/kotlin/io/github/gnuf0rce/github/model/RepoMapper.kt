@@ -1,10 +1,14 @@
 package io.github.gnuf0rce.github.model
 
 import io.github.gnuf0rce.github.*
+import io.github.gnuf0rce.github.entry.*
 import io.ktor.http.*
 import kotlinx.serialization.json.*
 
-open class RepoMapper(parent: Url, override val github: GithubClient) : GithubMapper(parent, "") {
+/**
+ * 1. https://api.github.com/repos/{owner}/{repo}
+ */
+open class RepoMapper(parent: Url, override val github: GitHubClient) : GitHubMapper(parent, "") {
 
     open suspend fun get() = get<JsonObject>()
 
@@ -52,7 +56,7 @@ open class RepoMapper(parent: Url, override val github: GithubClient) : GithubMa
 
     open val releases by lazy { ReleasesMapper(base, github) }
 
-    open suspend fun commits(page: Int, per: Int = 30) = page<JsonObject>(page, per, "commits")
+    open suspend fun commits(page: Int, per: Int = 30) = page<Commit>(page, per, "commits")
 
     open fun commit(sha: String) = CommitMapper(base, sha, github)
 

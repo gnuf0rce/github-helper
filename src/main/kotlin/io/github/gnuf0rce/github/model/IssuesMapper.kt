@@ -7,20 +7,24 @@ import kotlinx.serialization.*
 import kotlinx.serialization.json.*
 import java.time.OffsetDateTime
 
-open class IssuesMapper(parent: Url, override val github: GithubClient) : GithubMapper(parent, "issues") {
+/**
+ * 1. https://api.github.com/repos/{owner}/{repo}/issues
+ */
+open class IssuesMapper(parent: Url, override val github: GitHubClient) : GitHubMapper(parent, "issues") {
 
     @Serializable
     data class Context(
+        @SerialName("filter")
         val filter: IssueFilter = IssueFilter.assigned,
+        @SerialName("state")
         val state: STATE = STATE.open,
+        @SerialName("sort")
         val sort: IssueSort = IssueSort.created,
+        @SerialName("direction")
         val direction: Direction = Direction.desc,
         @Contextual
-        val since: OffsetDateTime? = null,
-//        collab: Boolean,
-//        orgs: Boolean,
-//        owned: Boolean,
-//        pulls: Boolean,
+        @SerialName("since")
+        val since: OffsetDateTime? = null
     )
 
     open suspend fun list(page: Int, per: Int = 30, context: Context? = null) = page<Context, Issue>(page, per, context)
