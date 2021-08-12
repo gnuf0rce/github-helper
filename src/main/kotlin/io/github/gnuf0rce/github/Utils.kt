@@ -8,6 +8,8 @@ import kotlinx.serialization.modules.*
 import java.time.*
 import java.time.format.*
 
+fun GitHubClient() = GitHubClient(token = System.getenv("GITHUB_TOKEN"))
+
 internal val GithubJson = Json {
     prettyPrint = true
     ignoreUnknownKeys = true
