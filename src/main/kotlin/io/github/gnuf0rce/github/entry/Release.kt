@@ -10,7 +10,7 @@ data class Release(
     @SerialName("assets_url")
     val assetsUrl: String,
     @SerialName("author")
-    override val user: Creator,
+    override val user: Coder,
     @SerialName("body")
     val body: String,
     @Contextual
@@ -30,8 +30,9 @@ data class Release(
     override val nodeId: String,
     @SerialName("prerelease")
     val prerelease: Boolean,
+    @Contextual
     @SerialName("published_at")
-    val publishedAt: String,
+    val publishedAt: OffsetDateTime? = null,
     @SerialName("tag_name")
     val tagName: String,
     @SerialName("tarball_url")
@@ -64,13 +65,13 @@ data class Release(
         @SerialName("download_count")
         val downloadCount: Int,
         @SerialName("id")
-        val id: Int,
+        val id: Long,
         @SerialName("label")
         val label: String?,
         @SerialName("name")
         val name: String,
         @SerialName("node_id")
-        val nodeId: String,
+        override val nodeId: String,
         @SerialName("size")
         val size: Int,
         @SerialName("state")
@@ -79,10 +80,10 @@ data class Release(
         @SerialName("updated_at")
         override val updatedAt: OffsetDateTime,
         @SerialName("uploader")
-        val uploader: Creator,
+        val uploader: Coder,
         @SerialName("url")
         val url: String
-    ) : LifeCycle {
+    ) : Entry, LifeCycle {
         @Deprecated("Release No Close", ReplaceWith("null"))
         override val closedAt: OffsetDateTime?
             get() = null

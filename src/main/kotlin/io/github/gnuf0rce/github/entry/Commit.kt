@@ -6,13 +6,13 @@ import java.time.*
 @Serializable
 data class Commit(
     @SerialName("author")
-    override val user: Creator,
+    override val user: Coder,
     @SerialName("comments_url")
     val commentsUrl: String,
     @SerialName("commit")
-    val commit: Commit,
+    val detail: Detail,
     @SerialName("committer")
-    val committer: Creator,
+    val committer: Coder,
     @SerialName("html_url")
     val htmlUrl: String,
     @SerialName("node_id")
@@ -29,10 +29,10 @@ data class Commit(
         get() = null
 
     override val updatedAt: OffsetDateTime
-        get() = commit.author.date
+        get() = detail.author.date
 
     override val createdAt: OffsetDateTime
-        get() = commit.author.date
+        get() = detail.author.date
 
     @Serializable
     data class Tree(
@@ -43,7 +43,7 @@ data class Commit(
     ) : Record
 
     @Serializable
-    data class Commit(
+    data class Detail(
         @SerialName("author")
         val author: Author,
         @SerialName("comment_count")

@@ -15,6 +15,9 @@ enum class Direction { asc, desc }
 enum class Affiliation { outside, direct, all }
 
 @Serializable
+enum class Association { MEMBER, CONTRIBUTOR, NONE }
+
+@Serializable
 enum class IssueFilter { assigned, created, mentioned, subscribed, all, repos }
 
 @Serializable

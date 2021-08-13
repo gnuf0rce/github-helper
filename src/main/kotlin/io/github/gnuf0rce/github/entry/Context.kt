@@ -23,46 +23,6 @@ interface Entry {
 }
 
 @Serializable
-data class Assignee(
-    @SerialName("avatar_url")
-    val avatarUrl: String,
-    @SerialName("events_url")
-    val eventsUrl: String,
-    @SerialName("followers_url")
-    val followersUrl: String,
-    @SerialName("following_url")
-    val followingUrl: String,
-    @SerialName("gists_url")
-    val gistsUrl: String,
-    @SerialName("gravatar_id")
-    val gravatarId: String,
-    @SerialName("html_url")
-    val htmlUrl: String,
-    @SerialName("id")
-    val id: Long,
-    @SerialName("login")
-    val login: String,
-    @SerialName("node_id")
-    val nodeId: String,
-    @SerialName("organizations_url")
-    val organizationsUrl: String,
-    @SerialName("received_events_url")
-    val receivedEventsUrl: String,
-    @SerialName("repos_url")
-    val reposUrl: String,
-    @SerialName("site_admin")
-    val siteAdmin: Boolean,
-    @SerialName("starred_url")
-    val starredUrl: String,
-    @SerialName("subscriptions_url")
-    val subscriptionsUrl: String,
-    @SerialName("type")
-    val type: String,
-    @SerialName("url")
-    val url: String
-)
-
-@Serializable
 data class Label(
     @SerialName("color")
     val color: String,
@@ -75,10 +35,10 @@ data class Label(
     @SerialName("name")
     val name: String,
     @SerialName("node_id")
-    val nodeId: String,
+    override val nodeId: String,
     @SerialName("url")
     val url: String
-)
+) : Entry
 
 @Serializable
 data class Milestone(
@@ -91,7 +51,7 @@ data class Milestone(
     @SerialName("created_at")
     val createdAt: OffsetDateTime,
     @SerialName("creator")
-    val creator: Creator,
+    val creator: Coder,
     @SerialName("description")
     val description: String,
     @Contextual
@@ -104,7 +64,7 @@ data class Milestone(
     @SerialName("labels_url")
     val labelsUrl: String,
     @SerialName("node_id")
-    val nodeId: String,
+    override val nodeId: String,
     @SerialName("number")
     val number: Int,
     @SerialName("open_issues")
@@ -118,7 +78,7 @@ data class Milestone(
     val updatedAt: OffsetDateTime,
     @SerialName("url")
     val url: String
-)
+) : Entry
 
 @Serializable
 data class PullRequest(
@@ -143,7 +103,7 @@ data class About(
     @SerialName("sha")
     val sha: String,
     @SerialName("user")
-    val user: Creator
+    val user: Coder
 )
 
 @Serializable
@@ -231,7 +191,7 @@ data class Repo(
     @SerialName("html_url")
     val htmlUrl: String,
     @SerialName("id")
-    val id: Int,
+    val id: Long,
     @SerialName("is_template")
     val isTemplate: Boolean = false,
     @SerialName("issue_comment_url")
@@ -261,7 +221,7 @@ data class Repo(
     @SerialName("network_count")
     val networkCount: Int = 0,
     @SerialName("node_id")
-    val nodeId: String,
+    override val nodeId: String,
     @SerialName("notifications_url")
     val notificationsUrl: String,
     @SerialName("open_issues")
@@ -269,7 +229,7 @@ data class Repo(
     @SerialName("open_issues_count")
     val openIssuesCount: Int,
     @SerialName("owner")
-    val owner: Creator,
+    val owner: Coder,
     @SerialName("permissions")
     val permissions: Map<String, Boolean> = emptyMap(),
     @SerialName("private")
@@ -320,7 +280,7 @@ data class Repo(
     val watchers: Int,
     @SerialName("watchers_count")
     val watchersCount: Int
-)
+): Entry
 
 @Serializable
 data class License(
@@ -331,12 +291,12 @@ data class License(
     @SerialName("name")
     val name: String,
     @SerialName("node_id")
-    val nodeId: String,
+    override val nodeId: String,
     @SerialName("spdx_id")
     val spdxId: String,
     @SerialName("url")
     val url: String
-)
+): Entry
 
 @Serializable
 data class Links(
@@ -377,7 +337,7 @@ data class RequestedTeam(
     @SerialName("name")
     val name: String,
     @SerialName("node_id")
-    val nodeId: String,
+    override val nodeId: String,
     @SerialName("parent")
     val parent: RequestedTeam?,
     @SerialName("permission")
@@ -390,4 +350,4 @@ data class RequestedTeam(
     val slug: String,
     @SerialName("url")
     val url: String
-)
+) : Entry

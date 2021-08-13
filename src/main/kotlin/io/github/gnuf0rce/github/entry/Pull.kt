@@ -8,11 +8,11 @@ data class Pull(
     @SerialName("active_lock_reason")
     val activeLockReason: String? = null,
     @SerialName("assignee")
-    val assignee: Assignee? = null,
+    val assignee: Coder? = null,
     @SerialName("assignees")
-    val assignees: List<Assignee> = emptyList(),
+    val assignees: List<Coder> = emptyList(),
     @SerialName("author_association")
-    val authorAssociation: String,
+    val authorAssociation: Association,
     @SerialName("auto_merge")
     val autoMerge: String?,
     @SerialName("base")
@@ -38,7 +38,7 @@ data class Pull(
     @SerialName("html_url")
     val htmlUrl: String,
     @SerialName("id")
-    val id: Int,
+    val id: Long,
     @SerialName("issue_url")
     val issueUrl: String,
     @SerialName("labels")
@@ -61,7 +61,7 @@ data class Pull(
     @SerialName("patch_url")
     val patchUrl: String,
     @SerialName("requested_reviewers")
-    val requestedReviewers: List<Creator> = emptyList(),
+    val requestedReviewers: List<Coder> = emptyList(),
     @SerialName("requested_teams")
     val requestedTeams: List<RequestedTeam> = emptyList(),
     @SerialName("review_comment_url")
@@ -69,7 +69,7 @@ data class Pull(
     @SerialName("review_comments_url")
     val reviewCommentsUrl: String,
     @SerialName("state")
-    val state: String,
+    val state: STATE,
     @SerialName("statuses_url")
     val statusesUrl: String,
     @SerialName("title")
@@ -80,5 +80,5 @@ data class Pull(
     @SerialName("url")
     val url: String,
     @SerialName("user")
-    override val user: Creator
-): Entry,  LifeCycle, WithUserInfo
+    override val user: Coder
+) : Entry, LifeCycle, WithUserInfo

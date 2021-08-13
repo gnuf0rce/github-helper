@@ -8,11 +8,11 @@ data class Issue(
     @SerialName("active_lock_reason")
     val activeLockReason: String?,
     @SerialName("assignee")
-    val assignee: Assignee?,
+    val assignee: Coder?,
     @SerialName("assignees")
-    val assignees: List<Assignee> = emptyList(),
+    val assignees: List<Coder> = emptyList(),
     @SerialName("author_association")
-    val authorAssociation: String,
+    val authorAssociation: Association,
     @SerialName("body")
     val body: String,
     @Contextual
@@ -48,7 +48,7 @@ data class Issue(
     @SerialName("repository_url")
     val repositoryUrl: String,
     @SerialName("state")
-    val state: String,
+    val state: STATE = STATE.open,
     @SerialName("title")
     val title: String,
     @Contextual
@@ -57,5 +57,5 @@ data class Issue(
     @SerialName("url")
     val url: String,
     @SerialName("user")
-    override val user: Creator
+    override val user: Coder
 ) : Entry, LifeCycle, WithUserInfo
