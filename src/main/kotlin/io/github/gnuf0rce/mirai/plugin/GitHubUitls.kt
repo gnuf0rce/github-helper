@@ -6,7 +6,6 @@ import io.ktor.client.features.*
 import io.ktor.http.*
 import net.mamoe.mirai.Bot
 import net.mamoe.mirai.console.command.*
-import net.mamoe.mirai.contact.*
 import net.mamoe.mirai.utils.*
 import java.io.*
 import java.net.*
@@ -60,6 +59,6 @@ internal fun Url.toProxy(): Proxy {
     return Proxy(type, InetSocketAddress(host, port))
 }
 
-internal fun Contact(id: Long): Contact = Bot.instancesSequence.flatMap { it.groups + it.friends }.first { it.id == id }
+internal fun Contact(id: Long) = Bot.instancesSequence.flatMap { it.groups + it.friends }.first { it.id == id }
 
 internal fun CommandSender.Contact() = requireNotNull(subject) { "无法从当前环境获取联系人" }

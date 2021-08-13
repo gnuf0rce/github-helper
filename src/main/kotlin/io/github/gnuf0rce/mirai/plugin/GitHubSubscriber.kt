@@ -8,7 +8,8 @@ import net.mamoe.mirai.console.util.ConsoleExperimentalApi
 import net.mamoe.mirai.console.util.CoroutineScopeUtils.childScope
 
 @OptIn(ConsoleExperimentalApi::class)
-abstract class GitHubSubscriber<T : LifeCycle> : CoroutineScope by GitHubHelperPlugin.childScope() {
+abstract class GitHubSubscriber<T : LifeCycle>(scope: CoroutineScope = GitHubHelperPlugin) :
+    CoroutineScope by scope.childScope() {
     companion object {
         val reply by GitHubConfig::reply
         val repos = mutableMapOf<String, GitHubRepo>().withDefault {
