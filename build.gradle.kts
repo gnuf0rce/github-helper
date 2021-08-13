@@ -6,7 +6,7 @@ plugins {
 }
 
 group = "io.github.gnuf0rce"
-version = "1.0.0"
+version = "1.0.1"
 
 mirai {
     configureShadow {
@@ -17,6 +17,7 @@ mirai {
 }
 
 repositories {
+    clear()
     mavenLocal()
     maven(url = "https://maven.aliyun.com/repository/public")
     mavenCentral()
