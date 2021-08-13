@@ -39,7 +39,7 @@ class RateLimitFeature internal constructor(val send: suspend (Status, String) -
 
         override fun install(feature: RateLimitFeature, scope: HttpClient) {
             scope.sendPipeline.intercept(HttpSendPipeline.Before) {
-                val type = context.attributes.computeIfAbsent(resource) { "default" }
+                val type = context.attributes.computeIfAbsent(resource) { "rate" }
                 with(feature) {
                     mutex.withLock {
                         val rate = rates.getValue(type)

@@ -6,7 +6,7 @@ import io.ktor.http.*
 import kotlinx.serialization.json.*
 
 /**
- * 1. https://api.github.com/repos/{owner}/{repo}
+ * with /repos/{owner}/{repo}
  */
 open class RepoMapper(parent: Url, override val github: GitHubClient) : GitHubMapper(parent, "") {
 

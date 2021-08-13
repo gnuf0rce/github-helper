@@ -43,3 +43,5 @@ object OffsetDateTimeSerializer : KSerializer<OffsetDateTime> {
 fun HttpClientConfig<*>.RateLimit(block: RateLimitFeature.Config.() -> Unit) {
     install(RateLimitFeature, block)
 }
+
+fun GitHubClient.repo(owner: String, repo: String) = GitHubRepo(owner, repo, this)
