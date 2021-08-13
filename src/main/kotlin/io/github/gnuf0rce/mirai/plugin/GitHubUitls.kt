@@ -4,15 +4,24 @@ import io.github.gnuf0rce.github.*
 import io.github.gnuf0rce.mirai.plugin.data.*
 import io.ktor.client.features.*
 import io.ktor.http.*
+import net.mamoe.mirai.Bot
+import net.mamoe.mirai.console.command.*
+import net.mamoe.mirai.contact.*
 import net.mamoe.mirai.utils.*
 import java.io.*
 import java.net.*
 
-internal val logger by GitHubHelperPlugin::logger
+internal val logger by lazy {
+    val open = System.getProperty("io.github.gnuf0rce.mirai.plugin.logger", "${true}").toBoolean()
+    if (open) GitHubHelperPlugin.logger else SilentLogger
+}
 
-internal val ImageFolder get() = GitHubHelperPlugin.dataFolder.resolve("image")
+internal val ImageFolder by lazy {
+    val dir = System.getProperty("io.github.gnuf0rce.mirai.plugin.dir")
+    (if (dir.isNullOrBlank()) GitHubHelperPlugin.dataFolder else File(dir)).resolve("image")
+}
 
-internal val github = object : GithubClient() {
+internal val github = object : GitHubClient(null) {
 
     override val proxy: Proxy by lazy {
         GitHubConfig.proxy.takeIf { it.isNotBlank() }?.let(::Url)?.toProxy() ?: Proxy.NO_PROXY
@@ -46,3 +55,7 @@ internal fun Url.toProxy(): Proxy {
     }
     return Proxy(type, InetSocketAddress(host, port))
 }
+
+internal fun Contact(id: Long): Contact = Bot.instancesSequence.flatMap { it.groups + it.friends }.first { it.id == id }
+
+internal fun CommandSender.Contact() = requireNotNull(subject) { "无法从当前环境获取联系人" }

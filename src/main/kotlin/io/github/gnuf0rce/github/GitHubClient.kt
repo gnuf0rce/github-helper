@@ -1,19 +1,19 @@
 package io.github.gnuf0rce.github
 
+import io.github.gnuf0rce.github.exception.*
 import io.ktor.client.*
 import io.ktor.client.engine.okhttp.*
 import io.ktor.client.features.*
 import io.ktor.client.features.compression.*
 import io.ktor.client.features.json.*
 import io.ktor.client.features.json.serializer.*
-import io.ktor.client.features.observer.*
 import io.ktor.client.request.*
 import io.ktor.http.*
 import kotlinx.coroutines.*
 import java.io.*
 import java.net.*
 
-open class GithubClient(open val token: String? = System.getenv("GITHUB_TOKEN")) : CoroutineScope, Closeable {
+open class GitHubClient(open val token: String?) : CoroutineScope, Closeable {
 
     protected open val proxy: Proxy? = null
 
@@ -32,18 +32,27 @@ open class GithubClient(open val token: String? = System.getenv("GITHUB_TOKEN"))
             socketTimeoutMillis = timeout
         }
         Json {
-            serializer = KotlinxSerializer(GithubJson)
+            serializer = KotlinxSerializer(GitHubJson)
             accept(ContentType.parse("application/vnd.github.v3+json"))
         }
         defaultRequest {
             header(HttpHeaders.Authorization, token?.let { "token $it" })
         }
-        ResponseObserver {
-            // TODO record rate-limit
+        HttpResponseValidator {
+            handleResponseException { cause ->
+                if (cause is ClientRequestException && "documentation_url" in cause.message.orEmpty()) {
+                    throw GitHubApiException(cause)
+                }
+            }
+        }
+        RateLimit {
+            send = { _, _ ->
+                //
+            }
         }
         engine {
             config {
-                proxy(this@GithubClient.proxy)
+                proxy(this@GitHubClient.proxy)
             }
         }
     }

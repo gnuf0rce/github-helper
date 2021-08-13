@@ -1,6 +1,5 @@
 package io.github.gnuf0rce.github.entry
 
-import io.github.gnuf0rce.github.*
 import kotlinx.serialization.*
 import java.time.*
 
@@ -9,22 +8,22 @@ data class Issue(
     @SerialName("active_lock_reason")
     val activeLockReason: String?,
     @SerialName("assignee")
-    val assignee: Assignee?,
+    val assignee: Coder?,
     @SerialName("assignees")
-    val assignees: List<Assignee> = emptyList(),
+    val assignees: List<Coder> = emptyList(),
     @SerialName("author_association")
-    val authorAssociation: String,
+    val authorAssociation: Association,
     @SerialName("body")
     val body: String,
+    @Contextual
     @SerialName("closed_at")
-    @Serializable(OffsetDateTimeSerializer::class)
     override val closedAt: OffsetDateTime?,
     @SerialName("comments")
     val comments: Int,
     @SerialName("comments_url")
     val commentsUrl: String,
+    @Contextual
     @SerialName("created_at")
-    @Serializable(OffsetDateTimeSerializer::class)
     override val createdAt: OffsetDateTime,
     @SerialName("events_url")
     val eventsUrl: String,
@@ -41,7 +40,7 @@ data class Issue(
     @SerialName("milestone")
     val milestone: Milestone? = null,
     @SerialName("node_id")
-    val nodeId: String,
+    override val nodeId: String,
     @SerialName("number")
     val number: Int,
     @SerialName("pull_request")
@@ -49,14 +48,14 @@ data class Issue(
     @SerialName("repository_url")
     val repositoryUrl: String,
     @SerialName("state")
-    val state: String,
+    val state: STATE = STATE.open,
     @SerialName("title")
     val title: String,
+    @Contextual
     @SerialName("updated_at")
-    @Serializable(OffsetDateTimeSerializer::class)
     override val updatedAt: OffsetDateTime,
     @SerialName("url")
     val url: String,
     @SerialName("user")
-    val user: Creator
-): LifeCycle
+    override val user: Coder
+) : Entry, LifeCycle, WithUserInfo

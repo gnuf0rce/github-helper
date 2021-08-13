@@ -1,14 +1,16 @@
 package io.github.gnuf0rce.github.entry
 
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
+import kotlinx.serialization.*
+import java.time.*
 
 interface UserInfo {
     val avatarUrl: String
+    val id: Long
+    val login: String
 }
 
 @Serializable
-data class Creator(
+data class Coder(
     @SerialName("avatar_url")
     override val avatarUrl: String,
     @SerialName("events_url")
@@ -24,11 +26,11 @@ data class Creator(
     @SerialName("html_url")
     val htmlUrl: String,
     @SerialName("id")
-    val id: Long,
+    override val id: Long,
     @SerialName("login")
-    val login: String,
+    override val login: String,
     @SerialName("node_id")
-    val nodeId: String,
+    override val nodeId: String,
     @SerialName("organizations_url")
     val organizationsUrl: String,
     @SerialName("received_events_url")
@@ -45,4 +47,15 @@ data class Creator(
     val type: String,
     @SerialName("url")
     val url: String
-) : UserInfo
+) : Entry, UserInfo
+
+@Serializable
+data class Author(
+    @Contextual
+    @SerialName("date")
+    val date: OffsetDateTime,
+    @SerialName("email")
+    val email: String,
+    @SerialName("name")
+    val name: String
+)
