@@ -12,10 +12,6 @@ interface WithGithubClient {
 
 internal fun Url.resolve(path: String) = if (path.isEmpty()) this else copy(encodedPath = encodedPath + "/${path}")
 
-abstract class GitHubMapper(parent: Url, path: String) : WithGithubClient {
-    final override val base: Url = parent.resolve(path)
-}
-
 internal suspend inline fun <reified R> WithGithubClient.rest(
     path: String = "",
     crossinline block: HttpRequestBuilder.() -> Unit
@@ -105,4 +101,3 @@ internal inline fun <reified T> HttpRequestBuilder.context(context: T) {
         }
     }
 }
-

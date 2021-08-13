@@ -4,7 +4,7 @@ import io.github.gnuf0rce.github.*
 import io.github.gnuf0rce.mirai.plugin.data.*
 import io.ktor.client.features.*
 import io.ktor.http.*
-import net.mamoe.mirai.Bot
+import net.mamoe.mirai.*
 import net.mamoe.mirai.console.command.*
 import net.mamoe.mirai.utils.*
 import java.io.*
