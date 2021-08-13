@@ -11,7 +11,7 @@ object GitHubRepoIssueCommand : CompositeCommand(
     "repo-issue",
     description = "Repo Issue Notice"
 ) {
-    internal val subscriber = object : GitHubSubscriber<Issue>() {
+    internal val subscriber = object : GitHubSubscriber<Issue>("repo-issues") {
         override val tasks: MutableMap<String, GitHubTask> by GitHubRepoTaskData::issues
 
         override suspend fun GitHubTask.load(per: Int) = repo.issues.list(page = 0, per = per)

@@ -11,7 +11,7 @@ object GitHubRepoPullCommand : CompositeCommand(
     "repo-pull",
     description = "Repo Pull Notice"
 ) {
-    internal val subscriber = object : GitHubSubscriber<Pull>() {
+    internal val subscriber = object : GitHubSubscriber<Pull>(primaryName) {
         override val tasks: MutableMap<String, GitHubTask> by GitHubRepoTaskData::pulls
 
         override suspend fun GitHubTask.load(per: Int) = repo.pulls.list(page = 0, per = per)
