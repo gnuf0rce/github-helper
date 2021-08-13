@@ -31,11 +31,15 @@ internal val github = object : GitHubClient(null) {
         GitHubConfig.token.takeIf { it.isNotBlank() }
     }
 
+    override val timeout: Long by lazy {
+        GitHubConfig.timeout * 1000
+    }
+
     override val ignore: (Throwable) -> Boolean = {
         when (it) {
             is IOException,
             is HttpRequestTimeoutException -> {
-                logger.warning { "RssHttpClient Ignore $it" }
+                logger.warning { "HttpClient Ignore $it" }
                 true
             }
             else -> {

@@ -15,4 +15,8 @@ object GitHubConfig : ReadOnlyPluginConfig("GithubConfig") {
     @ValueName("reply_type")
     @ValueDescription("Subscriber Reply Message Type")
     val reply by value(MessageType.TEXT)
+
+    @ValueName("timeout")
+    @ValueDescription("Http Timeout Second")
+    val timeout by value(30L)
 }
