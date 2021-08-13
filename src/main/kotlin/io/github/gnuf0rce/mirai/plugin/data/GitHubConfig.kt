@@ -9,10 +9,10 @@ object GitHubConfig : ReadOnlyPluginConfig("GithubConfig") {
     val proxy by value("")
 
     @ValueName("github_token")
-    @ValueDescription("github token by ...") // XXX
+    @ValueDescription("GitHub Token by https://github.com/settings/tokens")
     val token by value(System.getenv("GITHUB_TOKEN").orEmpty())
 
     @ValueName("reply_type")
-    @ValueDescription("...") // XXX
+    @ValueDescription("Subscriber Reply Message Type")
     val reply by value(MessageType.TEXT)
 }

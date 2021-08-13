@@ -4,6 +4,7 @@ import io.github.gnuf0rce.github.GitHubRepo
 import io.github.gnuf0rce.github.entry.*
 import io.github.gnuf0rce.mirai.plugin.data.*
 import kotlinx.coroutines.*
+import net.mamoe.mirai.console.util.ConsoleExperimentalApi
 import net.mamoe.mirai.console.util.CoroutineScopeUtils.childScope
 
 @OptIn(ConsoleExperimentalApi::class)
@@ -29,12 +30,68 @@ abstract class GitHubSubscriber<T : LifeCycle> : CoroutineScope by GitHubHelperP
         }
     }
 
-    private val reply get() = GitHubConfig.reply
+    fun add(id: String, contact: Long) {
+        compute(id) {
+            contacts.add(contact)
+        }
+        jobs.compute(id) { _, old ->
+            old?.takeIf { it.isActive } ?: run(id)
+        }
+    }
+
+    fun remove(id: String, contact: Long) {
+        compute(id) {
+            contacts.remove(contact)
+        }
+    }
+
+    fun interval(id: String, millis: Long) {
+        compute(id) {
+            interval = millis
+        }
+    }
+
+    fun list(contact: Long) = buildString {
+        val records = synchronized(jobs) { tasks.filter { (_, task) -> contact in task.contacts } }
+        appendLine("| name | last | interval |")
+        appendLine("|:----:|:----:|:--------:|")
+        records.forEach { (_, task) ->
+            appendLine("| ${task.id} | ${task.last} | ${task.interval} |")
+        }
+    }
+
+    protected abstract suspend fun GitHubTask.load(per: Int): List<T>
+
+    private suspend fun GitHubTask.sendMessage(record: T) = contacts.forEach { cid ->
+        kotlin.runCatching {
+            val contact = Contact(cid)
+            contact.sendMessage(record.toMessage(contact, reply, id))
+        }.onFailure {
+            logger.warning("发送信息失败", it)
+        }
+    }
+
+
+    private fun task(id: String) = synchronized(jobs) { tasks[id] }.takeIf { it?.contacts.isNullOrEmpty() }
+
+    private fun run(id: String) = launch(SupervisorJob()) {
+        while (isActive) {
+            val current = task(id) ?: break
+            val records = current.load(PER_PAGE).filter { it.updatedAt > current.last }
+            records.forEach { record ->
+                current.sendMessage(record)
+            }
+            compute(current.id) { last = records.maxOfOrNull { it.updatedAt } ?: current.last }
+            delay(current.interval)
+        }
+    }
 
     fun start() {
-
+        tasks.keys.forEach { run(it) }
     }
+
     fun stop() {
         coroutineContext.cancelChildren()
+        jobs.clear()
     }
 }
