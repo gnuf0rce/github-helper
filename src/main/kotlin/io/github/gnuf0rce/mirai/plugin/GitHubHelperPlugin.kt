@@ -5,6 +5,8 @@ import io.github.gnuf0rce.mirai.plugin.data.*
 import net.mamoe.mirai.console.command.CommandManager.INSTANCE.register
 import net.mamoe.mirai.console.command.CommandManager.INSTANCE.unregister
 import net.mamoe.mirai.console.plugin.jvm.*
+import net.mamoe.mirai.event.*
+import net.mamoe.mirai.event.events.*
 
 object GitHubHelperPlugin : KotlinPlugin(
     JvmPluginDescription(
@@ -20,13 +22,18 @@ object GitHubHelperPlugin : KotlinPlugin(
         GitHubRepoTaskData.reload()
 
         GitHubRepoIssueCommand.register()
-        GitHubRepoIssueCommand.subscriber.start()
         GitHubRepoPullCommand.register()
-        GitHubRepoPullCommand.subscriber.start()
         GitHubRepoReleaseCommand.register()
-        GitHubRepoReleaseCommand.subscriber.start()
         GitHubRepoCommitCommand.register()
-        GitHubRepoCommitCommand.subscriber.start()
+        GitHubIssuesCommand.register()
+
+        globalEventChannel().subscribeOnce<BotOnlineEvent> {
+            GitHubRepoIssueCommand.subscriber.start()
+            GitHubRepoPullCommand.subscriber.start()
+            GitHubRepoReleaseCommand.subscriber.start()
+            GitHubRepoCommitCommand.subscriber.start()
+            GitHubIssuesCommand.subscriber.start()
+        }
     }
 
     override fun onDisable() {

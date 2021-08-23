@@ -11,7 +11,7 @@ object GitHubRepoCommitCommand : CompositeCommand(
     "repo-commit",
     description = "Repo Commit Notice"
 ) {
-    internal val subscriber = object : GitHubSubscriber<Commit>(primaryName) {
+    internal val subscriber = object : GitHubSubscriber<Commit>(primaryName, GitHubHelperPlugin) {
         override val tasks: MutableMap<String, GitHubTask> by GitHubRepoTaskData::commits
 
         override suspend fun GitHubTask.load(per: Int) = repo.commits(page = 0, per = per)

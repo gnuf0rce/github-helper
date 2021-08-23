@@ -1,14 +1,15 @@
 package io.github.gnuf0rce.mirai.plugin
 
-import io.github.gnuf0rce.github.GitHubRepo
+import io.github.gnuf0rce.github.*
 import io.github.gnuf0rce.github.entry.*
 import io.github.gnuf0rce.mirai.plugin.data.*
 import kotlinx.coroutines.*
-import net.mamoe.mirai.console.util.ConsoleExperimentalApi
+import net.mamoe.mirai.console.util.*
 import net.mamoe.mirai.console.util.CoroutineScopeUtils.childScope
+import net.mamoe.mirai.utils.*
 
 @OptIn(ConsoleExperimentalApi::class)
-abstract class GitHubSubscriber<T : LifeCycle>(name: String, scope: CoroutineScope = GitHubHelperPlugin) :
+abstract class GitHubSubscriber<T : LifeCycle>(private val name: String, scope: CoroutineScope = GlobalScope) :
     CoroutineScope by scope.childScope(name) {
     companion object {
         val reply by GitHubConfig::reply
@@ -19,6 +20,7 @@ abstract class GitHubSubscriber<T : LifeCycle>(name: String, scope: CoroutineSco
         const val PER_PAGE = 30
 
         val GitHubTask.repo get() = repos.getValue(id)
+        val issues by lazy { GitHubIssues(github) }
     }
 
     private val jobs = mutableMapOf<String, Job>()
@@ -72,17 +74,21 @@ abstract class GitHubSubscriber<T : LifeCycle>(name: String, scope: CoroutineSco
         }
     }
 
-
     private fun task(id: String) = synchronized(jobs) { tasks[id] }.takeIf { it?.contacts.isNullOrEmpty() }
 
     private fun run(id: String) = launch(SupervisorJob()) {
+        logger.info { "$name with $id run start" }
         while (isActive) {
             val current = task(id) ?: break
-            val records = current.load(PER_PAGE).filter { it.updatedAt > current.last }
-            records.forEach { record ->
-                current.sendMessage(record)
+            runCatching {
+                val records = current.load(PER_PAGE).filter { it.updatedAt > current.last }
+                records.forEach { record ->
+                    current.sendMessage(record)
+                }
+                compute(current.id) { last = records.maxOfOrNull { it.updatedAt } ?: current.last }
+            }.onFailure {
+                logger.warning { "$name with $id run fail $it" }
             }
-            compute(current.id) { last = records.maxOfOrNull { it.updatedAt } ?: current.last }
             delay(current.interval)
         }
     }

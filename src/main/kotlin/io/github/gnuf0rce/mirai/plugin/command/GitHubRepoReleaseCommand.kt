@@ -11,7 +11,7 @@ object GitHubRepoReleaseCommand : CompositeCommand(
     "repo-release",
     description = "Repo Release Notice"
 ) {
-    internal val subscriber = object : GitHubSubscriber<Release>(primaryName) {
+    internal val subscriber = object : GitHubSubscriber<Release>(primaryName, GitHubHelperPlugin) {
         override val tasks: MutableMap<String, GitHubTask> by GitHubRepoTaskData::releases
 
         override suspend fun GitHubTask.load(per: Int) = repo.releases.list(page = 0, per = per)
@@ -31,7 +31,7 @@ object GitHubRepoReleaseCommand : CompositeCommand(
 
     @SubCommand
     suspend fun CommandSender.interval(repo: String, millis: Long) {
-        GitHubRepoCommitCommand.subscriber.interval(repo, millis)
+        subscriber.interval(repo, millis)
         sendMessage("$repo interval ${millis}ms with release")
     }
 
