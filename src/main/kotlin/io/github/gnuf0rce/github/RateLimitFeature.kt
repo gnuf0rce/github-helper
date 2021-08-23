@@ -30,6 +30,10 @@ class RateLimitFeature internal constructor(val send: suspend (Status, String) -
         )
     }
 
+    private suspend fun Status.delay() {
+        delay((reset - OffsetDateTime.now().toEpochSecond()) * 1_000)
+    }
+
     companion object Feature : HttpClientFeature<Config, RateLimitFeature> {
         val resource: AttributeKey<String> = AttributeKey("RateLimitResource")
 
@@ -43,9 +47,9 @@ class RateLimitFeature internal constructor(val send: suspend (Status, String) -
                 with(feature) {
                     mutex.withLock {
                         val rate = rates.getValue(type)
-                        if (rate.remaining > 0) return@withLock
-
-                        delay((rate.reset - OffsetDateTime.now().toEpochSecond()) * 1_000)
+                        if (rate.remaining == 0) {
+                            rate.delay()
+                        }
                     }
                 }
             }
