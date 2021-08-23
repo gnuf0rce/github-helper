@@ -74,7 +74,7 @@ abstract class GitHubSubscriber<T : LifeCycle>(private val name: String, scope: 
         }
     }
 
-    private fun task(id: String) = synchronized(jobs) { tasks[id] }.takeIf { it?.contacts.isNullOrEmpty() }
+    private fun task(id: String) = synchronized(jobs) { tasks[id] }?.takeIf { it.contacts.isNotEmpty() }
 
     private fun run(id: String) = launch(SupervisorJob()) {
         logger.info { "$name with $id run start" }

@@ -12,7 +12,7 @@ data class GitHubTask(
     val contacts: MutableSet<Long> = mutableSetOf(),
     @SerialName("last")
     @Serializable(OffsetDateTimeSerializer::class)
-    var last: OffsetDateTime = OffsetDateTime.MIN,
+    var last: OffsetDateTime = OffsetDateTime.now(),
     @SerialName("interval")
     var interval: Long = 600_000L
 )
