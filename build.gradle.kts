@@ -6,7 +6,7 @@ plugins {
 }
 
 group = "io.github.gnuf0rce"
-version = "1.0.1"
+version = "1.1.0"
 
 mirai {
     configureShadow {
