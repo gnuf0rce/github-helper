@@ -21,18 +21,10 @@ internal val ImageFolder by lazy {
 }
 
 internal val github by lazy {
-    object : GitHubClient(null) {
-
-        override val proxy: Proxy by lazy {
-            GitHubConfig.proxy.takeIf { it.isNotBlank() }?.let(::Url)?.toProxy() ?: Proxy.NO_PROXY
-        }
-
-        override val token: String? by lazy {
-            GitHubConfig.token.takeIf { it.isNotBlank() }
-        }
-
-        override val timeout: Long by lazy {
-            GitHubConfig.timeout * 1000
+    object : GitHubClient(token = GitHubConfig.token.takeIf { it.isNotBlank() }) {
+        init {
+            proxy = GitHubConfig.proxy.takeIf { it.isNotBlank() }?.let(::Url)?.toProxy()
+            timeout = GitHubConfig.timeout * 1000
         }
 
         override val ignore: (Throwable) -> Boolean = {

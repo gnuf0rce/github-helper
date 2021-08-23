@@ -15,9 +15,9 @@ import java.net.*
 
 open class GitHubClient(open val token: String?) : CoroutineScope, Closeable {
 
-    protected open val proxy: Proxy? = null
+    protected var proxy: Proxy? = null
 
-    protected open val timeout: Long = 30 * 1000L
+    protected var timeout: Long = 30 * 1000L
 
     protected open val client = HttpClient(OkHttp) {
         BrowserUserAgent()
