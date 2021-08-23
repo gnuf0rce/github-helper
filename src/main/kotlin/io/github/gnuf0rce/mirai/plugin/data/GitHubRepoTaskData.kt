@@ -3,7 +3,7 @@ package io.github.gnuf0rce.mirai.plugin.data
 import net.mamoe.mirai.console.data.*
 
 object GitHubRepoTaskData : AutoSavePluginData("RepoTaskData") {
-    @ValueName("issues")
+    @ValueName("commits")
     val commits by value(mutableMapOf<String, GitHubTask>())
 
     @ValueName("issues")
