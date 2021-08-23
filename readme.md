@@ -4,7 +4,7 @@
 
 [![Release](https://img.shields.io/github/v/release/gnuf0rce/github-helper)](https://github.com/gnuf0rce/github-helper/releases)
 [![Downloads](https://img.shields.io/github/downloads/gnuf0rce/github-helper/total)](https://shields.io/category/downloads)
-[![MiraiForum](https://img.shields.io/badge/post-on%20MiraiForum-yellow)](https://mirai.mamoe.net/)
+[![MiraiForum](https://img.shields.io/badge/post-on%20MiraiForum-yellow)](https://mirai.mamoe.net/topic/554)
 
 ## 指令
 
