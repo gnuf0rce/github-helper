@@ -6,33 +6,33 @@ import io.github.gnuf0rce.mirai.plugin.data.*
 import net.mamoe.mirai.console.command.*
 import net.mamoe.mirai.contact.*
 
-object GitHubRepoIssueCommand : CompositeCommand(
+object GitHubIssuesCommand : CompositeCommand(
     owner = GitHubHelperPlugin,
-    "repo-issue",
-    description = "Repo Issue Notice"
+    "issues",
+    description = "Issues Notice"
 ) {
     internal val subscriber = object : GitHubSubscriber<Issue>(primaryName, GitHubHelperPlugin) {
-        override val tasks: MutableMap<String, GitHubTask> by GitHubRepoTaskData::issues
+        override val tasks: MutableMap<String, GitHubTask> by GitHubTaskData::issues
 
-        override suspend fun GitHubTask.load(per: Int) = repo.issues.list(page = 0, per = per)
+        override suspend fun GitHubTask.load(per: Int) = issues.list(page = 0, per = per)
     }
 
     @SubCommand
-    suspend fun CommandSender.add(repo: String, contact: Contact = Contact()) {
-        subscriber.add(repo, contact.id)
-        sendMessage("$repo with issue 添加完成")
+    suspend fun CommandSender.add(contact: Contact = Contact()) {
+        subscriber.add("current", contact.id)
+        sendMessage("current with issue 添加完成")
     }
 
     @SubCommand
     suspend fun CommandSender.remove(repo: String, contact: Contact = Contact()) {
-        subscriber.remove(repo, contact.id)
-        sendMessage("$repo with issue 移除完成")
+        subscriber.remove("current", contact.id)
+        sendMessage("current with issue 移除完成")
     }
 
     @SubCommand
     suspend fun CommandSender.interval(repo: String, millis: Long) {
-        subscriber.interval(repo, millis)
-        sendMessage("$repo interval ${millis}ms with issue")
+        subscriber.interval("current", millis)
+        sendMessage("current interval ${millis}ms with issue")
     }
 
     @SubCommand

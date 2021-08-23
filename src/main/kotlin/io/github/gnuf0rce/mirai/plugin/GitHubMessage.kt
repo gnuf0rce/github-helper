@@ -44,7 +44,7 @@ suspend fun Issue.toMessage(contact: Contact, type: MessageType, notice: String)
     return when (type) {
         MessageType.TEXT -> buildMessageChain {
             add(image)
-            appendLine("$notice BY: ${user.login} ")
+            appendLine("$notice with issue BY ${user.login} ")
             appendLine("URL: $htmlUrl ")
             appendLine("TITLE: $title ")
             appendLine("STATE: $state ")
@@ -81,7 +81,7 @@ suspend fun Pull.toMessage(contact: Contact, type: MessageType, notice: String):
     return when (type) {
         MessageType.TEXT -> buildMessageChain {
             add(image)
-            appendLine("$notice BY: ${user.login} ")
+            appendLine("$notice with pull BY ${user.login} ")
             appendLine("URL: $htmlUrl ")
             appendLine("TITLE: $title ")
             appendLine("STATE: $state ")

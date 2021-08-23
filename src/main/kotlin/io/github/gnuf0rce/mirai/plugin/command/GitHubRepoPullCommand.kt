@@ -11,7 +11,7 @@ object GitHubRepoPullCommand : CompositeCommand(
     "repo-pull",
     description = "Repo Pull Notice"
 ) {
-    internal val subscriber = object : GitHubSubscriber<Pull>(primaryName) {
+    internal val subscriber = object : GitHubSubscriber<Pull>(primaryName, GitHubHelperPlugin) {
         override val tasks: MutableMap<String, GitHubTask> by GitHubRepoTaskData::pulls
 
         override suspend fun GitHubTask.load(per: Int) = repo.pulls.list(page = 0, per = per)
@@ -31,7 +31,7 @@ object GitHubRepoPullCommand : CompositeCommand(
 
     @SubCommand
     suspend fun CommandSender.interval(repo: String, millis: Long) {
-        GitHubRepoCommitCommand.subscriber.interval(repo, millis)
+        subscriber.interval(repo, millis)
         sendMessage("$repo interval ${millis}ms with pull")
     }
 
