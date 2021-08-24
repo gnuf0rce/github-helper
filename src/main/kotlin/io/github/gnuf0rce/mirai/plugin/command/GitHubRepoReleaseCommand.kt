@@ -14,6 +14,8 @@ object GitHubRepoReleaseCommand : CompositeCommand(
     internal val subscriber = object : GitHubSubscriber<Release>(primaryName, GitHubHelperPlugin) {
         override val tasks: MutableMap<String, GitHubTask> by GitHubRepoTaskData::releases
 
+        override val regex: Regex = REPO_REGEX
+
         override suspend fun GitHubTask.load(per: Int) = repo.releases.list(page = 0, per = per)
     }
 

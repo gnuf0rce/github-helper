@@ -14,7 +14,9 @@ object GitHubIssuesCommand : CompositeCommand(
     internal val subscriber = object : GitHubSubscriber<Issue>(primaryName, GitHubHelperPlugin) {
         override val tasks: MutableMap<String, GitHubTask> by GitHubTaskData::issues
 
-        override suspend fun GitHubTask.load(per: Int) = issues.list(page = 0, per = per)
+        override val regex: Regex? = null
+
+        override suspend fun GitHubTask.load(per: Int) = current.issues(page = 0, per = per)
     }
 
     @SubCommand

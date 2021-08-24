@@ -13,11 +13,12 @@ abstract class GitHubSubscriber<T : LifeCycle>(private val name: String, scope: 
     CoroutineScope by scope.childScope(name) {
     companion object {
         val reply by GitHubConfig::reply
-        val repos = mutableMapOf<String, GitHubRepo>().withDefault {
-            val (owner, repo) = it.split('/', '-')
+        val repos = mutableMapOf<String, GitHubRepo>().withDefault { id ->
+            val (owner, repo) = id.split('/', '-')
             GitHubRepo(owner, repo, github)
         }
         const val PER_PAGE = 30
+        val REPO_REGEX = """[0-9A-z_-]+/[0-9A-z_-]+""".toRegex()
 
         val GitHubTask.repo get() = repos.getValue(id)
         val issues by lazy { GitHubIssues(github) }
@@ -33,7 +34,10 @@ abstract class GitHubSubscriber<T : LifeCycle>(private val name: String, scope: 
         }
     }
 
+    protected abstract val regex: Regex?
+
     fun add(id: String, contact: Long) {
+        check(regex?.matches(id) ?: true) { "$id not matches $regex" }
         compute(id) {
             contacts.add(contact)
         }
@@ -43,12 +47,14 @@ abstract class GitHubSubscriber<T : LifeCycle>(private val name: String, scope: 
     }
 
     fun remove(id: String, contact: Long) {
+        check(regex?.matches(id) ?: true) { "$id no matches $regex" }
         compute(id) {
             contacts.remove(contact)
         }
     }
 
     fun interval(id: String, millis: Long) {
+        check(regex?.matches(id) ?: true) { "$id no matches $regex" }
         compute(id) {
             interval = millis
         }

@@ -14,6 +14,8 @@ object GitHubRepoPullCommand : CompositeCommand(
     internal val subscriber = object : GitHubSubscriber<Pull>(primaryName, GitHubHelperPlugin) {
         override val tasks: MutableMap<String, GitHubTask> by GitHubRepoTaskData::pulls
 
+        override val regex: Regex = REPO_REGEX
+
         override suspend fun GitHubTask.load(per: Int) = repo.pulls.list(page = 0, per = per)
     }
 
