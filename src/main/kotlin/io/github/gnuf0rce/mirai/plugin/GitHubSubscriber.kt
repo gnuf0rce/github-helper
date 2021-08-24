@@ -21,7 +21,7 @@ abstract class GitHubSubscriber<T : LifeCycle>(private val name: String, scope: 
         val REPO_REGEX = """[0-9A-z_-]+/[0-9A-z_-]+""".toRegex()
 
         val GitHubTask.repo get() = repos.getValue(id)
-        val issues by lazy { GitHubIssues(github) }
+        val current by lazy { GitHubCurrent(github) }
     }
 
     private val jobs = mutableMapOf<String, Job>()

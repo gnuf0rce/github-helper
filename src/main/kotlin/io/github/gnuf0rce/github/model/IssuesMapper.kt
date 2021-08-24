@@ -8,8 +8,7 @@ import kotlinx.serialization.json.*
 import java.time.OffsetDateTime
 
 /**
- * 1. https://api.github.com/issues
- * 2. https://api.github.com/repos/{owner}/{repo}/issues
+ * 1. https://api.github.com/repos/{owner}/{repo}/issues
  */
 open class IssuesMapper(parent: Url, override val github: GitHubClient) : GitHubMapper(parent, "issues") {
 

@@ -45,3 +45,5 @@ fun HttpClientConfig<*>.RateLimit(block: RateLimitFeature.Config.() -> Unit) {
 }
 
 fun GitHubClient.repo(owner: String, repo: String) = GitHubRepo(owner, repo, this)
+
+fun GitHubClient.current() = GitHubCurrent(this)
