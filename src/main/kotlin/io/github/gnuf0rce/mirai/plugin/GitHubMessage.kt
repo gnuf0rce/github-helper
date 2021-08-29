@@ -1,4 +1,4 @@
-@file:OptIn(MiraiExperimentalApi::class)
+@file:OptIn(MiraiExperimentalApi::class, ExperimentalSerializationApi::class)
 
 package io.github.gnuf0rce.mirai.plugin
 
@@ -48,9 +48,9 @@ suspend fun Issue.toMessage(contact: Contact, type: MessageType, notice: String)
             appendLine("URL: $htmlUrl ")
             appendLine("TITLE: $title ")
             appendLine("STATE: $state ")
-            if (labels.isEmpty()) appendLine("LABELS: ${labels.joinToString { it.name }} ")
-            appendLine("CREATED_AT: $createdAt ")
-            appendLine("UPDATED_AT: $updatedAt ")
+            if (labels.isNotEmpty()) appendLine("LABELS: ${labels.joinToString { it.name }} ")
+            appendLine("CREATED_AT: ${createdAt.withOffsetSameInstant(offset)} ")
+            appendLine("UPDATED_AT: ${updatedAt.withOffsetSameInstant(offset)} ")
         }
         MessageType.XML -> buildXmlMessage(1) {
             actionData = htmlUrl
@@ -85,9 +85,9 @@ suspend fun Pull.toMessage(contact: Contact, type: MessageType, notice: String):
             appendLine("URL: $htmlUrl ")
             appendLine("TITLE: $title ")
             appendLine("STATE: $state ")
-            if (labels.isEmpty()) appendLine("LABELS: ${labels.joinToString { it.name }} ")
-            appendLine("CREATED_AT: $createdAt ")
-            appendLine("UPDATED_AT: $updatedAt ")
+            if (labels.isNotEmpty()) appendLine("LABELS: ${labels.joinToString { it.name }} ")
+            appendLine("CREATED_AT: ${createdAt.withOffsetSameInstant(offset)} ")
+            appendLine("UPDATED_AT: ${updatedAt.withOffsetSameInstant(offset)} ")
         }
         MessageType.XML -> buildXmlMessage(1) {
             actionData = htmlUrl

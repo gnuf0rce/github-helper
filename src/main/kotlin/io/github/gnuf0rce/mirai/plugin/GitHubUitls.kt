@@ -9,6 +9,7 @@ import net.mamoe.mirai.console.command.*
 import net.mamoe.mirai.utils.*
 import java.io.*
 import java.net.*
+import java.time.*
 
 internal val logger by lazy {
     val open = System.getProperty("io.github.gnuf0rce.mirai.plugin.logger", "${true}").toBoolean()
@@ -51,6 +52,10 @@ internal fun Url.toProxy(): Proxy {
         else -> throw IllegalArgumentException("不支持的代理类型, $protocol")
     }
     return Proxy(type, InetSocketAddress(host, port))
+}
+
+internal val offset by lazy {
+    OffsetDateTime.now().offset
 }
 
 internal fun Contact(id: Long) = Bot.instancesSequence.flatMap { it.groups + it.friends }.first { it.id == id }
