@@ -6,12 +6,19 @@ plugins {
 }
 
 group = "io.github.gnuf0rce"
-version = "1.1.0"
+version = "1.1.1"
 
 mirai {
     configureShadow {
-        exclude {
-            it.path.startsWith("kotlin")
+        listOf(
+            "kotlin",
+            "org/intellij",
+            "org/jetbrains",
+            "org/slf4j"
+        ).forEach { prefix ->
+            exclude { element ->
+                element.path.startsWith(prefix)
+            }
         }
     }
 }
@@ -29,7 +36,7 @@ repositories {
 kotlin {
     sourceSets {
         all {
-//            languageSettings.useExperimentalAnnotation("kotlin.RequiresOptIn")
+            languageSettings.useExperimentalAnnotation("kotlin.RequiresOptIn")
 //            languageSettings.useExperimentalAnnotation("kotlin.ExperimentalStdlibApi")
 //            languageSettings.useExperimentalAnnotation("net.mamoe.mirai.utils.MiraiExperimentalApi")
 //            languageSettings.useExperimentalAnnotation("net.mamoe.mirai.console.util.ConsoleExperimentalApi")

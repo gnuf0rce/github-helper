@@ -9,7 +9,7 @@ import net.mamoe.mirai.console.util.CoroutineScopeUtils.childScope
 import net.mamoe.mirai.utils.*
 
 @OptIn(ConsoleExperimentalApi::class)
-abstract class GitHubSubscriber<T : LifeCycle>(private val name: String, scope: CoroutineScope = GlobalScope) :
+abstract class GitHubSubscriber<T : LifeCycle>(private val name: String, scope: CoroutineScope = MainScope()) :
     CoroutineScope by scope.childScope(name) {
     companion object {
         val reply by GitHubConfig::reply

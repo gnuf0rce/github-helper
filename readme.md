@@ -13,7 +13,7 @@
 `[...]`表示参数，当`[...]`后面带`?`时表示参数可选  
 `{...}`表示连续的多个参数
 
-`[repo]` 格式为 `mamoe/mirai`  
+`[repo]` 格式为 `{owner}/{repo}`, 举例 `mamoe/mirai`  
 `[contact]?`是可选的参数，会自动由当前环境填充，例如群聊填充群号，私聊填充QQ号
 
 ### GitHubIssuesCommand
@@ -71,4 +71,4 @@
 
 * token [Personal Access Tokens](https://github.com/settings/tokens)
 
-* reply Subscriber Reply Message Type `TEXT, XML, JSON`, JSON 还不可用
+* reply Subscriber Reply Message Type `TEXT, XML, JSON`, JSON 尚不可用
