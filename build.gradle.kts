@@ -3,10 +3,20 @@ plugins {
     kotlin("plugin.serialization") version Versions.kotlin
 
     id("net.mamoe.mirai-console") version Versions.mirai
+    id("net.mamoe.maven-central-publish") version "0.6.1"
 }
 
 group = "io.github.gnuf0rce"
 version = "1.1.1"
+
+mavenCentralPublish {
+    useCentralS01()
+    singleDevGithubProject("gnuf0rce", "github-helper", "cssxsh")
+    licenseFromGitHubProject("AGPL-3.0", "master")
+    publication {
+        artifact(tasks.getByName("buildPlugin"))
+    }
+}
 
 mirai {
     configureShadow {
