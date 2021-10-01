@@ -26,13 +26,13 @@ object GitHubIssuesCommand : CompositeCommand(
     }
 
     @SubCommand
-    suspend fun CommandSender.remove(repo: String, contact: Contact = Contact()) {
+    suspend fun CommandSender.remove(contact: Contact = Contact()) {
         subscriber.remove("current", contact.id)
         sendMessage("current with issue 移除完成")
     }
 
     @SubCommand
-    suspend fun CommandSender.interval(repo: String, millis: Long) {
+    suspend fun CommandSender.interval(millis: Long) {
         subscriber.interval("current", millis)
         sendMessage("current interval ${millis}ms with issue")
     }
