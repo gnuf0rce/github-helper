@@ -63,8 +63,8 @@ suspend fun Issue.toMessage(contact: Contact, type: MessageType, notice: String)
                 layout = 2
                 picture(coverUrl = image.queryUrl())
                 title(text = title)
-                labels.forEach { label ->
-                    summary(text = label.name,  color = "#${label.color.uppercase()}")
+                for (label in labels) {
+                    summary(text = label.name, color = "#${label.color.uppercase()}")
                 }
             }
 
@@ -100,8 +100,8 @@ suspend fun Pull.toMessage(contact: Contact, type: MessageType, notice: String):
                 layout = 2
                 picture(coverUrl = image.queryUrl())
                 title(text = title)
-                labels.forEach { label ->
-                    summary(text = label.name,  color = "#${label.color.uppercase()}")
+                for (label in labels) {
+                    summary(text = label.name, color = "#${label.color.uppercase()}")
                 }
             }
 

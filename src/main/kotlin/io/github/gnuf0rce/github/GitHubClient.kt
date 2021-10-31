@@ -68,11 +68,9 @@ open class GitHubClient(open val token: String?) : CoroutineScope, Closeable {
     suspend fun <T> useHttpClient(block: suspend (HttpClient) -> T): T = supervisorScope {
         var count = 0
         while (isActive) {
-            runCatching {
-                block(client)
-            }.onSuccess {
-                return@supervisorScope it
-            }.onFailure { throwable ->
+            try {
+                return@supervisorScope block(client)
+            } catch (throwable: Throwable) {
                 if (isActive && ignore(throwable)) {
                     if (++count > maxIgnoreCount) {
                         throw throwable

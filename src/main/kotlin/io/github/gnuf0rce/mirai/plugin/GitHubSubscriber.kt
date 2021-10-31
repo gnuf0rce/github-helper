@@ -64,19 +64,21 @@ abstract class GitHubSubscriber<T : LifeCycle>(private val name: String, scope: 
         val records = synchronized(jobs) { tasks.filter { (_, task) -> contact in task.contacts } }
         appendLine("| name | last | interval |")
         appendLine("|:----:|:----:|:--------:|")
-        records.forEach { (_, task) ->
+        for ((_, task) in records) {
             appendLine("| ${task.id} | ${task.last} | ${task.interval} |")
         }
     }
 
     protected abstract suspend fun GitHubTask.load(per: Int): List<T>
 
-    private suspend fun GitHubTask.sendMessage(record: T) = contacts.forEach { cid ->
-        kotlin.runCatching {
-            val contact = Contact(cid)
-            contact.sendMessage(record.toMessage(contact, reply, id))
-        }.onFailure {
-            logger.warning("发送信息失败", it)
+    private suspend fun GitHubTask.sendMessage(record: T) {
+        for (cid in contacts) {
+            try {
+                val contact = Contact(cid)
+                contact.sendMessage(record.toMessage(contact, reply, id))
+            } catch (e: Throwable) {
+                logger.warning("发送信息失败", e)
+            }
         }
     }
 
@@ -86,21 +88,21 @@ abstract class GitHubSubscriber<T : LifeCycle>(private val name: String, scope: 
         logger.info { "$name with $id run start" }
         while (isActive) {
             val current = task(id) ?: break
-            runCatching {
+            try {
                 val records = current.load(PER_PAGE).filter { it.updatedAt > current.last }
-                records.forEach { record ->
+                for (record in records) {
                     current.sendMessage(record)
                 }
                 compute(current.id) { last = records.maxOfOrNull { it.updatedAt } ?: current.last }
-            }.onFailure {
-                logger.warning { "$name with $id run fail $it" }
+            } catch (e: Throwable) {
+                logger.warning { "$name with $id run fail $e" }
             }
             delay(current.interval)
         }
     }
 
     fun start() {
-        tasks.keys.forEach { run(it) }
+        for (key in tasks.keys) run(key)
     }
 
     fun stop() {

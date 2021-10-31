@@ -88,7 +88,7 @@ internal inline fun <reified T> HttpRequestBuilder.context(context: T) {
     val json = context as? JsonObject ?: GitHubJson.encodeToJsonElement(context).jsonObject
     when (method) {
         HttpMethod.Get, HttpMethod.Delete -> {
-            json.forEach { (key, element) ->
+            for ((key, element) in json) {
                 parameter(key, element.jsonPrimitive.contentOrNull)
             }
         }
