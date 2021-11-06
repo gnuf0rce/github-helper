@@ -14,14 +14,32 @@ abstract class GitHubSubscriber<T : LifeCycle>(private val name: String, scope: 
     companion object {
         val reply by GitHubConfig::reply
         val repos = mutableMapOf<String, GitHubRepo>().withDefault { id ->
-            val (owner, repo) = id.split('/', '-')
+            val (owner, repo) = REPO_REGEX.find(id)!!.destructured
             GitHubRepo(owner, repo, github)
         }
         const val PER_PAGE = 30
-        val REPO_REGEX = """[0-9A-z_-]+/[0-9A-z_-]+""".toRegex()
+        val REPO_REGEX = """([0-9A-z_-]+)/([0-9A-z_-]+)""".toRegex()
 
         val GitHubTask.repo get() = repos.getValue(id)
         val current by lazy { GitHubCurrent(github) }
+
+        private val all = mutableListOf<GitHubSubscriber<*>>()
+
+        fun start() {
+            for (subscriber in all) {
+                subscriber.start()
+            }
+        }
+
+        fun stop() {
+            for (subscriber in all) {
+                subscriber.start()
+            }
+        }
+    }
+
+    init {
+        let(all::add)
     }
 
     private val jobs = mutableMapOf<String, Job>()
@@ -42,7 +60,7 @@ abstract class GitHubSubscriber<T : LifeCycle>(private val name: String, scope: 
             contacts.add(contact)
         }
         jobs.compute(id) { _, old ->
-            old?.takeIf { it.isActive } ?: run(id)
+            old?.takeIf { it.isActive } ?: launch(id)
         }
     }
 
@@ -84,7 +102,7 @@ abstract class GitHubSubscriber<T : LifeCycle>(private val name: String, scope: 
 
     private fun task(id: String) = synchronized(jobs) { tasks[id] }?.takeIf { it.contacts.isNotEmpty() }
 
-    private fun run(id: String) = launch(SupervisorJob()) {
+    private fun launch(id: String) = launch(SupervisorJob()) {
         logger.info { "$name with $id run start" }
         while (isActive) {
             val current = task(id) ?: break
@@ -102,7 +120,7 @@ abstract class GitHubSubscriber<T : LifeCycle>(private val name: String, scope: 
     }
 
     fun start() {
-        for (key in tasks.keys) run(key)
+        for (key in tasks.keys) launch(key)
     }
 
     fun stop() {

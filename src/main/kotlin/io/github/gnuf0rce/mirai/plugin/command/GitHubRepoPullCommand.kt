@@ -11,7 +11,7 @@ object GitHubRepoPullCommand : CompositeCommand(
     "repo-pull",
     description = "Repo Pull Notice"
 ) {
-    internal val subscriber = object : GitHubSubscriber<Pull>(primaryName, GitHubHelperPlugin) {
+    private val subscriber = object : GitHubSubscriber<Pull>(primaryName, GitHubHelperPlugin) {
         override val tasks: MutableMap<String, GitHubTask> by GitHubRepoTaskData::pulls
 
         override val regex: Regex = REPO_REGEX

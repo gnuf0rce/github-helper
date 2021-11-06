@@ -29,22 +29,15 @@ object GitHubHelperPlugin : KotlinPlugin(
         GitHubIssuesCommand.register()
 
         globalEventChannel().subscribeOnce<BotOnlineEvent> {
-            GitHubRepoIssueCommand.subscriber.start()
-            GitHubRepoPullCommand.subscriber.start()
-            GitHubRepoReleaseCommand.subscriber.start()
-            GitHubRepoCommitCommand.subscriber.start()
-            GitHubIssuesCommand.subscriber.start()
+            GitHubSubscriber.start()
         }
     }
 
     override fun onDisable() {
         GitHubRepoIssueCommand.unregister()
-        GitHubRepoIssueCommand.subscriber.stop()
         GitHubRepoPullCommand.unregister()
-        GitHubRepoPullCommand.subscriber.stop()
         GitHubRepoReleaseCommand.unregister()
-        GitHubRepoReleaseCommand.subscriber.stop()
         GitHubRepoCommitCommand.unregister()
-        GitHubRepoCommitCommand.subscriber.stop()
+        GitHubSubscriber.stop()
     }
 }

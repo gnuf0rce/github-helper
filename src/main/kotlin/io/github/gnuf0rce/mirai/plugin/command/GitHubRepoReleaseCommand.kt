@@ -11,7 +11,7 @@ object GitHubRepoReleaseCommand : CompositeCommand(
     "repo-release",
     description = "Repo Release Notice"
 ) {
-    internal val subscriber = object : GitHubSubscriber<Release>(primaryName, GitHubHelperPlugin) {
+    private val subscriber = object : GitHubSubscriber<Release>(primaryName, GitHubHelperPlugin) {
         override val tasks: MutableMap<String, GitHubTask> by GitHubRepoTaskData::releases
 
         override val regex: Regex = REPO_REGEX

@@ -11,7 +11,7 @@ object GitHubIssuesCommand : CompositeCommand(
     "issues",
     description = "Issues Notice"
 ) {
-    internal val subscriber = object : GitHubSubscriber<Issue>(primaryName, GitHubHelperPlugin) {
+    private val subscriber = object : GitHubSubscriber<Issue>(primaryName, GitHubHelperPlugin) {
         override val tasks: MutableMap<String, GitHubTask> by GitHubTaskData::issues
 
         override val regex: Regex? = null
