@@ -45,6 +45,7 @@ suspend fun Issue.toMessage(contact: Contact, type: MessageType, notice: String)
     return when (type) {
         MessageType.TEXT -> buildMessageChain {
             add(image)
+            appendLine()
             appendLine("$notice with issue BY ${user.login} ")
             appendLine("URL: $htmlUrl ")
             appendLine("TITLE: $title ")
@@ -72,7 +73,7 @@ suspend fun Issue.toMessage(contact: Contact, type: MessageType, notice: String)
             source(name = notice)
         }
         MessageType.JSON -> LightApp {
-            // TODO
+            TODO()
         }
     }
 }
@@ -82,6 +83,7 @@ suspend fun Pull.toMessage(contact: Contact, type: MessageType, notice: String):
     return when (type) {
         MessageType.TEXT -> buildMessageChain {
             add(image)
+            appendLine()
             appendLine("$notice with pull BY ${user.login} ")
             appendLine("URL: $htmlUrl ")
             appendLine("TITLE: $title ")
@@ -109,7 +111,7 @@ suspend fun Pull.toMessage(contact: Contact, type: MessageType, notice: String):
             source(name = notice)
         }
         MessageType.JSON -> LightApp {
-            // TODO
+            TODO()
         }
     }
 }
@@ -119,6 +121,7 @@ suspend fun Release.toMessage(contact: Contact, type: MessageType, notice: Strin
     return when (type) {
         MessageType.TEXT -> buildMessageChain {
             add(image)
+            appendLine()
             appendLine("$notice BY: ${user.login} ")
             appendLine("URL: $htmlUrl ")
             appendLine("NAME: $name ")
@@ -142,7 +145,7 @@ suspend fun Release.toMessage(contact: Contact, type: MessageType, notice: Strin
             source(name = notice)
         }
         MessageType.JSON -> LightApp {
-            // TODO
+            TODO()
         }
     }
 }
@@ -152,6 +155,7 @@ suspend fun Commit.toMessage(contact: Contact, type: MessageType, notice: String
     return when (type) {
         MessageType.TEXT -> buildMessageChain {
             add(image)
+            appendLine()
             appendLine("$notice BY: ${user.login} ")
             appendLine("URL: $htmlUrl ")
             appendLine("MESSAGE: ${detail.message} ")
@@ -174,7 +178,7 @@ suspend fun Commit.toMessage(contact: Contact, type: MessageType, notice: String
             source(name = notice)
         }
         MessageType.JSON -> LightApp {
-            // TODO
+            TODO()
         }
     }
 }
