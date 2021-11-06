@@ -36,6 +36,7 @@ suspend fun LifeCycle.toMessage(contact: Contact, type: MessageType, notice: Str
         is Release -> toMessage(contact, type, notice)
         is Release.Asset -> throw IllegalStateException("不该出现的执行")
         is Commit -> toMessage(contact, type, notice)
+        is Repo -> TODO()
     }
 }
 

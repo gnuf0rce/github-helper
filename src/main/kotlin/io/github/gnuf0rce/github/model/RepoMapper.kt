@@ -10,7 +10,7 @@ import kotlinx.serialization.json.*
  */
 open class RepoMapper(parent: Url, override val github: GitHubClient) : GitHubMapper(parent, "") {
 
-    open suspend fun get() = get<JsonObject>()
+    open suspend fun get() = get<Repo>()
 
     open suspend fun patch(context: JsonObject) = patch<JsonObject, JsonObject>(context)
 
