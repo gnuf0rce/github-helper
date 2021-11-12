@@ -49,7 +49,7 @@ abstract class GitHubSubscriber<T : LifeCycle>(private val name: String, scope: 
         }
     }
 
-    protected abstract val regex: Regex?
+    protected open val regex: Regex? = REPO_REGEX
 
     fun add(id: String, contact: Long) {
         check(regex?.matches(id) ?: true) { "$id not matches $regex" }
