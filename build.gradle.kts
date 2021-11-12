@@ -7,7 +7,7 @@ plugins {
 }
 
 group = "io.github.gnuf0rce"
-version = "1.1.2"
+version = "1.1.3"
 
 mavenCentralPublish {
     useCentralS01()
@@ -38,7 +38,6 @@ repositories {
     mavenLocal()
     maven(url = "https://maven.aliyun.com/repository/public")
     mavenCentral()
-    jcenter()
     maven(url = "https://maven.aliyun.com/repository/gradle-plugin")
     gradlePluginPortal()
 }
@@ -46,10 +45,7 @@ repositories {
 kotlin {
     sourceSets {
         all {
-            languageSettings.useExperimentalAnnotation("kotlin.RequiresOptIn")
-//            languageSettings.useExperimentalAnnotation("kotlin.ExperimentalStdlibApi")
-//            languageSettings.useExperimentalAnnotation("net.mamoe.mirai.utils.MiraiExperimentalApi")
-//            languageSettings.useExperimentalAnnotation("net.mamoe.mirai.console.util.ConsoleExperimentalApi")
+            languageSettings.optIn("kotlin.RequiresOptIn")
         }
     }
 }
@@ -62,7 +58,7 @@ dependencies {
         exclude(group = "io.ktor", module = "ktor-client-core")
     }
     // test
-    testImplementation(group = "org.junit.jupiter", name = "junit-jupiter", version = Versions.junit)
+    testImplementation(kotlin("test", Versions.kotlin))
 }
 
 tasks {
