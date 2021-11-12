@@ -120,7 +120,7 @@ data class License(
     val spdxId: String,
     @SerialName("url")
     val url: String
-): Entry
+) : Entry
 
 @Serializable
 data class Links(

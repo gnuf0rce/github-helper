@@ -9,7 +9,7 @@ import kotlinx.serialization.modules.*
 import java.time.*
 import java.time.format.*
 
-fun GitHubClient() = GitHubClient(token = System.getenv("GITHUB_TOKEN"))
+internal fun GitHubClient() = GitHubClient(token = System.getenv("GITHUB_TOKEN"))
 
 internal val GitHubJson = Json {
     prettyPrint = true
@@ -44,6 +44,6 @@ fun HttpClientConfig<*>.RateLimit(block: RateLimitFeature.Config.() -> Unit) {
     install(RateLimitFeature, block)
 }
 
-fun GitHubClient.repo(owner: String, repo: String) = GitHubRepo(owner, repo, this)
+fun GitHubClient.repo(owner: String, repo: String) = GitHubRepo(owner = owner, repo = repo, github = this)
 
-fun GitHubClient.current() = GitHubCurrent(this)
+fun GitHubClient.current() = GitHubCurrent(github = this)

@@ -181,10 +181,11 @@ data class Repo(
     val watchers: Int,
     @SerialName("watchers_count")
     val watchersCount: Int,
-): Entry, LifeCycle {
+) : Entry, LifeCycle {
 
     @Deprecated("Release No Close", ReplaceWith("null"))
-    override val closedAt: OffsetDateTime? get() = null
+    override val closedAt: OffsetDateTime?
+        get() = null
 
     /**
      * 1. https://github.com/{owner}/{repo}/raw/{branch}/README.md

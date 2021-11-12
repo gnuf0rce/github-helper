@@ -32,7 +32,7 @@ internal suspend inline fun <reified R> WithGithubClient.page(
     page: Int,
     per: Int,
     path: String = "",
-): List<R> = page<Any?, R>(page, per,  null, path)
+): List<R> = page<Any?, R>(page, per, null, path)
 
 internal suspend inline fun <reified T, reified R> WithGithubClient.page(
     page: Int,
