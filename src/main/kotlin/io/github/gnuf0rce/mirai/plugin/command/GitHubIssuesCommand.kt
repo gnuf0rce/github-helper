@@ -10,7 +10,7 @@ object GitHubIssuesCommand : CompositeCommand(
     owner = GitHubHelperPlugin,
     "issues",
     description = "Issues Notice"
-) {
+), GitHubCommand {
     private val subscriber = object : GitHubSubscriber<Issue>(primaryName, GitHubHelperPlugin) {
         override val tasks: MutableMap<String, GitHubTask> by GitHubTaskData::issues
 

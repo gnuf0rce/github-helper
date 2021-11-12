@@ -10,7 +10,7 @@ object GitHubRepoPullCommand : CompositeCommand(
     owner = GitHubHelperPlugin,
     "repo-pull",
     description = "Repo Pull Notice"
-) {
+), GitHubCommand {
     private val subscriber = object : GitHubSubscriber<Pull>(primaryName, GitHubHelperPlugin) {
         override val tasks: MutableMap<String, GitHubTask> by GitHubRepoTaskData::pulls
 
