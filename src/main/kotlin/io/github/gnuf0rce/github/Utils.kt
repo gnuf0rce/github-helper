@@ -1,6 +1,7 @@
 package io.github.gnuf0rce.github
 
 import io.ktor.client.*
+import io.ktor.http.*
 import kotlinx.serialization.*
 import kotlinx.serialization.descriptors.*
 import kotlinx.serialization.encoding.*
@@ -21,6 +22,9 @@ internal val GitHubJson = Json {
         contextual(OffsetDateTime::class, OffsetDateTimeSerializer)
     }
 }
+
+@Suppress("unused")
+internal val ContentType.Application.GitHubJson get() = ContentType.parse("application/vnd.github.v3+json")
 
 @OptIn(ExperimentalSerializationApi::class)
 @Serializer(OffsetDateTime::class)

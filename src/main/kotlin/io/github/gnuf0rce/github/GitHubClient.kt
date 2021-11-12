@@ -33,9 +33,12 @@ open class GitHubClient(open val token: String?) : CoroutineScope, Closeable {
         }
         Json {
             serializer = KotlinxSerializer(GitHubJson)
-            accept(ContentType.parse("application/vnd.github.v3+json"))
+            accept(ContentType.Application.GitHubJson)
         }
         defaultRequest {
+            accept(ContentType.Text.Html)
+            accept(ContentType.Text.Plain)
+            accept(ContentType.Application.GitHubJson)
             header(HttpHeaders.Authorization, token?.let { "token $it" })
         }
         HttpResponseValidator {
