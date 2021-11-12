@@ -14,12 +14,8 @@ abstract class GitHubSubscriber<T : LifeCycle>(private val name: String, scope: 
     CoroutineScope by scope.childScope(name) {
     companion object {
         val reply by GitHubConfig::reply
-        val repos = mutableMapOf<String, GitHubRepo>().withDefault { id ->
-            val (owner, repo) = REPO_REGEX.find(id)!!.destructured
-            GitHubRepo(owner, repo, github)
-        }
+        val repos = mutableMapOf<String, GitHubRepo>().withDefault { full -> github.repo(full) }
         const val PER_PAGE = 30
-        val REPO_REGEX = """([0-9A-z_-]+)/([0-9A-z_-]+)""".toRegex()
 
         val GitHubTask.repo get() = repos.getValue(id)
         val current by lazy { GitHubCurrent(github) }
