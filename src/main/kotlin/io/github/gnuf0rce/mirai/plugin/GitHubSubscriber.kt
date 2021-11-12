@@ -2,6 +2,7 @@ package io.github.gnuf0rce.mirai.plugin
 
 import io.github.gnuf0rce.github.*
 import io.github.gnuf0rce.github.entry.*
+import io.github.gnuf0rce.github.exception.*
 import io.github.gnuf0rce.mirai.plugin.data.*
 import kotlinx.coroutines.*
 import net.mamoe.mirai.console.util.*
@@ -112,8 +113,12 @@ abstract class GitHubSubscriber<T : LifeCycle>(private val name: String, scope: 
                     current.sendMessage(record)
                 }
                 compute(current.id) { last = records.maxOfOrNull { it.updatedAt } ?: current.last }
-            } catch (e: Throwable) {
-                logger.warning { "$name with $id run fail $e" }
+            } catch (cause: GitHubApiException) {
+                logger.warning {
+                    "$name with $id api fail, ${cause.json}"
+                }
+            } catch (cause: Throwable) {
+                logger.warning({ "$name with $id run fail" }, cause)
             }
             delay(current.interval)
         }
