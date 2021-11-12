@@ -49,7 +49,7 @@ open class GitHubClient(open val token: String?) : CoroutineScope, Closeable {
             }
         }
         RateLimit {
-            send = { _, _ ->
+            notice = { _, _ ->
                 //
             }
         }

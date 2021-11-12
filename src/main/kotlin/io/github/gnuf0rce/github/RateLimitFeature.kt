@@ -13,9 +13,9 @@ import java.time.*
 class RateLimitFeature internal constructor(val send: suspend (Status, String) -> Unit) {
     data class Status(val limit: Int, val remaining: Int, val reset: Long)
 
-    data class Config(var send: suspend (rate: Status, resource: String) -> Unit = { _, _ -> })
+    data class Config(var notice: suspend (rate: Status, resource: String) -> Unit = { _, _ -> })
 
-    constructor(config: Config) : this(config.send)
+    constructor(config: Config) : this(config.notice)
 
     private val rates = mutableMapOf<String, Status>()
         .withDefault { Status(1, 1, OffsetDateTime.now().toEpochSecond()) }
