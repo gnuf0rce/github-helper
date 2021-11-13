@@ -54,7 +54,7 @@ internal val REPO_REGEX = """([0-9A-z_-]+)/([0-9A-z_-]+)""".toRegex()
 fun GitHubClient.repo(owner: String, repo: String) = GitHubRepo(owner = owner, repo = repo, github = this)
 
 fun GitHubClient.repo(full: String): GitHubRepo {
-    val (owner, repo) = REPO_REGEX.find(full)!!.destructured
+    val (owner, repo) = requireNotNull(REPO_REGEX.find(full)) { "Not Found Owner And Repo." }.destructured
     return GitHubRepo(owner = owner, repo = repo, github = this)
 }
 
