@@ -41,4 +41,9 @@ object GitHubIssuesCommand : CompositeCommand(
     suspend fun CommandSender.list(contact: Contact = Contact()) {
         sendMessage(subscriber.list(contact.id))
     }
+
+    @SubCommand
+    suspend fun CommandSender.build(contact: Contact = Contact()) {
+        sendMessage(subscriber.build("current", contact.id))
+    }
 }

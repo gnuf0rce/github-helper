@@ -39,4 +39,9 @@ object GitHubRepoIssueCommand : CompositeCommand(
     suspend fun CommandSender.list(contact: Contact = Contact()) {
         sendMessage(subscriber.list(contact.id))
     }
+
+    @SubCommand
+    suspend fun CommandSender.build(repo: String, contact: Contact = Contact()) {
+        sendMessage(subscriber.build(repo, contact.id))
+    }
 }

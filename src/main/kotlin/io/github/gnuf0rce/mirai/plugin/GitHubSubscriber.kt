@@ -7,6 +7,7 @@ import io.github.gnuf0rce.mirai.plugin.data.*
 import kotlinx.coroutines.*
 import net.mamoe.mirai.console.util.*
 import net.mamoe.mirai.console.util.CoroutineScopeUtils.childScope
+import net.mamoe.mirai.message.data.*
 import net.mamoe.mirai.utils.*
 
 @OptIn(ConsoleExperimentalApi::class)
@@ -81,6 +82,23 @@ abstract class GitHubSubscriber<T : LifeCycle>(private val name: String, scope: 
         appendLine("|:----:|:----:|:--------:|")
         for ((_, task) in records) {
             appendLine("| ${task.id} | ${task.last} | ${task.interval} |")
+        }
+    }
+
+    suspend fun build(id: String, contact: Long): Message {
+        val records = GitHubTask(id).load(PER_PAGE)
+        if (records.isEmpty()) return "内容为空".toPlainText()
+        return buildForwardMessage(Contact(contact)) {
+            for (record in records) {
+                add(
+                    sender = context.bot,
+                    time = record.updatedAt.toEpochSecond().toInt(),
+                    message = record.toMessage(context, reply, id)
+                )
+            }
+            displayStrategy = object : ForwardMessage.DisplayStrategy {
+                override fun generateTitle(forward: RawForwardMessage): String = id
+            }
         }
     }
 
