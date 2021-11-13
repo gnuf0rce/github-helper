@@ -110,9 +110,7 @@ abstract class GitHubSubscriber<T : LifeCycle>(private val name: String, scope: 
                 }
                 compute(current.id) { last = records.maxOfOrNull { it.updatedAt } ?: current.last }
             } catch (cause: GitHubApiException) {
-                logger.warning {
-                    "$name with $id api fail, ${cause.json}"
-                }
+                logger.warning { "$name with $id api fail, ${cause.json}" }
             } catch (cause: Throwable) {
                 logger.warning({ "$name with $id run fail" }, cause)
             }

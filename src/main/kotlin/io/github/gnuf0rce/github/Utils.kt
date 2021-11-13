@@ -24,7 +24,8 @@ internal val GitHubJson = Json {
 }
 
 @Suppress("unused")
-internal val ContentType.Application.GitHubJson get() = ContentType.parse("application/vnd.github.v3+json")
+internal val ContentType.Application.GitHubJson
+    get() = ContentType.parse("application/vnd.github.v3+json")
 
 @OptIn(ExperimentalSerializationApi::class)
 @Serializer(OffsetDateTime::class)
