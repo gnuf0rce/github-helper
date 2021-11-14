@@ -9,13 +9,17 @@ import java.io.*
 import java.net.*
 import java.time.*
 
+internal const val LOGGER_PROPERTY = "io.github.gnuf0rce.mirai.plugin.logger"
+
+internal const val IMAGE_FOLDER_PROPERTY = "io.github.gnuf0rce.mirai.plugin.image"
+
 internal val logger by lazy {
-    val open = System.getProperty("io.github.gnuf0rce.mirai.plugin.logger", "${true}").toBoolean()
+    val open = System.getProperty(LOGGER_PROPERTY, "${true}").toBoolean()
     if (open) GitHubHelperPlugin.logger else SilentLogger
 }
 
 internal val ImageFolder by lazy {
-    val dir = System.getProperty("io.github.gnuf0rce.mirai.plugin.dir")
+    val dir = System.getProperty(IMAGE_FOLDER_PROPERTY)
     (if (dir.isNullOrBlank()) GitHubHelperPlugin.dataFolder else File(dir)).resolve("image")
 }
 
