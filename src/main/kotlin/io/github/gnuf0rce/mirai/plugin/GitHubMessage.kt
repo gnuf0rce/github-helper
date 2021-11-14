@@ -1,4 +1,4 @@
-@file:OptIn(MiraiExperimentalApi::class, ExperimentalSerializationApi::class)
+@file:OptIn(MiraiExperimentalApi::class, ExperimentalSerializationApi::class, ConsoleExperimentalApi::class)
 
 package io.github.gnuf0rce.mirai.plugin
 
@@ -8,12 +8,17 @@ import io.ktor.client.request.*
 import io.ktor.http.*
 import kotlinx.serialization.*
 import kotlinx.serialization.json.*
+import net.mamoe.mirai.*
+import net.mamoe.mirai.console.util.*
+import net.mamoe.mirai.console.util.ContactUtils.getContactOrNull
 import net.mamoe.mirai.contact.*
 import net.mamoe.mirai.message.data.*
 import net.mamoe.mirai.message.data.Image.Key.queryUrl
 import net.mamoe.mirai.utils.ExternalResource.Companion.uploadAsImage
 import net.mamoe.mirai.utils.*
 import java.io.File
+
+internal fun Contact(id: Long): Contact = Bot.instances.firstNotNullOf { it.getContactOrNull(id) }
 
 @Serializable
 enum class MessageType { TEXT, XML, JSON }

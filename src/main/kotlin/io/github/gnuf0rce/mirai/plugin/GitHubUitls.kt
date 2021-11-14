@@ -4,11 +4,6 @@ import io.github.gnuf0rce.github.*
 import io.github.gnuf0rce.mirai.plugin.data.*
 import io.ktor.client.features.*
 import io.ktor.http.*
-import net.mamoe.mirai.*
-import net.mamoe.mirai.console.command.*
-import net.mamoe.mirai.console.util.*
-import net.mamoe.mirai.console.util.ContactUtils.getContactOrNull
-import net.mamoe.mirai.contact.*
 import net.mamoe.mirai.utils.*
 import java.io.*
 import java.net.*
@@ -60,8 +55,3 @@ internal fun Url.toProxy(): Proxy {
 internal val offset by lazy {
     OffsetDateTime.now().offset
 }
-
-@OptIn(ConsoleExperimentalApi::class)
-internal fun Contact(id: Long): Contact = Bot.instances.firstNotNullOf { it.getContactOrNull(id) }
-
-internal fun CommandSender.Contact() = requireNotNull(subject) { "无法从当前环境获取联系人" }
