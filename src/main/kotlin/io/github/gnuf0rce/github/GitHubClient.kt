@@ -2,6 +2,7 @@ package io.github.gnuf0rce.github
 
 import io.github.gnuf0rce.github.exception.*
 import io.ktor.client.*
+import io.ktor.client.call.*
 import io.ktor.client.engine.okhttp.*
 import io.ktor.client.features.*
 import io.ktor.client.features.compression.*
@@ -9,7 +10,9 @@ import io.ktor.client.features.json.*
 import io.ktor.client.features.json.serializer.*
 import io.ktor.client.request.*
 import io.ktor.http.*
+import io.ktor.util.*
 import kotlinx.coroutines.*
+import kotlinx.serialization.*
 import java.io.*
 import java.net.*
 
@@ -44,7 +47,15 @@ open class GitHubClient(open val token: String?) : CoroutineScope, Closeable {
         HttpResponseValidator {
             handleResponseException { cause ->
                 if (cause is ClientRequestException && "documentation_url" in cause.message.orEmpty()) {
-                    throw GitHubApiException(cause)
+                    @OptIn(KtorExperimentalAPI::class, ExperimentalSerializationApi::class)
+                    throw GitHubApiException(
+                        cause, try {
+                            cause.response.call.save().response.receive()
+                        } catch (e: Throwable) {
+                            val json = cause.message!!.substringAfter("Text: \"").removeSuffix("\"")
+                            GitHubJson.decodeFromString(json)
+                        }
+                    )
                 }
             }
         }
