@@ -5,7 +5,7 @@ import io.ktor.http.*
 import kotlinx.serialization.json.*
 
 /**
- * 1. https://api.github.com/repos/{owner}/{repo}/branches/{branch}/protection
+ * 1. [https://api.github.com/repos/{owner}/{repo}/branches/{branch}/protection]
  */
 open class BranchProtectionMapper(parent: Url, branch: String, override val github: GitHubClient) :
     GitHubMapper(parent, "${branch}/protection") {
@@ -25,7 +25,7 @@ open class BranchProtectionMapper(parent: Url, branch: String, override val gith
     open suspend fun reviews(context: JsonObject) =
         patch<JsonObject, JsonObject>(context, "required_pull_request_reviews")
 
-    open suspend fun reviews_delete() = delete<Unit>("required_pull_request_reviews")
+    open suspend fun reviewsDelete() = delete<Unit>("required_pull_request_reviews")
 
     // open suspend fun signatures():
 }

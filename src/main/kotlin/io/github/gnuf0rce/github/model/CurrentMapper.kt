@@ -6,10 +6,13 @@ import io.ktor.http.*
 import kotlinx.serialization.json.*
 
 /**
- * with https://api.github.com/issues
+ * 1. [https://api.github.com/issues]
+ * 2. [https://api.github.com/user]
  */
 open class CurrentMapper(parent: Url, override val github: GitHubClient = GitHubClient()) : GitHubMapper(parent, "") {
 
     suspend fun issues(page: Int, per: Int = 30, context: JsonObject? = null) =
         page<JsonObject, Issue>(page, per, context, "issues")
+
+    suspend fun user() = get<Coder>("user")
 }

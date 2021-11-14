@@ -5,7 +5,7 @@ import io.ktor.http.*
 import kotlinx.serialization.json.*
 
 /**
- * 1. https://api.github.com/repos/{owner}/{repo}/branches
+ * 1. [https://api.github.com/repos/{owner}/{repo}/branches]
  */
 open class BranchesMapper(parent: Url, override val github: GitHubClient) : GitHubMapper(parent, "branches") {
     open suspend fun list(protected: Boolean, page: Int, per: Int = 30) =

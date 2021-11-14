@@ -5,7 +5,7 @@ import io.github.gnuf0rce.github.entry.*
 import io.ktor.http.*
 
 /**
- * 1. https://api.github.com/repos/{owner}/{repo}/autolinks
+ * 1. [https://api.github.com/repos/{owner}/{repo}/autolinks]
  */
 open class AutoLinksMapper(parent: Url, override val github: GitHubClient) : GitHubMapper(parent, "autolinks") {
 
