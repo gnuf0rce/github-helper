@@ -4,6 +4,7 @@ package io.github.gnuf0rce.mirai.plugin
 
 import io.github.gnuf0rce.github.*
 import io.github.gnuf0rce.github.entry.*
+import io.github.gnuf0rce.mirai.plugin.data.*
 import io.ktor.client.request.*
 import io.ktor.http.*
 import kotlinx.serialization.*
@@ -23,11 +24,31 @@ internal fun Contact(id: Long): Contact = Bot.instances.firstNotNullOf { it.getC
 @Serializable
 enum class MessageType { TEXT, XML, JSON }
 
-private suspend fun UserInfo.avatar(): File = Url(avatarUrl).let { url ->
-    ImageFolder.resolve("avatar").resolve(url.filename).apply {
-        if (exists().not()) {
+internal suspend fun UserInfo.avatar(flush: Boolean = false, client: GitHubClient = github): File {
+    val url = Url(avatarUrl)
+    return ImageFolder.resolve("avatar").resolve(url.filename).apply {
+        if (exists().not() || flush) {
             parentFile.mkdirs()
-            writeBytes(github.useHttpClient { it.get(url) })
+            writeBytes(client.useHttpClient { client ->
+                client.get(url)
+            })
+        }
+    }
+}
+
+private const val STATS_API = "https://github-readme-stats.vercel.app/api"
+
+@Suppress("BlockingMethodInNonBlockingContext")
+internal suspend fun UserInfo.stats(flush: Boolean = false, client: GitHubClient = github): File {
+    return ImageFolder.resolve("stats").resolve("${login}.svg").apply {
+        if (exists().not() || flush) {
+            parentFile.mkdirs()
+            writeBytes(client.useHttpClient { client ->
+                client.get(STATS_API) {
+                    parameter("username", login)
+                    for ((key, value) in GitHubConfig.stats) parameter(key, value)
+                }
+            })
         }
     }
 }

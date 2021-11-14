@@ -19,4 +19,11 @@ object GitHubConfig : ReadOnlyPluginConfig("GithubConfig") {
     @ValueName("timeout")
     @ValueDescription("Http Timeout Second")
     val timeout by value(30L)
+
+    @ValueName("stats")
+    @ValueDescription("with https://github-readme-stats.vercel.app/")
+    val stats by value(mapOf(
+        "show_icons" to "true",
+        "theme" to "tokyonight"
+    ))
 }
