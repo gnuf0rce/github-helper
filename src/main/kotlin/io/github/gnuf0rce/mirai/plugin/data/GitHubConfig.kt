@@ -22,8 +22,10 @@ object GitHubConfig : ReadOnlyPluginConfig("GithubConfig") {
 
     @ValueName("stats")
     @ValueDescription("with https://github-readme-stats.vercel.app/")
-    val stats by value(mapOf(
-        "show_icons" to "true",
-        "theme" to "tokyonight"
-    ))
+    val stats by value(
+        mapOf(
+            "show_icons" to "true",
+            "theme" to "tokyonight"
+        )
+    )
 }

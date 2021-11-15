@@ -63,6 +63,12 @@
 | `/<repo-release> <interval> [repo] [millis]?` | 设置订阅轮询间隔 |
 | `/<repo-release> <list> [contact]?`           | 查看订阅列表     |
 
+### GitHubStatsCommand
+
+| 指令                              | 描述     |
+|:----------------------------------|:---------|
+| `/<stats> <card> [name] [flush]?` | 查看状态 |
+
 ## 设置
 
 ### GithubConfig

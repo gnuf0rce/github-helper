@@ -18,6 +18,7 @@ import net.mamoe.mirai.message.data.Image.Key.queryUrl
 import net.mamoe.mirai.utils.ExternalResource.Companion.uploadAsImage
 import net.mamoe.mirai.utils.*
 import java.io.File
+import java.time.*
 
 internal fun Contact(id: Long): Contact = Bot.instances.firstNotNullOf { it.getContactOrNull(id) }
 
@@ -38,9 +39,24 @@ internal suspend fun UserInfo.avatar(flush: Boolean = false, client: GitHubClien
 
 private const val STATS_API = "https://github-readme-stats.vercel.app/api"
 
+private val RANK_REGEX = """(?<=rank-text[^>]{0,1024}>[^>]{0,1024}>[^\w]{0,1024})[\w+-]+""".toRegex()
+
+private val STARS_REGEX = """(?<=stars[^>]{0,1024}>[^\w]{0,1024})[^<\s]+""".toRegex()
+
+private val COMMITS_REGEX = """(?<=commits[^>]{0,1024}>[^\w]{0,1024})[^<\s]+""".toRegex()
+
+private val PRS_REGEX = """(?<=prs[^>]{0,1024}>[^\w]{0,1024})[^<\s]+""".toRegex()
+
+private val ISSUES_REGEX = """(?<=issues[^>]{0,1024}>[^\w]{0,1024})[^<\s]+""".toRegex()
+
+private val CONTRIBS_REGEX = """(?<=contribs[^>]{0,1024}>[^\w]{0,1024})[^<\s]+""".toRegex()
+
+/**
+ * XXX: svg to text
+ */
 @Suppress("BlockingMethodInNonBlockingContext")
-internal suspend fun UserInfo.stats(flush: Boolean = false, client: GitHubClient = github): File {
-    return ImageFolder.resolve("stats").resolve("${login}.svg").apply {
+internal suspend fun UserInfo.stats(flush: Boolean = false, client: GitHubClient = github): Message {
+    val svg = ImageFolder.resolve("stats").resolve("${login}.svg").apply {
         if (exists().not() || flush) {
             parentFile.mkdirs()
             writeBytes(client.useHttpClient { client ->
@@ -50,6 +66,19 @@ internal suspend fun UserInfo.stats(flush: Boolean = false, client: GitHubClient
                 }
             })
         }
+    }
+
+    val xml = svg.readText()
+    val year = Year.now()
+
+    return buildMessageChain {
+        appendLine("${login}'s GitHub Stats")
+        appendLine("Rank: ${RANK_REGEX.find(xml)?.value}")
+        appendLine("Total Stars Earned:   ${STARS_REGEX.find(xml)?.value}")
+        appendLine("Total Commits (${year}): ${COMMITS_REGEX.find(xml)?.value}")
+        appendLine("Total PRs:            ${PRS_REGEX.find(xml)?.value}")
+        appendLine("Total Issues:         ${ISSUES_REGEX.find(xml)?.value}")
+        appendLine("Contributed to:       ${CONTRIBS_REGEX.find(xml)?.value}")
     }
 }
 
