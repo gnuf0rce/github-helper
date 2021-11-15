@@ -30,7 +30,7 @@ private const val REPLIER_NOTICE = "replier"
 /**
  * 1. [https://github.com/{owner}/{repo}/]
  */
-internal val REPO_REGEX = """"(?<=github\.com/)([\w-]+)/([\w-]+)(?![\w-]*/[\w-])""".toRegex()
+internal val REPO_REGEX = """(?<=github\.com/)([\w-]+)/([\w-]+)(?![\w-]*/[\w-])""".toRegex()
 
 internal val RepoReplier: MessageReplier = replier@{ result ->
     logger.info { "${sender.render()} 匹配Repo(${result.value})" }
@@ -38,7 +38,7 @@ internal val RepoReplier: MessageReplier = replier@{ result ->
     try {
         val (owner, repo) = result.destructured
         val entry = github.repo(owner, repo).get()
-        subject.sendMessage(entry, REPLIER_NOTICE)
+        entry.toMessage(subject, reply, REPLIER_NOTICE)
     } catch (cause: Throwable) {
         logger.warning({ "构建Repo(${result.value})信息失败" }, cause)
         cause.message
@@ -56,7 +56,7 @@ internal val CommitReplier: MessageReplier = replier@{ result ->
     try {
         val (owner, repo, sha) = result.destructured
         val entry = github.repo(owner, repo).comments.get(sha)
-        subject.sendMessage(entry, REPLIER_NOTICE)
+        entry.toMessage(subject, reply, REPLIER_NOTICE)
     } catch (cause: Throwable) {
         logger.warning({ "构建Repo(${result.value})信息失败" }, cause)
         cause.message
@@ -74,7 +74,7 @@ internal val IssueReplier: MessageReplier = replier@{ result ->
     try {
         val (owner, repo, number) = result.destructured
         val entry = github.repo(owner, repo).issues.get(number.toInt())
-        subject.sendMessage(entry, REPLIER_NOTICE)
+        entry.toMessage(subject, reply, REPLIER_NOTICE)
     } catch (cause: Throwable) {
         logger.warning({ "构建Repo(${result.value})信息失败" }, cause)
         cause.message
@@ -92,7 +92,7 @@ internal val PullReplier: MessageReplier = replier@{ result ->
     try {
         val (owner, repo, number) = result.destructured
         val entry = github.repo(owner, repo).pulls.get(number.toInt())
-        subject.sendMessage(entry, REPLIER_NOTICE)
+        entry.toMessage(subject, reply, REPLIER_NOTICE)
     } catch (cause: Throwable) {
         logger.warning({ "构建Pull(${result.value})信息失败" }, cause)
         cause.message
@@ -102,7 +102,7 @@ internal val PullReplier: MessageReplier = replier@{ result ->
 /**
  * 1. [https://github.com/{owner}/{repo}/releases/tag/{tag}]
  */
-internal val RELEASE_REGEX = """(?<=github\.com/)([\w-]+)/([\w-]+)/releases/tag/([\w-]+)""".toRegex()
+internal val RELEASE_REGEX = """(?<=github\.com/)([\w-]+)/([\w-]+)/releases/tag/([^/#]+)""".toRegex()
 
 internal val ReleaseReplier: MessageReplier = replier@{ result ->
     logger.info { "${sender.render()} 匹配Release(${result.value})" }
@@ -117,7 +117,7 @@ internal val ReleaseReplier: MessageReplier = replier@{ result ->
             entry = list.find { it.tagName == tag } ?: continue
             break
         }
-        subject.sendMessage(entry, REPLIER_NOTICE)
+        entry.toMessage(subject, reply, REPLIER_NOTICE)
     } catch (cause: Throwable) {
         logger.warning({ "构建Release(${result.value})信息失败" }, cause)
         cause.message
