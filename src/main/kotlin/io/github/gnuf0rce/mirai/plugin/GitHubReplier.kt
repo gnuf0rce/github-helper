@@ -4,6 +4,8 @@ package io.github.gnuf0rce.mirai.plugin
 
 import io.github.gnuf0rce.github.entry.*
 import io.github.gnuf0rce.github.*
+import io.ktor.client.request.*
+import io.ktor.http.*
 import net.mamoe.mirai.console.command.CommandSender.Companion.toCommandSender
 import net.mamoe.mirai.console.permission.*
 import net.mamoe.mirai.console.util.*
@@ -124,12 +126,43 @@ internal val ReleaseReplier: MessageReplier = replier@{ result ->
     }
 }
 
+/**
+ * TODO: short link [https://git.io/JJmN9]
+ */
 internal val UrlRepliers by lazy {
     mapOf(
         COMMIT_REGEX to CommitReplier,
         ISSUE_REGEX to IssueReplier,
         PULL_REGEX to PullReplier,
         RELEASE_REGEX to ReleaseReplier,
-        REPO_REGEX to RepoReplier
+        REPO_REGEX to RepoReplier,
+        SHORT_LINK_REGEX to ShortLinkReplier
     )
+}
+
+
+private suspend fun Url.location(): String? {
+    return github.useHttpClient { client ->
+        client.config {
+            followRedirects = false
+            expectSuccess = false
+        }.head<HttpMessage>(this@location)
+    }.headers[HttpHeaders.Location]
+}
+
+internal val SHORT_LINK_REGEX = """git\.io/[\w]+""".toRegex()
+
+internal val ShortLinkReplier: MessageReplier = replier@{ result ->
+    logger.info { "${sender.render()} 匹配ShortLink(${result.value})" }
+    if (hasReplierPermission().not()) return@replier null
+    try {
+        val location = requireNotNull(Url(result.value).location()) { "跳转失败" }
+        for ((regex, replier) in UrlRepliers) {
+            val new = regex.find(location) ?: continue
+            return@replier replier(new)
+        }
+    } catch (cause: Throwable) {
+        logger.warning({ "构建ShortLink(${result.value})信息失败" }, cause)
+        cause.message
+    }
 }
