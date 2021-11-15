@@ -6,7 +6,7 @@ import kotlinx.serialization.*
 enum class Visibility { public, private }
 
 @Serializable
-enum class STATE { open, closed, all }
+enum class State { open, closed, all }
 
 @Serializable
 enum class Direction { asc, desc }
@@ -25,3 +25,6 @@ enum class IssueSort { created, updated, comments }
 
 @Serializable
 enum class MergeableState { unknown, dirty }
+
+@Serializable
+enum class CoderType { User, Organization }

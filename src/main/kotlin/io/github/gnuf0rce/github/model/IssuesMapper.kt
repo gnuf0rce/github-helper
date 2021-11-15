@@ -17,7 +17,7 @@ open class IssuesMapper(parent: Url, override val github: GitHubClient) : GitHub
         @SerialName("filter")
         val filter: IssueFilter = IssueFilter.assigned,
         @SerialName("state")
-        val state: STATE = STATE.open,
+        val state: State = State.open,
         @SerialName("sort")
         val sort: IssueSort = IssueSort.created,
         @SerialName("direction")

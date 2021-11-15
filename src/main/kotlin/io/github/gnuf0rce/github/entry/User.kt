@@ -44,7 +44,7 @@ data class Coder(
     @SerialName("subscriptions_url")
     val subscriptionsUrl: String,
     @SerialName("type")
-    val type: String,
+    val type: CoderType,
     @SerialName("url")
     override val url: String
 ) : Entry, UserInfo, HtmlPage

@@ -59,7 +59,7 @@ data class Issue(
     @SerialName("repository_url")
     val repositoryUrl: String,
     @SerialName("state")
-    val state: STATE = STATE.open,
+    val state: State = State.open,
     @SerialName("timeline_url")
     val timelineUrl: String,
     @SerialName("title")

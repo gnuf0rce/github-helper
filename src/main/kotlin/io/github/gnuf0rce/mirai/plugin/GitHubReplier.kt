@@ -12,6 +12,7 @@ import net.mamoe.mirai.console.util.*
 import net.mamoe.mirai.console.util.ContactUtils.render
 import net.mamoe.mirai.event.events.*
 import net.mamoe.mirai.utils.*
+import net.mamoe.mirai.utils.ExternalResource.Companion.uploadAsImage
 
 typealias MessageReplier = suspend MessageEvent.(MatchResult) -> Any?
 
@@ -40,7 +41,10 @@ internal val OwnerReplier: MessageReplier = replier@{ result ->
     try {
         val (owner) = result.destructured
         val entry = github.user(owner).get()
-        entry.stats()
+        when (entry.type) {
+            CoderType.User -> entry.stats()
+            CoderType.Organization -> entry.avatar().uploadAsImage(subject) // TODO: ...
+        }
     } catch (cause: Throwable) {
         logger.warning({ "构建Repo(${result.value})信息失败" }, cause)
         cause.message

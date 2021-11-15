@@ -93,7 +93,7 @@ data class Pull(
     @SerialName("review_comments_url")
     val reviewCommentsUrl: String,
     @SerialName("state")
-    val state: STATE,
+    val state: State,
     @SerialName("statuses_url")
     val statusesUrl: String,
     @SerialName("title")
