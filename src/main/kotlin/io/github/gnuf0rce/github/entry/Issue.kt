@@ -1,7 +1,6 @@
 package io.github.gnuf0rce.github.entry
 
 import kotlinx.serialization.*
-import kotlinx.serialization.json.*
 import java.time.*
 
 @Serializable
