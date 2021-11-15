@@ -15,4 +15,6 @@ open class PullsMapper(parent: Url, override val github: GitHubClient) : GitHubM
 
     // TODO context
     open suspend fun new(context: JsonObject) = post<JsonObject, Pull>(context)
+
+    open suspend fun get(index: Int) = get<Pull>("$index")
 }

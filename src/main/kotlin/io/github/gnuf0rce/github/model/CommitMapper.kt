@@ -1,12 +1,15 @@
 package io.github.gnuf0rce.github.model
 
 import io.github.gnuf0rce.github.*
+import io.github.gnuf0rce.github.entry.Commit
 import io.ktor.http.*
 import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonObject
 
 open class CommitMapper(parent: Url, sha: String, override val github: GitHubClient) :
     GitHubMapper(parent, "commits/$sha") {
+
+    open suspend fun get() = get<Commit>()
 
     open suspend fun comments(page: Int, per: Int = 30) = page<JsonObject>(page, per, "comments")
 

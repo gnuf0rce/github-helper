@@ -10,7 +10,7 @@ data class Release(
     @SerialName("assets_url")
     val assetsUrl: String,
     @SerialName("author")
-    override val user: Coder,
+    val author: Coder,
     @SerialName("body")
     val body: String,
     @Contextual
@@ -24,6 +24,8 @@ data class Release(
     override val htmlUrl: String,
     @SerialName("id")
     val id: Long,
+    @SerialName("mentions_count")
+    val mentionsCount: Int = 0,
     @SerialName("name")
     val name: String,
     @SerialName("node_id")
@@ -33,6 +35,8 @@ data class Release(
     @Contextual
     @SerialName("published_at")
     val publishedAt: OffsetDateTime? = null,
+    @SerialName("reactions")
+    val reactions: Reactions? = null,
     @SerialName("tag_name")
     val tagName: String,
     @SerialName("tarball_url")
@@ -45,9 +49,14 @@ data class Release(
     override val url: String,
     @SerialName("zipball_url")
     val zipballUrl: String
-) : Entry, LifeCycle, WithUserInfo, HtmlPage {
+) : Entry, LifeCycle, HtmlPage {
+
     @Deprecated("Release No Close", ReplaceWith("null"))
     override val closedAt: OffsetDateTime?
+        get() = null
+
+    @Deprecated("Release No Merge", ReplaceWith("null"))
+    override val mergedAt: OffsetDateTime?
         get() = null
 
     override val updatedAt: OffsetDateTime
@@ -84,8 +93,13 @@ data class Release(
         @SerialName("url")
         override val url: String
     ) : Entry, LifeCycle {
+
         @Deprecated("Asset No Close", ReplaceWith("null"))
         override val closedAt: OffsetDateTime?
+            get() = null
+
+        @Deprecated("Asset No Merged", ReplaceWith("null"))
+        override val mergedAt: OffsetDateTime?
             get() = null
     }
 }

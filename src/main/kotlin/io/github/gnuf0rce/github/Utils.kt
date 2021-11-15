@@ -51,7 +51,7 @@ fun HttpClientConfig<*>.RateLimit(block: RateLimitFeature.Config.() -> Unit) {
     install(RateLimitFeature, block)
 }
 
-internal val REPO_REGEX = """([0-9A-z_-]+)/([0-9A-z_-]+)""".toRegex()
+internal val REPO_REGEX = """([\w-]+)/([\w-]+)""".toRegex()
 
 fun GitHubClient.repo(owner: String, repo: String) = GitHubRepo(owner = owner, repo = repo, github = this)
 

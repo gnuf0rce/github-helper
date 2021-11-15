@@ -22,3 +22,6 @@ enum class IssueFilter { assigned, created, mentioned, subscribed, all, repos }
 
 @Serializable
 enum class IssueSort { created, updated, comments }
+
+@Serializable
+enum class MergeableState { unknown, dirty }

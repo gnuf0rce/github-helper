@@ -7,6 +7,8 @@ import java.time.*
 data class Repo(
     @SerialName("allow_auto_merge")
     val allowAutoMerge: Boolean = false,
+    @SerialName("allow_forking")
+    val allowForking: Boolean = false,
     @SerialName("allow_merge_commit")
     val allowMergeCommit: Boolean = false,
     @SerialName("allow_rebase_merge")
@@ -183,6 +185,10 @@ data class Repo(
 
     @Deprecated("Repo No Close", ReplaceWith("null"))
     override val closedAt: OffsetDateTime?
+        get() = null
+
+    @Deprecated("Repo No Merged", ReplaceWith("null"))
+    override val mergedAt: OffsetDateTime?
         get() = null
 
     /**

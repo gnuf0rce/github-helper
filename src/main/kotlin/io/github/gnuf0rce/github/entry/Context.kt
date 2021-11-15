@@ -6,6 +6,7 @@ import java.time.*
 sealed interface LifeCycle {
     val createdAt: OffsetDateTime
     val updatedAt: OffsetDateTime
+    val mergedAt: OffsetDateTime?
     val closedAt: OffsetDateTime?
 }
 
@@ -14,11 +15,7 @@ interface Record {
     val url: String
 }
 
-interface WithUserInfo {
-    val user: UserInfo
-}
-
-interface Entry {
+sealed interface Entry {
     val url: String
     val nodeId: String
 }
@@ -91,10 +88,13 @@ data class PullRequest(
     val diffUrl: String,
     @SerialName("html_url")
     override val htmlUrl: String,
+    @Contextual
+    @SerialName("merged_at")
+    val mergedAt: OffsetDateTime? = null,
     @SerialName("patch_url")
     val patchUrl: String,
     @SerialName("url")
-    override val url: String
+    override val url: String,
 ) : Entry, HtmlPage {
     @Deprecated("PullRequest No Id", ReplaceWith("throw NotImplementedError(\"PullRequest.nodeId\")"))
     override val nodeId: String
@@ -184,3 +184,27 @@ data class RequestedTeam(
     @SerialName("url")
     override val url: String
 ) : Entry, HtmlPage
+
+@Serializable
+data class Reactions(
+    @SerialName("confused")
+    val confused: Int,
+    @SerialName("eyes")
+    val eyes: Int,
+    @SerialName("heart")
+    val heart: Int,
+    @SerialName("hooray")
+    val hooray: Int,
+    @SerialName("laugh")
+    val laugh: Int,
+    @SerialName("rocket")
+    val rocket: Int,
+    @SerialName("total_count")
+    val totalCount: Int,
+    @SerialName("url")
+    val url: String,
+    @SerialName("+1")
+    val plus: Int,
+    @SerialName("-1")
+    val minus: Int
+)

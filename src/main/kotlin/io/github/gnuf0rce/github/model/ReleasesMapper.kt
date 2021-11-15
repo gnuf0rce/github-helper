@@ -12,7 +12,10 @@ open class ReleasesMapper(parent: Url, override val github: GitHubClient) : GitH
     open suspend fun list(page: Int, per: Int = 30, context: JsonObject? = null) =
         page<JsonObject, Release>(page, per, context)
 
-    open suspend fun latest() = get<JsonObject>("latest")
+
+    open suspend fun latest() = get<Release>("latest")
 
     open suspend fun new(context: JsonObject) = post<JsonObject, Release>(context)
+
+    open suspend fun get(id: Int) = get<Release>("$id")
 }

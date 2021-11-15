@@ -143,7 +143,7 @@ suspend fun Pull.toMessage(contact: Contact, type: MessageType, notice: String):
 }
 
 suspend fun Release.toMessage(contact: Contact, type: MessageType, notice: String): Message {
-    val image = user.avatar().uploadAsImage(contact)
+    val image = author.avatar().uploadAsImage(contact)
     return when (type) {
         MessageType.TEXT -> buildMessageChain {
             add(image)
@@ -177,7 +177,7 @@ suspend fun Release.toMessage(contact: Contact, type: MessageType, notice: Strin
 }
 
 suspend fun Commit.toMessage(contact: Contact, type: MessageType, notice: String): Message {
-    val image = user.avatar().uploadAsImage(contact)
+    val image = author.avatar().uploadAsImage(contact)
     return when (type) {
         MessageType.TEXT -> buildMessageChain {
             add(image)
