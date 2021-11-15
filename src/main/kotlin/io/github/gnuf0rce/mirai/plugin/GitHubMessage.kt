@@ -75,7 +75,7 @@ suspend fun Issue.toMessage(contact: Contact, type: MessageType, notice: String)
     return when (type) {
         MessageType.TEXT -> buildMessageChain {
             appendLine(image)
-            appendLine("$notice with issue BY ${user.login} ")
+            appendLine("$notice with issue by ${user.login} ")
             appendLine("URL: $htmlUrl ")
             appendLine("TITLE: $title ")
             appendLine("STATE: $state ")
@@ -112,7 +112,7 @@ suspend fun Pull.toMessage(contact: Contact, type: MessageType, notice: String):
     return when (type) {
         MessageType.TEXT -> buildMessageChain {
             appendLine(image)
-            appendLine("$notice with pull BY ${user.login} ")
+            appendLine("$notice with pull by ${user.login} ")
             appendLine("URL: $htmlUrl ")
             appendLine("TITLE: $title ")
             appendLine("STATE: $state ")
@@ -149,7 +149,7 @@ suspend fun Release.toMessage(contact: Contact, type: MessageType, notice: Strin
     return when (type) {
         MessageType.TEXT -> buildMessageChain {
             appendLine(image)
-            appendLine("$notice with release BY ${author.login} ")
+            appendLine("$notice with release by ${author.login} ")
             appendLine("URL: $htmlUrl ")
             appendLine("NAME: $name ")
             appendLine("CREATED_AT: $createdAt ")
@@ -182,7 +182,7 @@ suspend fun Commit.toMessage(contact: Contact, type: MessageType, notice: String
     return when (type) {
         MessageType.TEXT -> buildMessageChain {
             appendLine(image)
-            appendLine("$notice with commit BY ${author.login} ")
+            appendLine("$notice with commit by ${author.login} ")
             appendLine("URL: $htmlUrl ")
             appendLine("MESSAGE: ${detail.message} ")
             appendLine("CREATED_AT: $createdAt ")
@@ -214,7 +214,7 @@ suspend fun Repo.toMessage(contact: Contact, type: MessageType, notice: String):
     return when (type) {
         MessageType.TEXT -> buildMessageChain {
             appendLine(image)
-            appendLine("$notice with repo BY ${owner.login} ")
+            appendLine("$notice with repo by ${owner.login} ")
             appendLine("URL: $htmlUrl ")
             appendLine("LANGUAGE: $language ")
             appendLine("CREATED_AT: $createdAt ")
