@@ -7,7 +7,7 @@ plugins {
 }
 
 group = "io.github.gnuf0rce"
-version = "1.1.3"
+version = "1.1.4"
 
 mavenCentralPublish {
     useCentralS01()
@@ -58,6 +58,9 @@ dependencies {
         exclude(group = "io.ktor", module = "ktor-client-core")
     }
     // test
+    testImplementation("com.vladsch.flexmark:flexmark-all:0.62.2")
+    testImplementation("net.mamoe.yamlkt:yamlkt-jvm:0.10.2")
+    testImplementation("org.apache.xmlgraphics:batik-transcoder:1.14")
     testImplementation(kotlin("test", Versions.kotlin))
 }
 

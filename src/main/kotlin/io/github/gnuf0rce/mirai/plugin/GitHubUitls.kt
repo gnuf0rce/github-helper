@@ -21,8 +21,8 @@ internal val logger by lazy {
 }
 
 internal val ImageFolder by lazy {
-    val dir = System.getProperty(IMAGE_FOLDER_PROPERTY)
-    (if (dir.isNullOrBlank()) GitHubHelperPlugin.dataFolder else File(dir)).resolve("image")
+    val path = System.getProperty(IMAGE_FOLDER_PROPERTY)
+    (if (path.isNullOrBlank()) GitHubHelperPlugin.dataFolder else File(path)).resolve("image")
 }
 
 internal val reply by lazy {
