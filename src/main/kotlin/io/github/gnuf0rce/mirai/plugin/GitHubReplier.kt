@@ -32,6 +32,24 @@ private const val REPLIER_NOTICE = "replier"
 /**
  * 1. [https://github.com/{owner}/{repo}/]
  */
+internal val OWNER_REGEX = """(?<=github\.com/)([\w-]+)(?![\w-]*/[\w-])""".toRegex()
+
+internal val OwnerReplier: MessageReplier = replier@{ result ->
+    logger.info { "${sender.render()} 匹配Owner(${result.value})" }
+    if (hasReplierPermission().not()) return@replier null
+    try {
+        val (owner) = result.destructured
+        val entry = github.user(owner).get()
+        entry.stats()
+    } catch (cause: Throwable) {
+        logger.warning({ "构建Repo(${result.value})信息失败" }, cause)
+        cause.message
+    }
+}
+
+/**
+ * 1. [https://github.com/{owner}/{repo}/]
+ */
 internal val REPO_REGEX = """(?<=github\.com/)([\w-]+)/([\w-]+)(?![\w-]*/[\w-])""".toRegex()
 
 internal val RepoReplier: MessageReplier = replier@{ result ->
@@ -136,10 +154,10 @@ internal val UrlRepliers by lazy {
         PULL_REGEX to PullReplier,
         RELEASE_REGEX to ReleaseReplier,
         REPO_REGEX to RepoReplier,
+        OWNER_REGEX to OwnerReplier,
         SHORT_LINK_REGEX to ShortLinkReplier
     )
 }
-
 
 private suspend fun Url.location(): String? {
     return github.useHttpClient { client ->
