@@ -9,6 +9,7 @@ import net.mamoe.mirai.console.extension.*
 import net.mamoe.mirai.console.plugin.jvm.*
 import net.mamoe.mirai.event.*
 import net.mamoe.mirai.event.events.*
+import net.mamoe.mirai.utils.*
 
 object GitHubHelperPlugin : KotlinPlugin(
     JvmPluginDescription(
@@ -35,6 +36,14 @@ object GitHubHelperPlugin : KotlinPlugin(
 
         globalEventChannel().subscribeOnce<BotOnlineEvent> {
             GitHubSubscriber.start()
+        }
+
+        logger.info { "/perm add u* ${ReplierPermission.id}" }
+
+        globalEventChannel().subscribeMessages {
+            for ((regex, replier) in UrlRepliers) {
+                regex findingReply replier
+            }
         }
     }
 
