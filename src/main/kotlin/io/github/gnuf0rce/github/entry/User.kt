@@ -24,7 +24,7 @@ data class Coder(
     @SerialName("gravatar_id")
     val gravatarId: String,
     @SerialName("html_url")
-    val htmlUrl: String,
+    override val htmlUrl: String,
     @SerialName("id")
     override val id: Long,
     @SerialName("login")
@@ -46,8 +46,8 @@ data class Coder(
     @SerialName("type")
     val type: String,
     @SerialName("url")
-    val url: String
-) : Entry, UserInfo
+    override val url: String
+) : Entry, UserInfo, HtmlPage
 
 @Serializable
 data class Author(

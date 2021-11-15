@@ -19,7 +19,12 @@ interface WithUserInfo {
 }
 
 interface Entry {
+    val url: String
     val nodeId: String
+}
+
+interface HtmlPage {
+    val htmlUrl: String?
 }
 
 @Serializable
@@ -37,7 +42,7 @@ data class Label(
     @SerialName("node_id")
     override val nodeId: String,
     @SerialName("url")
-    val url: String
+    override val url: String
 ) : Entry
 
 @Serializable
@@ -58,7 +63,7 @@ data class Milestone(
     @SerialName("due_on")
     val dueOn: OffsetDateTime?,
     @SerialName("html_url")
-    val htmlUrl: String,
+    override val htmlUrl: String,
     @SerialName("id")
     val id: Long,
     @SerialName("labels_url")
@@ -77,20 +82,24 @@ data class Milestone(
     @SerialName("updated_at")
     val updatedAt: OffsetDateTime,
     @SerialName("url")
-    val url: String
-) : Entry
+    override val url: String
+) : Entry, HtmlPage
 
 @Serializable
 data class PullRequest(
     @SerialName("diff_url")
     val diffUrl: String,
     @SerialName("html_url")
-    val htmlUrl: String,
+    override val htmlUrl: String,
     @SerialName("patch_url")
     val patchUrl: String,
     @SerialName("url")
-    val url: String
-)
+    override val url: String
+) : Entry, HtmlPage {
+    @Deprecated("PullRequest No Id", ReplaceWith("throw NotImplementedError(\"PullRequest.nodeId\")"))
+    override val nodeId: String
+        get() = throw NotImplementedError("PullRequest.nodeId")
+}
 
 @Serializable
 data class About(
@@ -109,7 +118,7 @@ data class About(
 @Serializable
 data class License(
     @SerialName("html_url")
-    val htmlUrl: String? = null,
+    override val htmlUrl: String? = null,
     @SerialName("key")
     val key: String,
     @SerialName("name")
@@ -119,8 +128,8 @@ data class License(
     @SerialName("spdx_id")
     val spdxId: String,
     @SerialName("url")
-    val url: String
-) : Entry
+    override val url: String
+) : Entry, HtmlPage
 
 @Serializable
 data class Links(
@@ -153,7 +162,7 @@ data class RequestedTeam(
     @SerialName("description")
     val description: String,
     @SerialName("html_url")
-    val htmlUrl: String,
+    override val htmlUrl: String,
     @SerialName("id")
     val id: Long,
     @SerialName("members_url")
@@ -173,5 +182,5 @@ data class RequestedTeam(
     @SerialName("slug")
     val slug: String,
     @SerialName("url")
-    val url: String
-) : Entry
+    override val url: String
+) : Entry, HtmlPage

@@ -36,7 +36,7 @@ data class Pull(
     @SerialName("head")
     val head: About,
     @SerialName("html_url")
-    val htmlUrl: String,
+    override val htmlUrl: String,
     @SerialName("id")
     val id: Long,
     @SerialName("issue_url")
@@ -78,7 +78,7 @@ data class Pull(
     @SerialName("updated_at")
     override val updatedAt: OffsetDateTime,
     @SerialName("url")
-    val url: String,
+    override val url: String,
     @SerialName("user")
     override val user: Coder
-) : Entry, LifeCycle, WithUserInfo
+) : Entry, LifeCycle, WithUserInfo, HtmlPage

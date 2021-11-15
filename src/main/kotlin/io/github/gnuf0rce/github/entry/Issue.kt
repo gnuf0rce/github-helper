@@ -28,7 +28,7 @@ data class Issue(
     @SerialName("events_url")
     val eventsUrl: String,
     @SerialName("html_url")
-    val htmlUrl: String,
+    override val htmlUrl: String,
     @SerialName("id")
     val id: Long,
     @SerialName("labels")
@@ -55,7 +55,7 @@ data class Issue(
     @SerialName("updated_at")
     override val updatedAt: OffsetDateTime,
     @SerialName("url")
-    val url: String,
+    override val url: String,
     @SerialName("user")
     override val user: Coder
-) : Entry, LifeCycle, WithUserInfo
+) : Entry, LifeCycle, WithUserInfo, HtmlPage

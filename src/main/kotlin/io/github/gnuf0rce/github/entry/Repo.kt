@@ -1,9 +1,7 @@
 package io.github.gnuf0rce.github.entry
 
-import kotlinx.serialization.Contextual
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
-import java.time.OffsetDateTime
+import kotlinx.serialization.*
+import java.time.*
 
 @Serializable
 data class Repo(
@@ -89,7 +87,7 @@ data class Repo(
     @SerialName("hooks_url")
     val hooksUrl: String,
     @SerialName("html_url")
-    val htmlUrl: String,
+    override val htmlUrl: String,
     @SerialName("id")
     val id: Long,
     @SerialName("is_template")
@@ -105,7 +103,7 @@ data class Repo(
     @SerialName("labels_url")
     val labelsUrl: String,
     @SerialName("language")
-    val language: String?,//
+    val language: String?,
     @SerialName("languages_url")
     val languagesUrl: String,
     @SerialName("license")
@@ -174,16 +172,16 @@ data class Repo(
     @SerialName("updated_at")
     override val updatedAt: OffsetDateTime,
     @SerialName("url")
-    val url: String,
+    override val url: String,
     @SerialName("visibility")
     val visibility: Visibility = Visibility.public,
     @SerialName("watchers")
     val watchers: Int,
     @SerialName("watchers_count")
     val watchersCount: Int,
-) : Entry, LifeCycle {
+) : Entry, LifeCycle, HtmlPage {
 
-    @Deprecated("Release No Close", ReplaceWith("null"))
+    @Deprecated("Repo No Close", ReplaceWith("null"))
     override val closedAt: OffsetDateTime?
         get() = null
 

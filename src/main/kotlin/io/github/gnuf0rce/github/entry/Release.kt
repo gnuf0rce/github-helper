@@ -21,7 +21,7 @@ data class Release(
     @SerialName("draft")
     val draft: Boolean,
     @SerialName("html_url")
-    val htmlUrl: String,
+    override val htmlUrl: String,
     @SerialName("id")
     val id: Long,
     @SerialName("name")
@@ -42,10 +42,10 @@ data class Release(
     @SerialName("upload_url")
     val uploadUrl: String,
     @SerialName("url")
-    val url: String,
+    override val url: String,
     @SerialName("zipball_url")
     val zipballUrl: String
-) : Entry, LifeCycle, WithUserInfo {
+) : Entry, LifeCycle, WithUserInfo, HtmlPage {
     @Deprecated("Release No Close", ReplaceWith("null"))
     override val closedAt: OffsetDateTime?
         get() = null
@@ -82,9 +82,9 @@ data class Release(
         @SerialName("uploader")
         val uploader: Coder,
         @SerialName("url")
-        val url: String
+        override val url: String
     ) : Entry, LifeCycle {
-        @Deprecated("Release No Close", ReplaceWith("null"))
+        @Deprecated("Asset No Close", ReplaceWith("null"))
         override val closedAt: OffsetDateTime?
             get() = null
     }

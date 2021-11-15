@@ -14,7 +14,7 @@ data class Commit(
     @SerialName("committer")
     val committer: Coder,
     @SerialName("html_url")
-    val htmlUrl: String,
+    override val htmlUrl: String,
     @SerialName("node_id")
     override val nodeId: String,
     @SerialName("parents")
@@ -23,7 +23,7 @@ data class Commit(
     override val sha: String,
     @SerialName("url")
     override val url: String
-) : Entry, Record, LifeCycle, WithUserInfo {
+) : Entry, Record, LifeCycle, WithUserInfo, HtmlPage {
     @Deprecated("Commit No Close", ReplaceWith("null"))
     override val closedAt: OffsetDateTime?
         get() = null
@@ -55,10 +55,14 @@ data class Commit(
         @SerialName("tree")
         val tree: Tree,
         @SerialName("url")
-        val url: String,
+        override val url: String,
         @SerialName("verification")
         val verification: Verification
-    )
+    ): Entry {
+        @Deprecated("Detail No Id", ReplaceWith("throw NotImplementedError(\"Detail.nodeId\")"))
+        override val nodeId: String
+            get() = throw NotImplementedError("Detail.nodeId")
+    }
 
     @Serializable
     data class Verification(
