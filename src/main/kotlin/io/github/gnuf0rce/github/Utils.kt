@@ -10,11 +10,13 @@ import kotlinx.serialization.modules.*
 import java.time.*
 import java.time.format.*
 
+const val IGNORE_UNKNOWN_KEYS = "io.github.gnuf0rce.github.ignore"
+
 internal fun GitHubClient() = GitHubClient(token = System.getenv("GITHUB_TOKEN"))
 
 internal val GitHubJson = Json {
     prettyPrint = true
-    ignoreUnknownKeys = true
+    ignoreUnknownKeys = System.getProperty(IGNORE_UNKNOWN_KEYS, "false").toBoolean()
     isLenient = true
     allowStructuredMapKeys = true
     serializersModule = SerializersModule {
