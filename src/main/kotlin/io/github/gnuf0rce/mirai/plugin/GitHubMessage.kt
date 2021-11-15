@@ -55,6 +55,8 @@ internal suspend fun UserInfo.stats(flush: Boolean = false, client: GitHubClient
 
 internal fun LightApp(block: JsonObjectBuilder.() -> Unit) = LightApp(GitHubJson.encodeToString(buildJsonObject(block)))
 
+internal fun MessageChainBuilder.appendLine(image: Image) = append(image).appendLine()
+
 suspend fun LifeCycle.toMessage(contact: Contact, type: MessageType, notice: String): Message {
     return when (this) {
         is Issue -> toMessage(contact, type, notice)
@@ -62,16 +64,17 @@ suspend fun LifeCycle.toMessage(contact: Contact, type: MessageType, notice: Str
         is Release -> toMessage(contact, type, notice)
         is Release.Asset -> throw IllegalStateException("不该出现的执行")
         is Commit -> toMessage(contact, type, notice)
-        is Repo -> TODO()
+        is Repo -> toMessage(contact, type, notice)
     }
 }
+
+suspend fun Contact.sendMessage(entry: LifeCycle, notice: String) = sendMessage(entry.toMessage(this, reply, notice))
 
 suspend fun Issue.toMessage(contact: Contact, type: MessageType, notice: String): Message {
     val image = user.avatar().uploadAsImage(contact)
     return when (type) {
         MessageType.TEXT -> buildMessageChain {
-            add(image)
-            appendLine()
+            appendLine(image)
             appendLine("$notice with issue BY ${user.login} ")
             appendLine("URL: $htmlUrl ")
             appendLine("TITLE: $title ")
@@ -108,8 +111,7 @@ suspend fun Pull.toMessage(contact: Contact, type: MessageType, notice: String):
     val image = user.avatar().uploadAsImage(contact)
     return when (type) {
         MessageType.TEXT -> buildMessageChain {
-            add(image)
-            appendLine()
+            appendLine(image)
             appendLine("$notice with pull BY ${user.login} ")
             appendLine("URL: $htmlUrl ")
             appendLine("TITLE: $title ")
@@ -146,9 +148,8 @@ suspend fun Release.toMessage(contact: Contact, type: MessageType, notice: Strin
     val image = author.avatar().uploadAsImage(contact)
     return when (type) {
         MessageType.TEXT -> buildMessageChain {
-            add(image)
-            appendLine()
-            appendLine("$notice BY: ${user.login} ")
+            appendLine(image)
+            appendLine("$notice with release BY ${author.login} ")
             appendLine("URL: $htmlUrl ")
             appendLine("NAME: $name ")
             appendLine("CREATED_AT: $createdAt ")
@@ -180,9 +181,8 @@ suspend fun Commit.toMessage(contact: Contact, type: MessageType, notice: String
     val image = author.avatar().uploadAsImage(contact)
     return when (type) {
         MessageType.TEXT -> buildMessageChain {
-            add(image)
-            appendLine()
-            appendLine("$notice BY: ${user.login} ")
+            appendLine(image)
+            appendLine("$notice with commit BY ${author.login} ")
             appendLine("URL: $htmlUrl ")
             appendLine("MESSAGE: ${detail.message} ")
             appendLine("CREATED_AT: $createdAt ")
@@ -206,5 +206,20 @@ suspend fun Commit.toMessage(contact: Contact, type: MessageType, notice: String
         MessageType.JSON -> LightApp {
             TODO()
         }
+    }
+}
+
+suspend fun Repo.toMessage(contact: Contact, type: MessageType, notice: String): Message {
+    val image = owner.avatar().uploadAsImage(contact)
+    return when (type) {
+        MessageType.TEXT -> buildMessageChain {
+            appendLine(image)
+            appendLine("$notice with repo BY ${owner.login} ")
+            appendLine("URL: $htmlUrl ")
+            appendLine("LANGUAGE: $language ")
+            appendLine("CREATED_AT: $createdAt ")
+        }
+        MessageType.XML -> TODO()
+        MessageType.JSON -> TODO()
     }
 }

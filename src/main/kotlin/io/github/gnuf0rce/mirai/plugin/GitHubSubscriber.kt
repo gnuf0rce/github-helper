@@ -11,10 +11,9 @@ import net.mamoe.mirai.message.data.*
 import net.mamoe.mirai.utils.*
 
 @OptIn(ConsoleExperimentalApi::class)
-abstract class GitHubSubscriber<T : LifeCycle>(private val name: String, scope: CoroutineScope = MainScope()) :
-    CoroutineScope by scope.childScope(name) {
+abstract class GitHubSubscriber<T : LifeCycle>(private val name: String, parent: CoroutineScope = MainScope()) :
+    CoroutineScope by parent.childScope(name) {
     companion object {
-        val reply by GitHubConfig::reply
         val repos = mutableMapOf<String, GitHubRepo>().withDefault { full -> github.repo(full) }
         const val PER_PAGE = 30
 
@@ -107,8 +106,7 @@ abstract class GitHubSubscriber<T : LifeCycle>(private val name: String, scope: 
     private suspend fun GitHubTask.sendMessage(record: T) {
         for (cid in contacts) {
             try {
-                val contact = Contact(cid)
-                contact.sendMessage(record.toMessage(contact, reply, id))
+                Contact(cid).sendMessage(record, id)
             } catch (e: Throwable) {
                 logger.warning("发送信息失败", e)
             }
