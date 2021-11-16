@@ -8,6 +8,7 @@ import io.ktor.client.request.*
 import io.ktor.http.*
 import net.mamoe.mirai.console.command.CommandSender.Companion.toCommandSender
 import net.mamoe.mirai.console.permission.*
+import net.mamoe.mirai.console.permission.PermissionService.Companion.hasPermission
 import net.mamoe.mirai.console.util.*
 import net.mamoe.mirai.console.util.ContactUtils.render
 import net.mamoe.mirai.event.events.*
@@ -18,14 +19,12 @@ typealias MessageReplier = suspend MessageEvent.(MatchResult) -> Any?
 internal val ReplierPermission: Permission by lazy {
     PermissionService.INSTANCE.register(
         id = GitHubHelperPlugin.permissionId("url"),
-        description = "",
+        description = "自动匹配GitHub相关的Url, 并返回结果",
         parent = GitHubHelperPlugin.parentPermission
     )
 }
 
-private fun MessageEvent.hasReplierPermission() = with(PermissionService) {
-    toCommandSender().hasPermission(ReplierPermission)
-}
+private fun MessageEvent.hasReplierPermission() = toCommandSender().hasPermission(ReplierPermission)
 
 private const val REPLIER_NOTICE = "replier"
 
