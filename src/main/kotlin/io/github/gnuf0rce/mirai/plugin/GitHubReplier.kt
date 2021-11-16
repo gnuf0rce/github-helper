@@ -12,7 +12,6 @@ import net.mamoe.mirai.console.util.*
 import net.mamoe.mirai.console.util.ContactUtils.render
 import net.mamoe.mirai.event.events.*
 import net.mamoe.mirai.utils.*
-import net.mamoe.mirai.utils.ExternalResource.Companion.uploadAsImage
 
 typealias MessageReplier = suspend MessageEvent.(MatchResult) -> Any?
 
@@ -41,10 +40,7 @@ internal val OwnerReplier: MessageReplier = replier@{ result ->
     try {
         val (owner) = result.destructured
         val entry = github.user(owner).get()
-        when (entry.type) {
-            CoderType.User -> entry.stats()
-            CoderType.Organization -> entry.avatar().uploadAsImage(subject) // TODO: ...
-        }
+        entry.toMessage(subject)
     } catch (cause: Throwable) {
         logger.warning({ "构建Repo(${result.value})信息失败" }, cause)
         cause.message
@@ -148,9 +144,21 @@ internal val ReleaseReplier: MessageReplier = replier@{ result ->
     }
 }
 
-/**
- * TODO: short link [https://git.io/JJmN9]
- */
+internal val MILESTONE_REGEX = """(?<=github\.com)([\w-]+)/([\w-]+)/milestone/(\d+)""".toRegex()
+
+internal val MilestoneReplier: MessageReplier = replier@{ result ->
+    logger.info { "${sender.render()} 匹配Milestone(${result.value})" }
+    if (hasReplierPermission().not()) return@replier null
+    try {
+        val (owner, repo, number) = result.destructured
+        val entry = github.repo(owner, repo).milestones.get(number.toInt())
+        entry.toMessage(subject, reply, REPLIER_NOTICE)
+    } catch (cause: Throwable) {
+        logger.warning({ "构建Milestone(${result.value})信息失败" }, cause)
+        cause.message
+    }
+}
+
 internal val UrlRepliers by lazy {
     mapOf(
         COMMIT_REGEX to CommitReplier,
@@ -159,6 +167,7 @@ internal val UrlRepliers by lazy {
         RELEASE_REGEX to ReleaseReplier,
         REPO_REGEX to RepoReplier,
         OWNER_REGEX to OwnerReplier,
+        MILESTONE_REGEX to MilestoneReplier,
         SHORT_LINK_REGEX to ShortLinkReplier
     )
 }
