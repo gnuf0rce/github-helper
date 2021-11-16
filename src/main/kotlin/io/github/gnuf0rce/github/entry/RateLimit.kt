@@ -7,7 +7,7 @@ data class RateLimit(
     @SerialName("rate")
     val rate: Status,
     @SerialName("resources")
-    val resources: Map<String, Status>
+    val resources: Map<String, Status> = emptyMap()
 ) {
     @Serializable
     data class Status(
@@ -18,7 +18,7 @@ data class RateLimit(
         @SerialName("reset")
         val reset: Long,
         @SerialName("resource")
-        val resource: String,
+        val resource: String? = null,
         @SerialName("used")
         val used: Int
     )
