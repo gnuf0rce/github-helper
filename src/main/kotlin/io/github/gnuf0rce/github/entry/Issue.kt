@@ -8,27 +8,27 @@ data class Issue(
     @SerialName("active_lock_reason")
     val activeLockReason: String?,
     @SerialName("assignee")
-    val assignee: Coder?,
+    override val assignee: Coder? = null,
     @SerialName("assignees")
-    val assignees: List<Coder> = emptyList(),
+    override val assignees: List<Coder> = emptyList(),
     @SerialName("author_association")
-    val authorAssociation: Association,
+    override val authorAssociation: Association,
     @SerialName("body")
-    val body: String?,
+    override val body: String,
     @Contextual
     @SerialName("closed_at")
     override val closedAt: OffsetDateTime?,
     @SerialName("closed_by")
-    val closedBy: Coder? = null,
+    override val closedBy: Coder? = null,
     @SerialName("comments")
-    val comments: Int,
+    override val comments: Int = 0,
     @SerialName("comments_url")
-    val commentsUrl: String,
+    override val commentsUrl: String,
     @Contextual
     @SerialName("created_at")
     override val createdAt: OffsetDateTime,
     @SerialName("draft")
-    val draft: Boolean = false,
+    override val draft: Boolean = false,
     @SerialName("events_url")
     val eventsUrl: String,
     @SerialName("html_url")
@@ -36,20 +36,20 @@ data class Issue(
     @SerialName("id")
     val id: Long,
     @SerialName("labels")
-    val labels: List<Label> = emptyList(),
+    override val labels: List<ControlRecord.Label> = emptyList(),
     @SerialName("labels_url")
     val labelsUrl: String,
     @SerialName("locked")
-    val locked: Boolean,
+    override val locked: Boolean,
     @Contextual
     @SerialName("merged_at")
     override val mergedAt: OffsetDateTime? = null,
     @SerialName("milestone")
-    val milestone: Milestone? = null,
+    override val milestone: Milestone? = null,
     @SerialName("node_id")
     override val nodeId: String,
     @SerialName("number")
-    val number: Int,
+    override val number: Int,
     @SerialName("performed_via_github_app")
     val performedViaGithubApp: String? = null,
     @SerialName("pull_request")
@@ -59,16 +59,16 @@ data class Issue(
     @SerialName("repository_url")
     val repositoryUrl: String,
     @SerialName("state")
-    val state: State = State.open,
+    override val state: State = State.open,
     @SerialName("timeline_url")
     val timelineUrl: String,
     @SerialName("title")
-    val title: String,
+    override val title: String,
     @Contextual
     @SerialName("updated_at")
     override val updatedAt: OffsetDateTime,
     @SerialName("url")
     override val url: String,
     @SerialName("user")
-    val user: Coder
-) : Entry, LifeCycle, HtmlPage
+    override val user: Coder
+) : Entry, LifeCycle, HtmlPage, ControlRecord

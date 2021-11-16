@@ -28,3 +28,9 @@ enum class MergeableState { unknown, dirty }
 
 @Serializable
 enum class CoderType { User, Organization }
+
+@Serializable
+enum class AssetState { uploaded }
+
+@Serializable
+enum class VerificationReason { valid, unsigned }

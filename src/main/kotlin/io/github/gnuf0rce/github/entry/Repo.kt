@@ -49,7 +49,7 @@ data class Repo(
     @SerialName("deployments_url")
     val deploymentsUrl: String,
     @SerialName("description")
-    val description: String,
+    val description: String?,
     @SerialName("disabled")
     val disabled: Boolean,
     @SerialName("downloads_url")
@@ -109,7 +109,7 @@ data class Repo(
     @SerialName("languages_url")
     val languagesUrl: String,
     @SerialName("license")
-    val license: License,
+    val license: License?,
     @SerialName("merges_url")
     val mergesUrl: String,
     @SerialName("milestones_url")
@@ -136,8 +136,9 @@ data class Repo(
     val `private`: Boolean = false,
     @SerialName("pulls_url")
     val pullsUrl: String,
+    @Contextual
     @SerialName("pushed_at")
-    val pushedAt: String,
+    val pushedAt: OffsetDateTime,
     @SerialName("releases_url")
     val releasesUrl: String,
     @SerialName("size")
@@ -187,9 +188,11 @@ data class Repo(
     override val closedAt: OffsetDateTime?
         get() = null
 
-    @Deprecated("Repo No Merged", ReplaceWith("null"))
-    override val mergedAt: OffsetDateTime?
-        get() = null
+    /**
+     * 1. [pushedAt]
+     */
+    override val mergedAt: OffsetDateTime
+        get() = pushedAt
 
     /**
      * 1. https://github.com/{owner}/{repo}/raw/{branch}/README.md

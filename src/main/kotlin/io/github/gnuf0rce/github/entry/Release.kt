@@ -1,5 +1,6 @@
 package io.github.gnuf0rce.github.entry
 
+import io.ktor.http.*
 import kotlinx.serialization.*
 import java.time.*
 
@@ -51,9 +52,11 @@ data class Release(
     val zipballUrl: String
 ) : Entry, LifeCycle, HtmlPage {
 
-    @Deprecated("Release No Close", ReplaceWith("null"))
+    /**
+     * 1. [publishedAt]
+     */
     override val closedAt: OffsetDateTime?
-        get() = null
+        get() = publishedAt
 
     @Deprecated("Release No Merge", ReplaceWith("null"))
     override val mergedAt: OffsetDateTime?
@@ -66,8 +69,9 @@ data class Release(
     data class Asset(
         @SerialName("browser_download_url")
         val browserDownloadUrl: String,
+        @Contextual
         @SerialName("content_type")
-        val contentType: String,
+        val contentType: ContentType,
         @Contextual
         @SerialName("created_at")
         override val createdAt: OffsetDateTime,
@@ -84,7 +88,7 @@ data class Release(
         @SerialName("size")
         val size: Int,
         @SerialName("state")
-        val state: String,
+        val state: AssetState,
         @Contextual
         @SerialName("updated_at")
         override val updatedAt: OffsetDateTime,

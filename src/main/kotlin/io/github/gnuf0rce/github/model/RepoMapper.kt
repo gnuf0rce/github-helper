@@ -56,6 +56,8 @@ open class RepoMapper(parent: Url, override val github: GitHubClient) : GitHubMa
 
     open val releases by lazy { ReleasesMapper(base, github) }
 
+    open val milestones by lazy { MilestonesMapper(base, github) }
+
     open suspend fun commits(page: Int, per: Int = 30) = page<Commit>(page, per, "commits")
 
     open fun commit(sha: String) = CommitMapper(base, sha, github)

@@ -20,67 +20,9 @@ sealed interface Entry {
     val nodeId: String
 }
 
-interface HtmlPage {
+sealed interface HtmlPage {
     val htmlUrl: String?
 }
-
-@Serializable
-data class Label(
-    @SerialName("color")
-    val color: String,
-    @SerialName("default")
-    val default: Boolean,
-    @SerialName("description")
-    val description: String,
-    @SerialName("id")
-    val id: Long,
-    @SerialName("name")
-    val name: String,
-    @SerialName("node_id")
-    override val nodeId: String,
-    @SerialName("url")
-    override val url: String
-) : Entry
-
-@Serializable
-data class Milestone(
-    @Contextual
-    @SerialName("closed_at")
-    val closedAt: OffsetDateTime?,
-    @SerialName("closed_issues")
-    val closedIssues: Int,
-    @Contextual
-    @SerialName("created_at")
-    val createdAt: OffsetDateTime,
-    @SerialName("creator")
-    val creator: Coder,
-    @SerialName("description")
-    val description: String,
-    @Contextual
-    @SerialName("due_on")
-    val dueOn: OffsetDateTime?,
-    @SerialName("html_url")
-    override val htmlUrl: String,
-    @SerialName("id")
-    val id: Long,
-    @SerialName("labels_url")
-    val labelsUrl: String,
-    @SerialName("node_id")
-    override val nodeId: String,
-    @SerialName("number")
-    val number: Int,
-    @SerialName("open_issues")
-    val openIssues: Int,
-    @SerialName("state")
-    val state: String,
-    @SerialName("title")
-    val title: String,
-    @Contextual
-    @SerialName("updated_at")
-    val updatedAt: OffsetDateTime,
-    @SerialName("url")
-    override val url: String
-) : Entry, HtmlPage
 
 @Serializable
 data class PullRequest(
@@ -114,22 +56,6 @@ data class About(
     @SerialName("user")
     val user: Coder
 )
-
-@Serializable
-data class License(
-    @SerialName("html_url")
-    override val htmlUrl: String? = null,
-    @SerialName("key")
-    val key: String,
-    @SerialName("name")
-    val name: String,
-    @SerialName("node_id")
-    override val nodeId: String,
-    @SerialName("spdx_id")
-    val spdxId: String,
-    @SerialName("url")
-    override val url: String
-) : Entry, HtmlPage
 
 @Serializable
 data class Links(
