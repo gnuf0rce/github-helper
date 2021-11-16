@@ -79,7 +79,7 @@ data class Commit(
         @SerialName("payload")
         val payload: String?,
         @SerialName("reason")
-        val reason: String,
+        val reason: VerificationReason,
         @SerialName("signature")
         val signature: String?,
         @SerialName("verified")
