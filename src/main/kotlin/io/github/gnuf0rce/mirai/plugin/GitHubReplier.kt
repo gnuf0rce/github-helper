@@ -30,7 +30,7 @@ private fun MessageEvent.hasReplierPermission() = with(PermissionService) {
 private const val REPLIER_NOTICE = "replier"
 
 /**
- * 1. [https://github.com/{owner}/{repo}/]
+ * 1. [https://github.com/{owner}/]
  */
 internal val OWNER_REGEX = """(?<=github\.com/)([\w-]+)(?![\w-]*/[\w-])""".toRegex()
 
@@ -102,9 +102,9 @@ internal val IssueReplier: MessageReplier = replier@{ result ->
 }
 
 /**
- * 1. [https://github.com/{owner}/{repo}/pulls/{number}]
+ * 1. [https://github.com/{owner}/{repo}/pull/{number}]
  */
-internal val PULL_REGEX = """(?<=github\.com/)([\w-]+)/([\w-]+)/pulls/(\d+)""".toRegex()
+internal val PULL_REGEX = """(?<=github\.com/)([\w-]+)/([\w-]+)/pull/(\d+)""".toRegex()
 
 internal val PullReplier: MessageReplier = replier@{ result ->
     logger.info { "${sender.render()} 匹配Pull(${result.value})" }
@@ -120,7 +120,7 @@ internal val PullReplier: MessageReplier = replier@{ result ->
 }
 
 /**
- * 1. [https://github.com/{owner}/{repo}/releases/tag/{tag}]
+ * 1. [https://github.com/{owner}/{repo}/releases/tag/{name}]
  */
 internal val RELEASE_REGEX = """(?<=github\.com/)([\w-]+)/([\w-]+)/releases/tag/([^/#]+)""".toRegex()
 
@@ -128,13 +128,13 @@ internal val ReleaseReplier: MessageReplier = replier@{ result ->
     logger.info { "${sender.render()} 匹配Release(${result.value})" }
     if (hasReplierPermission().not()) return@replier null
     try {
-        val (owner, repo, tag) = result.destructured
+        val (owner, repo, name) = result.destructured
         var page = 1
         lateinit var entry: Release
         while (true) {
             val list = github.repo(owner, repo).releases.list(page++)
-            if (list.isEmpty()) throw NotImplementedError("$tag with ${owner}/${repo}")
-            entry = list.find { it.tagName == tag } ?: continue
+            if (list.isEmpty()) throw NotImplementedError("$name with ${owner}/${repo}")
+            entry = list.find { it.tagName == name } ?: continue
             break
         }
         entry.toMessage(subject, reply, REPLIER_NOTICE)
@@ -144,6 +144,9 @@ internal val ReleaseReplier: MessageReplier = replier@{ result ->
     }
 }
 
+/**
+ * 1. [https://github.com/{owner}/{repo}/milestone/{number}]
+ */
 internal val MILESTONE_REGEX = """(?<=github\.com)([\w-]+)/([\w-]+)/milestone/(\d+)""".toRegex()
 
 internal val MilestoneReplier: MessageReplier = replier@{ result ->
