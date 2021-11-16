@@ -7,7 +7,6 @@ import io.ktor.http.*
 import net.mamoe.mirai.utils.*
 import java.io.*
 import java.net.*
-import java.time.*
 
 const val LOGGER_PROPERTY = "io.github.gnuf0rce.mirai.plugin.logger"
 
@@ -62,8 +61,4 @@ internal fun Url.toProxy(): Proxy {
         else -> throw IllegalArgumentException("不支持的代理类型, $protocol")
     }
     return Proxy(type, InetSocketAddress(host, port))
-}
-
-internal val offset by lazy {
-    OffsetDateTime.now().offset
 }

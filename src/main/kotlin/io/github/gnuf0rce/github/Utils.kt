@@ -21,7 +21,8 @@ internal val GitHubJson = Json {
     allowStructuredMapKeys = true
     serializersModule = SerializersModule {
         include(serializersModule)
-        contextual(OffsetDateTime::class, OffsetDateTimeSerializer)
+        contextual(OffsetDateTimeSerializer)
+        contextual(ContentTypeSerializer)
     }
 }
 
@@ -37,12 +38,29 @@ object OffsetDateTimeSerializer : KSerializer<OffsetDateTime> {
 
     private val formatter get() = DateTimeFormatter.ISO_OFFSET_DATE_TIME
 
+    private val offset get() = OffsetDateTime.now().offset
+
     override fun deserialize(decoder: Decoder): OffsetDateTime {
-        return OffsetDateTime.parse(decoder.decodeString(), formatter)
+        return OffsetDateTime.parse(decoder.decodeString(), formatter).withOffsetSameInstant(offset)
     }
 
     override fun serialize(encoder: Encoder, value: OffsetDateTime) {
-        encoder.encodeString(value.format(formatter))
+        encoder.encodeString(value.withOffsetSameInstant(ZoneOffset.UTC).format(formatter))
+    }
+}
+
+@OptIn(ExperimentalSerializationApi::class)
+@Serializer(ContentType::class)
+object ContentTypeSerializer : KSerializer<ContentType> {
+    override val descriptor: SerialDescriptor =
+        PrimitiveSerialDescriptor(ContentType::class.qualifiedName!!, PrimitiveKind.STRING)
+
+    override fun deserialize(decoder: Decoder): ContentType {
+        return ContentType.parse(decoder.decodeString())
+    }
+
+    override fun serialize(encoder: Encoder, value: ContentType) {
+        encoder.encodeString(value.toString())
     }
 }
 
