@@ -14,22 +14,38 @@ const val IMAGE_FOLDER_PROPERTY = "io.github.gnuf0rce.mirai.plugin.image"
 
 const val REPLY_TYPE_PROPERTY = "io.github.gnuf0rce.mirai.plugin.reply"
 
+/**
+ * 1. [LOGGER_PROPERTY]
+ * 2. [GitHubHelperPlugin.logger]
+ */
 internal val logger by lazy {
     val open = System.getProperty(LOGGER_PROPERTY, "${true}").toBoolean()
     if (open) GitHubHelperPlugin.logger else SilentLogger
 }
 
+/**
+ * 1. [IMAGE_FOLDER_PROPERTY]
+ * 2. [GitHubHelperPlugin.dataFolder]
+ */
 internal val ImageFolder by lazy {
     val path = System.getProperty(IMAGE_FOLDER_PROPERTY)
     (if (path.isNullOrBlank()) GitHubHelperPlugin.dataFolder else File(path)).resolve("image")
 }
 
+/**
+ * 1. [REPLY_TYPE_PROPERTY]
+ * 2. [MessageType]
+ */
 internal val reply by lazy {
     System.getProperty(REPLY_TYPE_PROPERTY)
         ?.let(MessageType::valueOf)
         ?: GitHubConfig.reply
 }
 
+/**
+ * 1. [GitHubClient]
+ * 2. [GitHubConfig]
+ */
 internal val github by lazy {
     object : GitHubClient(token = GitHubConfig.token.takeIf { it.isNotBlank() }) {
         init {
