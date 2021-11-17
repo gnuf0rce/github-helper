@@ -71,4 +71,20 @@ data class Issue(
     override val url: String,
     @SerialName("user")
     override val user: Coder
-) : Entry, LifeCycle, HtmlPage, ControlRecord
+) : Entry, LifeCycle, HtmlPage, ControlRecord {
+
+    @Serializable
+    data class PullRequest(
+        @SerialName("diff_url")
+        val diffUrl: String,
+        @SerialName("html_url")
+        override val htmlUrl: String,
+        @Contextual
+        @SerialName("merged_at")
+        val mergedAt: OffsetDateTime? = null,
+        @SerialName("patch_url")
+        val patchUrl: String,
+        @SerialName("url")
+        val url: String,
+    ) : HtmlPage
+}

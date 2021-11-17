@@ -1,13 +1,6 @@
 package io.github.gnuf0rce.github.entry
 
 import kotlinx.serialization.*
-import java.time.*
-
-interface UserInfo {
-    val avatarUrl: String
-    val id: Long
-    val login: String
-}
 
 @Serializable
 data class Coder(
@@ -47,15 +40,9 @@ data class Coder(
     val type: CoderType,
     @SerialName("url")
     override val url: String
-) : Entry, UserInfo, HtmlPage
+) : Entry, UserInfo, HtmlPage {
 
-@Serializable
-data class Author(
-    @Contextual
-    @SerialName("date")
-    val date: OffsetDateTime,
-    @SerialName("email")
-    val email: String,
-    @SerialName("name")
-    val name: String
-)
+    sealed interface Product {
+        val creator: Coder
+    }
+}

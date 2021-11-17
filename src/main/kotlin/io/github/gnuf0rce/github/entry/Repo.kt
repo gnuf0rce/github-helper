@@ -182,7 +182,10 @@ data class Repo(
     val watchers: Int,
     @SerialName("watchers_count")
     val watchersCount: Int,
-) : Entry, LifeCycle, HtmlPage {
+) : Entry, LifeCycle, HtmlPage, Coder.Product {
+
+    override val creator: Coder
+        get() = owner
 
     @Deprecated("Repo No Close", ReplaceWith("null"))
     override val closedAt: OffsetDateTime?

@@ -30,7 +30,10 @@ data class Commit(
     val stats: Stats = Stats(),
     @SerialName("files")
     val files: List<File> = emptyList()
-) : Entry, Record, LifeCycle, HtmlPage {
+) : Entry, Record, LifeCycle, HtmlPage, Coder.Product {
+
+    override val creator: Coder
+        get() = author
 
     @Deprecated("Commit No Close", ReplaceWith("null"))
     override val closedAt: OffsetDateTime?
@@ -72,6 +75,17 @@ data class Commit(
         val url: String,
         @SerialName("verification")
         val verification: Verification
+    )
+
+    @Serializable
+    data class Author(
+        @Contextual
+        @SerialName("date")
+        val date: OffsetDateTime,
+        @SerialName("email")
+        val email: String,
+        @SerialName("name")
+        val name: String
     )
 
     @Serializable

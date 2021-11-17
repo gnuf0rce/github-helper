@@ -50,7 +50,10 @@ data class Release(
     override val url: String,
     @SerialName("zipball_url")
     val zipballUrl: String
-) : Entry, LifeCycle, HtmlPage, Content {
+) : Entry, LifeCycle, HtmlPage, Content, Coder.Product {
+
+    override val creator: Coder
+        get() = author
 
     /**
      * 1. [publishedAt]

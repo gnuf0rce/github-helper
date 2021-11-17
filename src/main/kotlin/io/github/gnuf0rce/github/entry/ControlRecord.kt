@@ -6,7 +6,7 @@ import kotlinx.serialization.*
  * @see [Pull]
  * @see [Issue]
  */
-sealed interface ControlRecord : Entry, LifeCycle, HtmlPage, Content {
+sealed interface ControlRecord : Entry, LifeCycle, HtmlPage, Content, Coder.Product {
     override val htmlUrl: String
     val title: String
     val user: Coder
@@ -17,12 +17,14 @@ sealed interface ControlRecord : Entry, LifeCycle, HtmlPage, Content {
     val number: Int
     val labels: List<Label>
     val authorAssociation: Association
-    override val body: String?
     val comments: Int
     val commentsUrl: String
     val milestone: Milestone?
     val draft: Boolean
     val locked: Boolean
+
+    override val creator: Coder
+        get() = user
 
     @Serializable
     data class Label(

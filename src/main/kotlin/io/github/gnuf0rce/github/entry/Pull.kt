@@ -87,7 +87,7 @@ data class Pull(
     @SerialName("requested_reviewers")
     val requestedReviewers: List<Coder> = emptyList(),
     @SerialName("requested_teams")
-    val requestedTeams: List<RequestedTeam> = emptyList(),
+    val requestedTeams: List<Team> = emptyList(),
     @SerialName("review_comment_url")
     val reviewCommentUrl: String,
     @SerialName("review_comments")
@@ -108,6 +108,20 @@ data class Pull(
     @SerialName("user")
     override val user: Coder
 ) : Entry, LifeCycle, HtmlPage, ControlRecord {
+
+    @Serializable
+    data class About(
+        @SerialName("label")
+        val label: String,
+        @SerialName("ref")
+        val ref: String,
+        @SerialName("repo")
+        val repo: Repo? = null,
+        @SerialName("sha")
+        val sha: String,
+        @SerialName("user")
+        val user: Coder
+    )
 
     @Serializable
     data class Links(
