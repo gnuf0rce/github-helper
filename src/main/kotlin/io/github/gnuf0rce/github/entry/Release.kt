@@ -13,7 +13,7 @@ data class Release(
     @SerialName("author")
     val author: Coder,
     @SerialName("body")
-    val body: String,
+    val body: String?,
     @Contextual
     @SerialName("created_at")
     override val createdAt: OffsetDateTime,
