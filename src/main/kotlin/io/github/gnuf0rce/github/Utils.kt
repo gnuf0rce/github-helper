@@ -1,6 +1,5 @@
 package io.github.gnuf0rce.github
 
-import io.ktor.client.*
 import io.ktor.http.*
 import kotlinx.serialization.*
 import kotlinx.serialization.descriptors.*
@@ -63,21 +62,3 @@ object ContentTypeSerializer : KSerializer<ContentType> {
         encoder.encodeString(value.toString())
     }
 }
-
-@Suppress("FunctionName")
-fun HttpClientConfig<*>.RateLimit(block: RateLimitFeature.Config.() -> Unit) {
-    install(RateLimitFeature, block)
-}
-
-internal val REPO_REGEX = """([\w-]+)/([\w-]+)""".toRegex()
-
-fun GitHubClient.repo(owner: String, repo: String) = GitHubRepo(owner = owner, repo = repo, github = this)
-
-fun GitHubClient.repo(full: String): GitHubRepo {
-    val (owner, repo) = requireNotNull(REPO_REGEX.find(full)) { "Not Found FullName." }.destructured
-    return GitHubRepo(owner = owner, repo = repo, github = this)
-}
-
-fun GitHubClient.user(name: String) = GitHubUser(user = name, github = this)
-
-fun GitHubClient.current() = GitHubCurrent(github = this)

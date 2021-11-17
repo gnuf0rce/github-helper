@@ -6,7 +6,7 @@ import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
 import io.ktor.util.*
-import kotlinx.coroutines.delay
+import kotlinx.coroutines.*
 import kotlinx.coroutines.sync.*
 import java.time.*
 
@@ -66,4 +66,9 @@ class RateLimitFeature internal constructor(val send: suspend (Status, String) -
             }
         }
     }
+}
+
+@Suppress("FunctionName")
+fun HttpClientConfig<*>.RateLimit(block: RateLimitFeature.Config.() -> Unit) {
+    install(RateLimitFeature, block)
 }
