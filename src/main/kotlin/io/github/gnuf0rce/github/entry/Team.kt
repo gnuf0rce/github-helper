@@ -5,7 +5,7 @@ import kotlinx.serialization.*
 @Serializable
 data class Team(
     @SerialName("description")
-    val description: String,
+    val description: String?,
     @SerialName("html_url")
     override val htmlUrl: String,
     @SerialName("id")

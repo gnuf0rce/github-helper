@@ -33,7 +33,7 @@ sealed interface ControlRecord : Entry, LifeCycle, HtmlPage, Content, Owner.Prod
         @SerialName("default")
         val default: Boolean,
         @SerialName("description")
-        val description: String,
+        val description: String?,
         @SerialName("id")
         val id: Long,
         @SerialName("name")

@@ -16,7 +16,7 @@ data class Milestone(
     @SerialName("creator")
     val creator: Owner,
     @SerialName("description")
-    val description: String,
+    val description: String?,
     @Contextual
     @SerialName("due_on")
     val dueOn: OffsetDateTime?,
