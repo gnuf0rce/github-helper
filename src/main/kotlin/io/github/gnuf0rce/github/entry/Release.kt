@@ -91,7 +91,7 @@ data class Release(
         @SerialName("size")
         val size: Int,
         @SerialName("state")
-        val state: AssetState,
+        val state: State,
         @Contextual
         @SerialName("updated_at")
         override val updatedAt: OffsetDateTime,
@@ -100,6 +100,9 @@ data class Release(
         @SerialName("url")
         override val url: String
     ) : Entry, LifeCycle {
+
+        @Serializable
+        enum class State { uploaded }
 
         @Deprecated("Asset No Close", ReplaceWith("null"))
         override val closedAt: OffsetDateTime?
