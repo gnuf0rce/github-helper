@@ -3,7 +3,7 @@ package io.github.gnuf0rce.mirai.plugin
 import kotlinx.serialization.*
 import kotlinx.serialization.json.*
 import net.mamoe.mirai.message.data.*
-import kotlin.reflect.full.createInstance
+import kotlin.reflect.full.*
 
 
 @OptIn(ExperimentalSerializationApi::class)
@@ -19,7 +19,7 @@ sealed class StructMessageBuilder {
     fun build(json: Json = Json.Default) = LightApp(json, block)
 }
 
-internal data class StructNew(
+data class StructNew(
     val config: Config = Config(),
     var uin: Long = 0,
     val detail: Detail = Detail(),
