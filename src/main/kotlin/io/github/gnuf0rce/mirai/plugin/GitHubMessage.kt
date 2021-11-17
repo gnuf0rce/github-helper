@@ -93,19 +93,24 @@ internal suspend fun Coder.toMessage(contact: Contact): Message {
     }
 }
 
-suspend fun LifeCycle.toMessage(contact: Contact, type: MessageType, notice: String): Message {
+suspend fun HtmlPage.toMessage(contact: Contact, type: MessageType, notice: String): Message {
     return when (this) {
         is Issue -> toMessage(contact, type, notice)
         is Pull -> toMessage(contact, type, notice)
         is Release -> toMessage(contact, type, notice)
-        is Release.Asset -> throw IllegalStateException("不该出现的执行")
         is Commit -> toMessage(contact, type, notice)
         is Repo -> toMessage(contact, type, notice)
         is Milestone -> toMessage(contact, type, notice)
+        is Coder -> toMessage(contact)
+        is License -> (htmlUrl ?: name).toPlainText()
+        is Issue.PullRequest -> htmlUrl.toPlainText()
+        is Readme -> htmlUrl.toPlainText()
+        is Team -> htmlUrl.toPlainText()
+        is Commit.Tree -> (htmlUrl ?: sha).toPlainText()
     }
 }
 
-suspend fun Contact.sendMessage(entry: LifeCycle, notice: String) = sendMessage(entry.toMessage(this, reply, notice))
+suspend fun Contact.sendMessage(entry: HtmlPage, notice: String) = sendMessage(entry.toMessage(this, reply, notice))
 
 suspend fun ControlRecord.toMessage(contact: Contact, type: MessageType, notice: String): Message {
     val image = user.avatar().uploadAsImage(contact)

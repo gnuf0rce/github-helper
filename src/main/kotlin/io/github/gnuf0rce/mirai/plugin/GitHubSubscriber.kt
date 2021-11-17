@@ -11,8 +11,10 @@ import net.mamoe.mirai.message.data.*
 import net.mamoe.mirai.utils.*
 
 @OptIn(ConsoleExperimentalApi::class)
-abstract class GitHubSubscriber<T : LifeCycle>(private val name: String, parent: CoroutineScope = MainScope()) :
-    CoroutineScope by parent.childScope(name) {
+abstract class GitHubSubscriber<T>(private val name: String, parent: CoroutineScope) :
+    CoroutineScope by parent.childScope(name)
+    where T : LifeCycle, T : HtmlPage {
+
     companion object {
         val repos = mutableMapOf<String, GitHubRepo>().withDefault { full -> github.repo(full) }
         const val PER_PAGE = 30
