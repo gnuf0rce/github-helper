@@ -17,7 +17,7 @@ sealed interface ControlRecord : Entry, LifeCycle, HtmlPage {
     val number: Int
     val labels: List<Label>
     val authorAssociation: Association
-    val body: String
+    val body: String?
     val comments: Int
     val commentsUrl: String
     val milestone: Milestone?

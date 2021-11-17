@@ -20,7 +20,7 @@ data class Pull(
     @SerialName("base")
     val base: About,
     @SerialName("body")
-    override val body: String,
+    override val body: String?,
     @SerialName("changed_files")
     val changedFiles: Int = 0,
     @Contextual
@@ -107,4 +107,31 @@ data class Pull(
     override val url: String,
     @SerialName("user")
     override val user: Coder
-) : Entry, LifeCycle, HtmlPage, ControlRecord
+) : Entry, LifeCycle, HtmlPage, ControlRecord {
+
+    @Serializable
+    data class Links(
+        @SerialName("comments")
+        val comments: Link,
+        @SerialName("commits")
+        val commits: Link,
+        @SerialName("html")
+        val html: Link,
+        @SerialName("issue")
+        val issue: Link,
+        @SerialName("review_comment")
+        val reviewComment: Link,
+        @SerialName("review_comments")
+        val reviewComments: Link,
+        @SerialName("self")
+        val self: Link,
+        @SerialName("statuses")
+        val statuses: Link
+    )
+
+    @Serializable
+    data class Link(
+        @SerialName("href")
+        val href: String
+    )
+}

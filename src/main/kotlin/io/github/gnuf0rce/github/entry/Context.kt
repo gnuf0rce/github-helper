@@ -58,32 +58,6 @@ data class About(
 )
 
 @Serializable
-data class Links(
-    @SerialName("comments")
-    val comments: Link,
-    @SerialName("commits")
-    val commits: Link,
-    @SerialName("html")
-    val html: Link,
-    @SerialName("issue")
-    val issue: Link,
-    @SerialName("review_comment")
-    val reviewComment: Link,
-    @SerialName("review_comments")
-    val reviewComments: Link,
-    @SerialName("self")
-    val self: Link,
-    @SerialName("statuses")
-    val statuses: Link
-) {
-    @Serializable
-    data class Link(
-        @SerialName("href")
-        val href: String
-    )
-}
-
-@Serializable
 data class RequestedTeam(
     @SerialName("description")
     val description: String,

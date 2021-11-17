@@ -14,7 +14,7 @@ data class Issue(
     @SerialName("author_association")
     override val authorAssociation: Association,
     @SerialName("body")
-    override val body: String,
+    override val body: String?,
     @Contextual
     @SerialName("closed_at")
     override val closedAt: OffsetDateTime?,
