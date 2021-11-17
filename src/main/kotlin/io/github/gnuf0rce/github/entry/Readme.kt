@@ -15,7 +15,7 @@ data class Readme(
     @SerialName("download_url")
     val downloadUrl: String,
     @SerialName("encoding")
-    val encoding: String,
+    val encoding: Encoding,
     @SerialName("git_url")
     val gitUrl: String,
     @SerialName("html_url")
@@ -31,10 +31,13 @@ data class Readme(
     @SerialName("size")
     val size: Int,
     @SerialName("type")
-    val type: String,
+    val type: Type,
     @SerialName("url")
     override val url: String
 ) : HtmlPage, Record {
+
+    @Serializable
+    enum class Type { file }
 
     @Serializable
     data class Links(
@@ -49,10 +52,7 @@ data class Readme(
     @OptIn(InternalAPI::class)
     internal fun decode(): String {
         return when (encoding) {
-            "base64" -> {
-                content.lineSequence().joinToString("") { it.decodeBase64String() }
-            }
-            else -> throw IllegalArgumentException(encoding)
+            Encoding.base64 -> content.lineSequence().joinToString("") { it.decodeBase64String() }
         }
     }
 }

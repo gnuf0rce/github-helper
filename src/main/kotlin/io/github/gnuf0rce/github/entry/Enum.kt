@@ -28,3 +28,6 @@ enum class MergeableState { unknown, dirty }
 
 @Serializable
 enum class VerificationReason { valid, unsigned }
+
+@Serializable
+enum class Encoding { base64 }
