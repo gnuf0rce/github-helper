@@ -6,7 +6,7 @@ import kotlinx.serialization.*
  * @see [Pull]
  * @see [Issue]
  */
-sealed interface ControlRecord : Entry, LifeCycle, HtmlPage {
+sealed interface ControlRecord : Entry, LifeCycle, HtmlPage, Content {
     override val htmlUrl: String
     val title: String
     val user: Coder
@@ -17,7 +17,7 @@ sealed interface ControlRecord : Entry, LifeCycle, HtmlPage {
     val number: Int
     val labels: List<Label>
     val authorAssociation: Association
-    val body: String?
+    override val body: String?
     val comments: Int
     val commentsUrl: String
     val milestone: Milestone?

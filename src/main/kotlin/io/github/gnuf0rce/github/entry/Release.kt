@@ -13,7 +13,7 @@ data class Release(
     @SerialName("author")
     val author: Coder,
     @SerialName("body")
-    val body: String?,
+    override val body: String?,
     @Contextual
     @SerialName("created_at")
     override val createdAt: OffsetDateTime,
@@ -50,7 +50,7 @@ data class Release(
     override val url: String,
     @SerialName("zipball_url")
     val zipballUrl: String
-) : Entry, LifeCycle, HtmlPage {
+) : Entry, LifeCycle, HtmlPage, Content {
 
     /**
      * 1. [publishedAt]

@@ -24,6 +24,10 @@ sealed interface HtmlPage {
     val htmlUrl: String?
 }
 
+sealed interface Content {
+    val body: String?
+}
+
 @Serializable
 data class PullRequest(
     @SerialName("diff_url")
