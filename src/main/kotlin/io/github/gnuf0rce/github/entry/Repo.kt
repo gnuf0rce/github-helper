@@ -85,7 +85,7 @@ data class Repo(
     @SerialName("has_wiki")
     val hasWiki: Boolean = false,
     @SerialName("homepage")
-    val homepage: String,
+    val homepage: String?,
     @SerialName("hooks_url")
     val hooksUrl: String,
     @SerialName("html_url")
