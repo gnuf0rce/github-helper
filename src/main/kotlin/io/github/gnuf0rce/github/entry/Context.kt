@@ -10,7 +10,7 @@ sealed interface LifeCycle {
     val closedAt: OffsetDateTime?
 }
 
-interface Record {
+sealed interface Record {
     val sha: String
     val url: String
 }
