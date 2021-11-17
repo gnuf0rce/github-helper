@@ -281,7 +281,7 @@ suspend fun Milestone.toMessage(contact: Contact, type: MessageType, notice: Str
                 layout = 2
                 picture(coverUrl = image.queryUrl())
                 title(text = title)
-                summary(text = description)
+                summary(text = description.orEmpty())
             }
 
             source(name = notice)
