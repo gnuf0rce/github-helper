@@ -86,10 +86,10 @@ internal fun MessageChainBuilder.appendLine(image: Image) = append(image).append
 /**
  * TODO: more info ...
  */
-internal suspend fun Coder.toMessage(contact: Contact): Message {
+suspend fun Owner.toMessage(contact: Contact): Message {
     return when (type) {
-        CoderType.User -> stats()
-        CoderType.Organization -> avatar().uploadAsImage(contact)
+        Owner.Type.User -> avatar().uploadAsImage(contact) + "\n" + stats()
+        Owner.Type.Organization -> avatar().uploadAsImage(contact)
     }
 }
 
@@ -101,7 +101,7 @@ suspend fun HtmlPage.toMessage(contact: Contact, type: MessageType, notice: Stri
         is Commit -> toMessage(contact, type, notice)
         is Repo -> toMessage(contact, type, notice)
         is Milestone -> toMessage(contact, type, notice)
-        is Coder -> toMessage(contact)
+        is Owner -> toMessage(contact)
         is License -> (htmlUrl ?: name).toPlainText()
         is Issue.PullRequest -> htmlUrl.toPlainText()
         is Readme -> htmlUrl.toPlainText()

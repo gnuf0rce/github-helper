@@ -6,7 +6,7 @@ import java.time.*
 @Serializable
 data class Commit(
     @SerialName("author")
-    val author: Coder,
+    val author: Owner,
     @SerialName("comments_url")
     val commentsUrl: String,
     /**
@@ -15,7 +15,7 @@ data class Commit(
     @SerialName("commit")
     val detail: Detail,
     @SerialName("committer")
-    val committer: Coder,
+    val committer: Owner,
     @SerialName("html_url")
     override val htmlUrl: String,
     @SerialName("node_id")
@@ -30,9 +30,9 @@ data class Commit(
     val stats: Stats = Stats(),
     @SerialName("files")
     val files: List<File> = emptyList()
-) : Entry, Record, LifeCycle, HtmlPage, Coder.Product {
+) : Entry, Record, LifeCycle, HtmlPage, Owner.Product {
 
-    override val creator: Coder
+    override val owner: Owner
         get() = author
 
     @Deprecated("Commit No Close", ReplaceWith("null"))

@@ -10,7 +10,7 @@ import io.ktor.http.*
  */
 open class UserMapper(parent: Url, override val github: GitHubClient) : GitHubMapper(parent, "") {
 
-    open suspend fun get() = get<Coder>()
+    open suspend fun get() = get<Owner>()
 
     open suspend fun repos(page: Int, per: Int = 30) = page<Repo>(page, per, "repos")
 }

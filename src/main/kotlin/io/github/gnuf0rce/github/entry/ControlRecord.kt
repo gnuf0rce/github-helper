@@ -6,13 +6,13 @@ import kotlinx.serialization.*
  * @see [Pull]
  * @see [Issue]
  */
-sealed interface ControlRecord : Entry, LifeCycle, HtmlPage, Content, Coder.Product {
+sealed interface ControlRecord : Entry, LifeCycle, HtmlPage, Content, Owner.Product {
     override val htmlUrl: String
     val title: String
-    val user: Coder
-    val assignee: Coder?
-    val assignees: List<Coder>
-    val closedBy: Coder?
+    val user: Owner
+    val assignee: Owner?
+    val assignees: List<Owner>
+    val closedBy: Owner?
     val state: State
     val number: Int
     val labels: List<Label>
@@ -23,7 +23,7 @@ sealed interface ControlRecord : Entry, LifeCycle, HtmlPage, Content, Coder.Prod
     val draft: Boolean
     val locked: Boolean
 
-    override val creator: Coder
+    override val owner: Owner
         get() = user
 
     @Serializable

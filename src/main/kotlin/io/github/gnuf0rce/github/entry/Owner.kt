@@ -3,7 +3,7 @@ package io.github.gnuf0rce.github.entry
 import kotlinx.serialization.*
 
 @Serializable
-data class Coder(
+data class Owner(
     @SerialName("avatar_url")
     override val avatarUrl: String,
     @SerialName("events_url")
@@ -37,12 +37,15 @@ data class Coder(
     @SerialName("subscriptions_url")
     val subscriptionsUrl: String,
     @SerialName("type")
-    val type: CoderType,
+    val type: Type,
     @SerialName("url")
     override val url: String
 ) : Entry, UserInfo, HtmlPage {
 
+    @Serializable
+    enum class Type { User, Organization }
+
     sealed interface Product {
-        val creator: Coder
+        val owner: Owner
     }
 }

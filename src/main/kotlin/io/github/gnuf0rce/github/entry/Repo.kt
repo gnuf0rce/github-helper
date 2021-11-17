@@ -129,7 +129,7 @@ data class Repo(
     @SerialName("open_issues_count")
     val openIssuesCount: Int,
     @SerialName("owner")
-    val owner: Coder,
+    override val owner: Owner,
     @SerialName("permissions")
     val permissions: Map<String, Boolean> = emptyMap(),
     @SerialName("private")
@@ -182,10 +182,7 @@ data class Repo(
     val watchers: Int,
     @SerialName("watchers_count")
     val watchersCount: Int,
-) : Entry, LifeCycle, HtmlPage, Coder.Product {
-
-    override val creator: Coder
-        get() = owner
+) : Entry, LifeCycle, HtmlPage, Owner.Product {
 
     @Deprecated("Repo No Close", ReplaceWith("null"))
     override val closedAt: OffsetDateTime?

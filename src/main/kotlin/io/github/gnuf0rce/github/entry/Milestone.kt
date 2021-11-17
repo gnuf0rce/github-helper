@@ -14,7 +14,7 @@ data class Milestone(
     @SerialName("created_at")
     override val createdAt: OffsetDateTime,
     @SerialName("creator")
-    override val creator: Coder,
+    val creator: Owner,
     @SerialName("description")
     val description: String,
     @Contextual
@@ -41,7 +41,10 @@ data class Milestone(
     override val updatedAt: OffsetDateTime,
     @SerialName("url")
     override val url: String,
-) : Entry, LifeCycle, HtmlPage, Coder.Product {
+) : Entry, LifeCycle, HtmlPage, Owner.Product {
+
+    override val owner: Owner
+        get() = creator
 
     @Deprecated("Milestone No Merge", ReplaceWith("null"))
     override val mergedAt: OffsetDateTime?

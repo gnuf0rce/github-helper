@@ -8,9 +8,9 @@ data class Issue(
     @SerialName("active_lock_reason")
     val activeLockReason: String?,
     @SerialName("assignee")
-    override val assignee: Coder? = null,
+    override val assignee: Owner? = null,
     @SerialName("assignees")
-    override val assignees: List<Coder> = emptyList(),
+    override val assignees: List<Owner> = emptyList(),
     @SerialName("author_association")
     override val authorAssociation: Association,
     @SerialName("body")
@@ -19,7 +19,7 @@ data class Issue(
     @SerialName("closed_at")
     override val closedAt: OffsetDateTime?,
     @SerialName("closed_by")
-    override val closedBy: Coder? = null,
+    override val closedBy: Owner? = null,
     @SerialName("comments")
     override val comments: Int = 0,
     @SerialName("comments_url")
@@ -70,7 +70,7 @@ data class Issue(
     @SerialName("url")
     override val url: String,
     @SerialName("user")
-    override val user: Coder
+    override val user: Owner
 ) : Entry, LifeCycle, HtmlPage, ControlRecord {
 
     @Serializable

@@ -10,9 +10,9 @@ data class Pull(
     @SerialName("additions")
     val additions: Int = 0,
     @SerialName("assignee")
-    override val assignee: Coder? = null,
+    override val assignee: Owner? = null,
     @SerialName("assignees")
-    override val assignees: List<Coder> = emptyList(),
+    override val assignees: List<Owner> = emptyList(),
     @SerialName("author_association")
     override val authorAssociation: Association,
     @SerialName("auto_merge")
@@ -27,7 +27,7 @@ data class Pull(
     @SerialName("closed_at")
     override val closedAt: OffsetDateTime?,
     @SerialName("closed_by")
-    override val closedBy: Coder? = null,
+    override val closedBy: Owner? = null,
     @SerialName("comments")
     override val comments: Int = 0,
     @SerialName("comments_url")
@@ -68,7 +68,7 @@ data class Pull(
     @SerialName("merged")
     val merged: Boolean = false,
     @SerialName("merged_by")
-    val mergedBy: Coder? = null,
+    val mergedBy: Owner? = null,
     @SerialName("merge_commit_sha")
     val mergeCommitSha: String,
     @Contextual
@@ -85,7 +85,7 @@ data class Pull(
     @SerialName("rebaseable")
     val rebaseable: Boolean? = null,
     @SerialName("requested_reviewers")
-    val requestedReviewers: List<Coder> = emptyList(),
+    val requestedReviewers: List<Owner> = emptyList(),
     @SerialName("requested_teams")
     val requestedTeams: List<Team> = emptyList(),
     @SerialName("review_comment_url")
@@ -106,7 +106,7 @@ data class Pull(
     @SerialName("url")
     override val url: String,
     @SerialName("user")
-    override val user: Coder
+    override val user: Owner
 ) : Entry, LifeCycle, HtmlPage, ControlRecord {
 
     @Serializable
@@ -120,8 +120,12 @@ data class Pull(
         @SerialName("sha")
         val sha: String,
         @SerialName("user")
-        val user: Coder
-    )
+        val user: Owner
+    ) : Owner.Product {
+
+        override val owner: Owner
+            get() = user
+    }
 
     @Serializable
     data class Links(

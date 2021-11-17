@@ -11,7 +11,7 @@ data class Release(
     @SerialName("assets_url")
     val assetsUrl: String,
     @SerialName("author")
-    val author: Coder,
+    val author: Owner,
     @SerialName("body")
     override val body: String?,
     @Contextual
@@ -50,9 +50,9 @@ data class Release(
     override val url: String,
     @SerialName("zipball_url")
     val zipballUrl: String
-) : Entry, LifeCycle, HtmlPage, Content, Coder.Product {
+) : Entry, LifeCycle, HtmlPage, Content, Owner.Product {
 
-    override val creator: Coder
+    override val owner: Owner
         get() = author
 
     /**
@@ -96,7 +96,7 @@ data class Release(
         @SerialName("updated_at")
         override val updatedAt: OffsetDateTime,
         @SerialName("uploader")
-        val uploader: Coder,
+        val uploader: Owner,
         @SerialName("url")
         override val url: String
     ) : Entry, LifeCycle {
