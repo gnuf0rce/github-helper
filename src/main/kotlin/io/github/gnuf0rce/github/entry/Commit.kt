@@ -119,6 +119,7 @@ data class Commit(
         @SerialName("status")
         val status: String
     ) : Record {
+
         override val url: String
             get() = contentsUrl
     }
