@@ -3,7 +3,7 @@ package io.github.gnuf0rce.github.model
 import io.github.gnuf0rce.github.*
 import io.ktor.client.request.*
 import io.ktor.http.*
-import kotlinx.serialization.json.*
+import io.ktor.util.*
 
 interface WithGithubClient {
     val base: Url
@@ -85,11 +85,19 @@ internal suspend inline fun <reified R> WithGithubClient.open(
 
 internal inline fun <reified T> HttpRequestBuilder.context(context: T) {
     if (context == null) return
-    val json = context as? JsonObject ?: GitHubJson.encodeToJsonElement(context).jsonObject
     when (method) {
         HttpMethod.Get, HttpMethod.Delete -> {
-            for ((key, element) in json) {
-                parameter(key, element.jsonPrimitive.contentOrNull)
+            when (context) {
+                is Parameters -> {
+                    @OptIn(InternalAPI::class)
+                    url.parameters.appendAll(context)
+                }
+                is Map<*, *> -> {
+                    for ((key, value) in context) parameter(key as String, value)
+                }
+                else -> {
+                    throw IllegalArgumentException("${T::class} can not used as context")
+                }
             }
         }
         HttpMethod.Post, HttpMethod.Put, HttpMethod.Patch -> {
