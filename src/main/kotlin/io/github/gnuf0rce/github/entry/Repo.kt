@@ -193,10 +193,4 @@ data class Repo(
      */
     override val mergedAt: OffsetDateTime
         get() = pushedAt
-
-    /**
-     * 1. https://github.com/{owner}/{repo}/raw/{branch}/README.md
-     * 2. https://raw.githubusercontent.com/{owner}/{repo}/{branch}/README.md
-     */
-    val readme get() = "https://raw.githubusercontent.com/${fullName}/${defaultBranch}/README.md"
 }

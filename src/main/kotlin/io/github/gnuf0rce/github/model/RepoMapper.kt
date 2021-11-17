@@ -64,5 +64,5 @@ open class RepoMapper(parent: Url, override val github: GitHubClient) : GitHubMa
 
     open fun context(path: String) = ContentMapper(base, path, github)
 
-    open suspend fun readme(dir: String = "") = get<JsonObject>("readme/$dir")
+    open suspend fun readme(dir: String = "") = get<Readme>("readme/$dir")
 }
