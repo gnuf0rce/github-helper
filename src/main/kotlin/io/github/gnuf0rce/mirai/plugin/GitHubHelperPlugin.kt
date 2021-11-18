@@ -60,7 +60,7 @@ object GitHubHelperPlugin : KotlinPlugin(
                     delay(10_000)
                     val member = requireNotNull(group?.get(fromId)) { "获取${fromId}信息失败" }
                     member.nameCard = login
-                    group!!.sendMessage(At(member) + "如果是机器人请看群公告修改id")
+                    group!!.sendMessage(At(member) + "新人入群请看群公告")
                 } else {
                     logger.info { "拒绝 $fromId - $login -${stats.rank}"  }
                     reject(message = "你的Github账户活跃等级不足: ${stats.rank}")
