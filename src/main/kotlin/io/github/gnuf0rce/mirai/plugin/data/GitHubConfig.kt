@@ -20,6 +20,10 @@ object GitHubConfig : ReadOnlyPluginConfig("GithubConfig") {
     @ValueDescription("Http Timeout Second")
     val timeout by value(30L)
 
+    @ValueName("rank_member_join")
+    @ValueDescription("放行等级 B+, A+, A++, S, S+")
+    val rank by value("A+")
+
     @ValueName("stats")
     @ValueDescription("with https://github-readme-stats.vercel.app/")
     val stats by value(
