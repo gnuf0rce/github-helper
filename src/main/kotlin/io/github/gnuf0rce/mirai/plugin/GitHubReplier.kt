@@ -121,7 +121,7 @@ internal val PullReplier: MessageReplier = replier@{ result ->
 /**
  * 1. [https://github.com/{owner}/{repo}/releases/tag/{name}]
  */
-internal val RELEASE_REGEX = """(?<=github\.com/)([\w-]+)/([\w-]+)/releases/tag/([^/#]+)""".toRegex()
+internal val RELEASE_REGEX = """(?<=github\.com/)([\w-]+)/([\w-]+)/releases/tag/([^/#"]+)""".toRegex()
 
 internal val ReleaseReplier: MessageReplier = replier@{ result ->
     logger.info { "${sender.render()} 匹配Release(${result.value})" }
