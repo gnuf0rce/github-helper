@@ -8,7 +8,8 @@ import kotlinx.serialization.json.*
 /**
  * 1. [https://api.github.com/repos/{owner}/{repo}]
  */
-open class RepoMapper(parent: Url, override val github: GitHubClient) : GitHubMapper(parent, "") {
+open class RepoMapper(parent: Url, override val github: GitHubClient) :
+    GitHubMapper(parent, "") {
 
     open suspend fun get() = get<Repo>()
 

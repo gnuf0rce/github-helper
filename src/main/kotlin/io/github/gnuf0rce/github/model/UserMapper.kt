@@ -8,7 +8,8 @@ import io.ktor.http.*
  * 1. [https://api.github.com/users/{user}]
  * 2. [https://api.github.com/users/{user}/repos]
  */
-open class UserMapper(parent: Url, override val github: GitHubClient) : GitHubMapper(parent, "") {
+open class UserMapper(parent: Url, override val github: GitHubClient) :
+    GitHubMapper(parent, "") {
 
     open suspend fun get() = get<Owner>()
 

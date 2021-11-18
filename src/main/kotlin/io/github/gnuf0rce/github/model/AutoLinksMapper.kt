@@ -7,7 +7,8 @@ import io.ktor.http.*
 /**
  * 1. [https://api.github.com/repos/{owner}/{repo}/autolinks]
  */
-open class AutoLinksMapper(parent: Url, override val github: GitHubClient) : GitHubMapper(parent, "autolinks") {
+open class AutoLinksMapper(parent: Url, override val github: GitHubClient) :
+    GitHubMapper(parent, "autolinks") {
 
     open suspend fun list(page: Int, per: Int = 30) = page<AutoLink>(page, per)
 

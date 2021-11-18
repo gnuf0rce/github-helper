@@ -10,7 +10,8 @@ import kotlinx.serialization.json.*
  * 2. [https://api.github.com/user]
  * 3. [https://api.github.com/rate_limit]
  */
-open class CurrentMapper(parent: Url, override val github: GitHubClient = GitHubClient()) : GitHubMapper(parent, "") {
+open class CurrentMapper(parent: Url, override val github: GitHubClient = GitHubClient()) :
+    GitHubMapper(parent, "") {
 
     suspend fun issues(page: Int, per: Int = 30, context: JsonObject? = null) =
         page<JsonObject, Issue>(page, per, context, "issues")

@@ -8,7 +8,8 @@ import kotlinx.serialization.json.*
 /**
  * 1. [https://api.github.com/repos/{owner}/{repo}/pulls]
  */
-open class PullsMapper(parent: Url, override val github: GitHubClient) : GitHubMapper(parent, "pulls") {
+open class PullsMapper(parent: Url, override val github: GitHubClient) :
+    GitHubMapper(parent, "pulls") {
 
     open suspend fun list(page: Int, per: Int = 30, context: JsonObject? = null) =
         page<JsonObject, Pull>(page, per, context)
