@@ -51,7 +51,7 @@ abstract class GitHubSubscriber<T>(private val name: String, parent: CoroutineSc
         }
     }
 
-    protected open val regex: Regex? = REPO_REGEX
+    protected open val regex: Regex? = FULL_REGEX
 
     fun add(id: String, contact: Long) {
         check(regex?.matches(id) ?: true) { "$id not matches $regex" }
