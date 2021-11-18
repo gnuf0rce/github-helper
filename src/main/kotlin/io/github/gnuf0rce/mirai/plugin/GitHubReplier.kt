@@ -74,7 +74,7 @@ internal val CommitReplier: MessageReplier = replier@{ result ->
     if (hasReplierPermission().not()) return@replier null
     try {
         val (owner, repo, sha) = result.destructured
-        val entry = github.repo(owner, repo).comments.get(sha)
+        val entry = github.repo(owner, repo).commit(sha).get()
         entry.toMessage(subject, reply, REPLIER_NOTICE)
     } catch (cause: Throwable) {
         logger.warning({ "构建Repo(${result.value})信息失败" }, cause)
