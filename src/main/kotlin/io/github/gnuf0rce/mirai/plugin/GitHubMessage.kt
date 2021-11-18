@@ -93,25 +93,24 @@ internal suspend fun UserInfo.stats(flush: Boolean = false, client: GitHubClient
 
 internal fun MessageChainBuilder.appendLine(image: Image) = append(image).appendLine()
 
+internal suspend fun UserInfo.card() = buildString {
+    val stats = stats()
+    val year = Year.now()
+    appendLine("${login}'s GitHub Stats")
+    appendLine("Rank:                 ${stats.rank}")
+    appendLine("Total Stars Earned:   ${stats.stars}")
+    appendLine("Total Commits (${year}): ${stats.commits}")
+    appendLine("Total PRs:            ${stats.prs}")
+    appendLine("Total Issues:         ${stats.issues}")
+    appendLine("Contributed to:       ${stats.contrib}")
+}
+
 /**
  * TODO: more info ...
  */
 suspend fun Owner.toMessage(contact: Contact): Message {
     return when (type) {
-        Owner.Type.User -> {
-            val stats = stats()
-            val year = Year.now()
-            val text = buildString {
-                appendLine("${login}'s GitHub Stats")
-                appendLine("Rank:                 ${stats.rank}")
-                appendLine("Total Stars Earned:   ${stats.stars}")
-                appendLine("Total Commits (${year}): ${stats.commits}")
-                appendLine("Total PRs:            ${stats.prs}")
-                appendLine("Total Issues:         ${stats.issues}")
-                appendLine("Contributed to:       ${stats.contrib}")
-            }
-            avatar().uploadAsImage(contact) + "\n" + text
-        }
+        Owner.Type.User -> avatar().uploadAsImage(contact) + "\n" + card()
         Owner.Type.Organization -> avatar().uploadAsImage(contact)
     }
 }
