@@ -48,13 +48,25 @@ private val PRS_REGEX = """(?<=prs[^>]{0,1024}>[^\w]{0,1024})[^<\s]+""".toRegex(
 
 private val ISSUES_REGEX = """(?<=issues[^>]{0,1024}>[^\w]{0,1024})[^<\s]+""".toRegex()
 
-private val CONTRIBS_REGEX = """(?<=contribs[^>]{0,1024}>[^\w]{0,1024})[^<\s]+""".toRegex()
+private val CONTRIB_REGEX = """(?<=contribs[^>]{0,1024}>[^\w]{0,1024})[^<\s]+""".toRegex()
+
+data class UserStats(
+    /**
+     * B+, A+, A++, S, S+
+     */
+    val rank: String?,
+    val stars: String?,
+    val commits: String?,
+    val prs: String?,
+    val issues: String?,
+    val contrib: String?
+)
 
 /**
  * XXX: svg to text
  */
 @Suppress("BlockingMethodInNonBlockingContext")
-internal suspend fun UserInfo.stats(flush: Boolean = false, client: GitHubClient = github): Message {
+internal suspend fun UserInfo.stats(flush: Boolean = false, client: GitHubClient = github): UserStats {
     val svg = ImageFolder.resolve("stats").resolve("${login}.svg").apply {
         if (exists().not() || flush) {
             parentFile.mkdirs()
@@ -68,17 +80,15 @@ internal suspend fun UserInfo.stats(flush: Boolean = false, client: GitHubClient
     }
 
     val xml = svg.readText()
-    val year = Year.now()
 
-    return buildMessageChain {
-        appendLine("${login}'s GitHub Stats")
-        appendLine("Rank: ${RANK_REGEX.find(xml)?.value}")
-        appendLine("Total Stars Earned:   ${STARS_REGEX.find(xml)?.value}")
-        appendLine("Total Commits (${year}): ${COMMITS_REGEX.find(xml)?.value}")
-        appendLine("Total PRs:            ${PRS_REGEX.find(xml)?.value}")
-        appendLine("Total Issues:         ${ISSUES_REGEX.find(xml)?.value}")
-        appendLine("Contributed to:       ${CONTRIBS_REGEX.find(xml)?.value}")
-    }
+    return UserStats(
+        rank = RANK_REGEX.find(xml)?.value,
+        stars = STARS_REGEX.find(xml)?.value,
+        commits = COMMITS_REGEX.find(xml)?.value,
+        prs = PRS_REGEX.find(xml)?.value,
+        issues = ISSUES_REGEX.find(xml)?.value,
+        contrib = CONTRIB_REGEX.find(xml)?.value
+    )
 }
 
 internal fun MessageChainBuilder.appendLine(image: Image) = append(image).appendLine()
@@ -88,7 +98,20 @@ internal fun MessageChainBuilder.appendLine(image: Image) = append(image).append
  */
 suspend fun Owner.toMessage(contact: Contact): Message {
     return when (type) {
-        Owner.Type.User -> avatar().uploadAsImage(contact) + "\n" + stats()
+        Owner.Type.User -> {
+            val stats = stats()
+            val year = Year.now()
+            val text = buildString {
+                appendLine("${login}'s GitHub Stats")
+                appendLine("Rank:                 ${stats.rank}")
+                appendLine("Total Stars Earned:   ${stats.stars}")
+                appendLine("Total Commits (${year}): ${stats.commits}")
+                appendLine("Total PRs:            ${stats.prs}")
+                appendLine("Total Issues:         ${stats.issues}")
+                appendLine("Contributed to:       ${stats.contrib}")
+            }
+            avatar().uploadAsImage(contact) + "\n" + text
+        }
         Owner.Type.Organization -> avatar().uploadAsImage(contact)
     }
 }
@@ -170,6 +193,7 @@ suspend fun Release.toMessage(contact: Contact, type: MessageType, notice: Strin
             appendLine("PUBLISHED_AT: $publishedAt ")
             appendLine("URL: $htmlUrl ")
             appendLine("NAME: $name ")
+            appendLine(body)
         }
         MessageType.XML -> buildXmlMessage(1) {
             actionData = htmlUrl

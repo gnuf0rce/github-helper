@@ -11,9 +11,9 @@ object GitHubStatsCommand : CompositeCommand(
 ), GitHubCommand {
 
     @SubCommand
-    suspend fun CommandSender.card(name: String) {
+    suspend fun UserCommandSender.card(name: String) {
         val user = github.user(name).get()
 
-        sendMessage(user.stats(true))
+        sendMessage(user.toMessage(subject))
     }
 }
