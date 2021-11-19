@@ -49,12 +49,12 @@ object GitHubHelperPlugin : KotlinPlugin(
             }
         }
 
-        if (GitHubConfig.rank > "") globalEventChannel().subscribeAlways<MemberJoinRequestEvent> {
+        if (GitHubConfig.percentage > 0) globalEventChannel().subscribeAlways<MemberJoinRequestEvent> {
             val login = message.substringAfterLast("答案：").trim()
             try {
                 val user = github.user(login = login).get()
                 val stats = user.stats(flush = true)
-                if (stats.rank.orEmpty() >= "A+") {
+                if (stats.percentage >= GitHubConfig.percentage) {
                     logger.info { "同意 $fromId - $login - ${stats.rank}" }
                     accept()
                     delay(10_000)
@@ -63,9 +63,10 @@ object GitHubHelperPlugin : KotlinPlugin(
                     group!!.sendMessage(At(member) + "新人入群请看群公告")
                 } else {
                     logger.info { "拒绝 $fromId - $login -${stats.rank}"  }
-                    reject(message = "你的Github账户活跃等级不足: ${stats.rank}")
+                    reject(message = "你的Github账户活跃等级不足: ${stats.rank}/${stats.percentage}")
                 }
             } catch (exception: GitHubApiException) {
+                logger.warning { "拒绝 $fromId - $login - ${exception.json}"  }
                 reject(message = "你的Github账户信息获取失败: $login")
             } catch (cause: Throwable) {
                 logger.warning({ "未知错误, 无法处理" }, cause)

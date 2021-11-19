@@ -62,7 +62,7 @@ data class UserStats(
     val prs: String?,
     val issues: String?,
     val contrib: String?,
-    val percentage: Int?
+    val percentage: Int
 )
 
 /**
@@ -94,7 +94,7 @@ internal suspend fun UserInfo.stats(flush: Boolean = false, client: GitHubClient
         percentage = OFFSET_REGEX.find(xml)?.let { pre ->
             val next = OFFSET_REGEX.find(xml, pre.range.last)!!
             (1 - next.value.toDouble() / pre.value.toDouble()) * 100
-        }?.toInt()
+        }?.toInt() ?: 0
     )
 }
 
