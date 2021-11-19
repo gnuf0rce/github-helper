@@ -50,6 +50,8 @@ private val ISSUES_REGEX = """(?<=issues[^>]{0,1024}>[^\w]{0,1024})[^<\s]+""".to
 
 private val CONTRIB_REGEX = """(?<=contribs[^>]{0,1024}>[^\w]{0,1024})[^<\s]+""".toRegex()
 
+private val OFFSET_REGEX = """(?<=dashoffset: )\d+\.?\d+""".toRegex()
+
 data class UserStats(
     /**
      * B+, A+, A++, S, S+
@@ -59,7 +61,8 @@ data class UserStats(
     val commits: String?,
     val prs: String?,
     val issues: String?,
-    val contrib: String?
+    val contrib: String?,
+    val percentage: Int?
 )
 
 /**
@@ -87,7 +90,11 @@ internal suspend fun UserInfo.stats(flush: Boolean = false, client: GitHubClient
         commits = COMMITS_REGEX.find(xml)?.value,
         prs = PRS_REGEX.find(xml)?.value,
         issues = ISSUES_REGEX.find(xml)?.value,
-        contrib = CONTRIB_REGEX.find(xml)?.value
+        contrib = CONTRIB_REGEX.find(xml)?.value,
+        percentage = OFFSET_REGEX.find(xml)?.let { pre ->
+            val next = OFFSET_REGEX.find(xml, pre.range.last)!!
+            (1 - next.value.toDouble() / pre.value.toDouble()) * 100
+        }?.toInt()
     )
 }
 
@@ -96,8 +103,8 @@ internal fun MessageChainBuilder.appendLine(image: Image) = append(image).append
 internal suspend fun UserInfo.card() = buildString {
     val stats = stats()
     val year = Year.now()
-    appendLine("${login}'s GitHub Stats")
-    appendLine("Rank:                 ${stats.rank}")
+    appendLine("${name}'s GitHub Stats")
+    appendLine("Rank:                 ${stats.rank}/${stats.percentage}")
     appendLine("Total Stars Earned:   ${stats.stars}")
     appendLine("Total Commits (${year}): ${stats.commits}")
     appendLine("Total PRs:            ${stats.prs}")
