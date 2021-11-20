@@ -1,6 +1,7 @@
 package io.github.gnuf0rce.github.entry
 
 import kotlinx.serialization.*
+import java.time.*
 
 @Serializable
 data class Owner(
@@ -39,8 +40,46 @@ data class Owner(
     @SerialName("type")
     val type: Type,
     @SerialName("url")
-    override val url: String
-) : Entry, UserInfo, HtmlPage {
+    override val url: String,
+    @SerialName("name")
+    override val name: String = "",
+    @SerialName("company")
+    val company: String? = null,
+    @SerialName("blog")
+    val blog: String? = null,
+    @SerialName("location")
+    val location: String? = null,
+    @SerialName("email")
+    val email: String? = null,
+    @SerialName("hireable")
+    val hireable: Boolean? = null,
+    @SerialName("bio")
+    val bio: String? = null,
+    @SerialName("twitter_username")
+    val twitterUsername: String? = null,
+    @SerialName("public_repos")
+    val publicRepos: Int = 0,
+    @SerialName("public_gists")
+    val publicGists: Int = 0,
+    @SerialName("followers")
+    val followers: Int = 0,
+    @SerialName("following")
+    val following: Int = 0,
+    @Contextual
+    @SerialName("created_at")
+    override val createdAt: OffsetDateTime = OffsetDateTime.MIN,
+    @Contextual
+    @SerialName("updated_at")
+    override val updatedAt: OffsetDateTime = OffsetDateTime.MIN,
+) : Entry, UserInfo, LifeCycle, HtmlPage {
+
+    @Deprecated("Owner No Merge", ReplaceWith("null"))
+    override val mergedAt: OffsetDateTime?
+        get() = null
+
+    @Deprecated("Owner No Closed", ReplaceWith("null"))
+    override val closedAt: OffsetDateTime?
+        get() = null
 
     @Serializable
     enum class Type { User, Organization }

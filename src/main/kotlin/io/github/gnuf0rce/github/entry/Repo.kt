@@ -182,6 +182,8 @@ data class Repo(
     val watchers: Int,
     @SerialName("watchers_count")
     val watchersCount: Int,
+    @SerialName("organization")
+    val organization: Owner? = null,
 ) : Entry, LifeCycle, HtmlPage, Owner.Product {
 
     @Deprecated("Repo No Close", ReplaceWith("null"))

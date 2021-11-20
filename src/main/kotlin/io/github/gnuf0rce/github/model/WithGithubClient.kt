@@ -4,6 +4,7 @@ import io.github.gnuf0rce.github.*
 import io.ktor.client.request.*
 import io.ktor.http.*
 import io.ktor.util.*
+import kotlinx.serialization.json.*
 
 interface WithGithubClient {
     val base: Url
@@ -32,7 +33,8 @@ internal suspend inline fun <reified R> WithGithubClient.page(
     page: Int,
     per: Int,
     path: String = "",
-): List<R> = page<Any?, R>(page, per, null, path)
+    block: MutableMap<String, Any?>.() -> Unit = {}
+): List<R> = page(page, per, mutableMapOf<String, Any?>().apply(block), path)
 
 internal suspend inline fun <reified T, reified R> WithGithubClient.page(
     page: Int,
@@ -53,6 +55,12 @@ internal suspend inline fun <reified R> WithGithubClient.delete(
 }
 
 internal suspend inline fun <reified T, reified R> WithGithubClient.post(
+    path: String = "",
+    block: JsonObjectBuilder.() -> Unit = {}
+): R = post(buildJsonObject(block), path)
+
+
+internal suspend inline fun <reified T, reified R> WithGithubClient.post(
     context: T,
     path: String = ""
 ): R = rest(path) {
@@ -61,12 +69,23 @@ internal suspend inline fun <reified T, reified R> WithGithubClient.post(
 }
 
 internal suspend inline fun <reified T, reified R> WithGithubClient.put(
+    path: String = "",
+    block: JsonObjectBuilder.() -> Unit = {}
+): R = put(buildJsonObject(block), path)
+
+internal suspend inline fun <reified T, reified R> WithGithubClient.put(
     context: T,
     path: String = ""
 ): R = rest(path) {
     method = HttpMethod.Put
     context(context)
 }
+
+internal suspend inline fun <reified T, reified R> WithGithubClient.patch(
+    path: String = "",
+    block: JsonObjectBuilder.() -> Unit = {}
+): R = patch(buildJsonObject(block), path)
+
 
 internal suspend inline fun <reified T, reified R> WithGithubClient.patch(
     context: T,
@@ -93,7 +112,7 @@ internal inline fun <reified T> HttpRequestBuilder.context(context: T) {
                     url.parameters.appendAll(context)
                 }
                 is Map<*, *> -> {
-                    for ((key, value) in context) parameter(key as String, value)
+                    for ((key, value) in context) parameter(key.toString(), value)
                 }
                 else -> {
                     throw IllegalArgumentException("${T::class} can not used as context")
