@@ -32,7 +32,7 @@ abstract class GitHubSubscriber<T>(private val name: String, parent: CoroutineSc
 
         fun stop() {
             for (subscriber in all) {
-                subscriber.start()
+                subscriber.stop()
             }
         }
     }
