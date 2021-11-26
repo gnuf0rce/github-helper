@@ -41,6 +41,9 @@ data class Owner(
     val type: Type,
     @SerialName("url")
     override val url: String,
+
+    // region Only User
+
     @SerialName("name")
     override val name: String = "",
     @SerialName("company")
@@ -65,6 +68,9 @@ data class Owner(
     val followers: Int = 0,
     @SerialName("following")
     val following: Int = 0,
+
+    // endregion
+
     @Contextual
     @SerialName("created_at")
     override val createdAt: OffsetDateTime = OffsetDateTime.MIN,

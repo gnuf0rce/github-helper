@@ -9,6 +9,7 @@ data class RateLimit(
     @SerialName("resources")
     val resources: Map<String, Status> = emptyMap()
 ) {
+
     @Serializable
     data class Status(
         @SerialName("limit")

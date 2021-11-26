@@ -191,7 +191,7 @@ data class Repo(
         get() = null
 
     /**
-     * 1. [pushedAt]
+     * @see [pushedAt]
      */
     override val mergedAt: OffsetDateTime
         get() = pushedAt

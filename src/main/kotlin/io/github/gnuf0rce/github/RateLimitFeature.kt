@@ -18,7 +18,7 @@ class RateLimitFeature internal constructor(val send: suspend (Status, String) -
     constructor(config: Config) : this(config.notice)
 
     private val rates = mutableMapOf<String, Status>()
-        .withDefault { Status(1, 1, OffsetDateTime.now().toEpochSecond()) }
+        .withDefault { Status(limit = 1, remaining = 1, reset = OffsetDateTime.now().toEpochSecond()) }
 
     private val mutex = Mutex()
 
