@@ -21,6 +21,8 @@ object GitHubHelperPlugin : KotlinPlugin(
         version = "1.1.5",
     ) {
         author("cssxsh")
+
+        dependsOn("xyz.cssxsh.mirai.plugin.mirai-selenium-plugin", true)
     }
 ) {
 

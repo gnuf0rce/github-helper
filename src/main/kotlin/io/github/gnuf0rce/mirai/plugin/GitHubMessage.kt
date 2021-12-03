@@ -7,6 +7,7 @@ import io.github.gnuf0rce.github.entry.*
 import io.github.gnuf0rce.mirai.plugin.data.*
 import io.ktor.client.request.*
 import io.ktor.http.*
+import kotlinx.coroutines.*
 import kotlinx.serialization.*
 import net.mamoe.mirai.*
 import net.mamoe.mirai.console.util.*
@@ -16,6 +17,9 @@ import net.mamoe.mirai.message.data.*
 import net.mamoe.mirai.message.data.Image.Key.queryUrl
 import net.mamoe.mirai.utils.ExternalResource.Companion.uploadAsImage
 import net.mamoe.mirai.utils.*
+import net.mamoe.mirai.utils.ExternalResource.Companion.toExternalResource
+import org.openqa.selenium.*
+import xyz.cssxsh.selenium.*
 import java.io.File
 import java.time.*
 
@@ -32,6 +36,37 @@ internal suspend fun UserInfo.avatar(flush: Boolean = false, client: GitHubClien
             writeBytes(client.useHttpClient { client ->
                 client.get(url)
             })
+        }
+    }
+}
+
+internal suspend fun Readme.pdf(flush: Boolean = false): File {
+    return ImageFolder.resolve("readme").resolve("${sha}.pdf").apply {
+        if (exists().not() || flush) {
+            parentFile.mkdirs()
+            val bytes = useRemoteWebDriver { driver ->
+                driver.get(htmlUrl)
+                try {
+                    withTimeout(180_000) {
+                        do {
+                            delay(10_000)
+                        } while (!driver.isReady())
+                    }
+                } catch (_: TimeoutCancellationException) {
+                    // ignore
+                }
+                driver.printToPDF()
+            }
+            writeBytes(bytes)
+        }
+    }
+}
+
+internal fun Readme.markdown(flush: Boolean = false): File {
+    return ImageFolder.resolve("readme").resolve("${sha}.md").apply {
+        if (exists().not() || flush) {
+            parentFile.mkdirs()
+            writeText(decode())
         }
     }
 }
@@ -70,16 +105,26 @@ data class UserStats(
  */
 @Suppress("BlockingMethodInNonBlockingContext")
 internal suspend fun UserInfo.stats(flush: Boolean = false, client: GitHubClient = github): UserStats {
-    val svg = ImageFolder.resolve("stats").resolve("${login}.svg").apply {
-        if (exists().not() || flush) {
-            parentFile.mkdirs()
-            writeBytes(client.useHttpClient { client ->
-                client.get(STATS_API) {
-                    parameter("username", login)
-                    for ((key, value) in GitHubConfig.stats) parameter(key, value)
-                }
-            })
+    val stats = ImageFolder.resolve("stats")
+    val (svg, png) = with(stats) { resolve("${login}.svg") to resolve("${login}.png") }
+
+    if (svg.exists().not() || flush) {
+        stats.mkdirs()
+        svg.writeBytes(client.useHttpClient { http ->
+            http.get(STATS_API) {
+                parameter("username", login)
+                for ((key, value) in GitHubConfig.stats) parameter(key, value)
+            }
+        })
+    }
+
+    if (selenium && (png.exists().not() || flush)) {
+        val screenshot = useRemoteWebDriver { driver ->
+            driver.get("file:///${svg.absolutePath}")
+            delay(10_000)
+            driver.findElement(By.tagName("rect")).getScreenshotAs(OutputType.BYTES)
         }
+        png.writeBytes(screenshot)
     }
 
     val xml = svg.readText()
@@ -100,16 +145,22 @@ internal suspend fun UserInfo.stats(flush: Boolean = false, client: GitHubClient
 
 internal fun MessageChainBuilder.appendLine(image: Image) = append(image).appendLine()
 
-internal suspend fun UserInfo.card() = buildString {
+internal suspend fun UserInfo.card(contact: Contact): Message {
     val stats = stats()
-    val year = Year.now()
-    appendLine("${name}'s GitHub Stats")
-    appendLine("Rank:                 ${stats.rank}/${stats.percentage}")
-    appendLine("Total Stars Earned:   ${stats.stars}")
-    appendLine("Total Commits (${year}): ${stats.commits}")
-    appendLine("Total PRs:            ${stats.prs}")
-    appendLine("Total Issues:         ${stats.issues}")
-    appendLine("Contributed to:       ${stats.contrib}")
+    return if (selenium) {
+        ImageFolder.resolve("stats").resolve("${login}.png").uploadAsImage(contact)
+    } else {
+        val year = Year.now()
+        buildMessageChain {
+            appendLine("${name ?: login}'s GitHub Stats")
+            appendLine("Rank:                 ${stats.rank}/${stats.percentage}")
+            appendLine("Total Stars Earned:   ${stats.stars}")
+            appendLine("Total Commits (${year}): ${stats.commits}")
+            appendLine("Total PRs:            ${stats.prs}")
+            appendLine("Total Issues:         ${stats.issues}")
+            appendLine("Contributed to:       ${stats.contrib}")
+        }
+    }
 }
 
 /**
@@ -117,7 +168,7 @@ internal suspend fun UserInfo.card() = buildString {
  */
 suspend fun Owner.toMessage(contact: Contact): Message {
     return when (type) {
-        Owner.Type.User -> avatar().uploadAsImage(contact) + "\n" + card()
+        Owner.Type.User -> avatar().uploadAsImage(contact) + "\n" + card(contact)
         Owner.Type.Organization -> avatar().uploadAsImage(contact)
     }
 }
@@ -133,7 +184,7 @@ suspend fun HtmlPage.toMessage(contact: Contact, type: MessageType, notice: Stri
         is Owner -> toMessage(contact)
         is License -> (htmlUrl ?: name).toPlainText()
         is Issue.PullRequest -> htmlUrl.toPlainText()
-        is Readme -> htmlUrl.toPlainText()
+        is Readme -> toMessage(contact)
         is Team -> htmlUrl.toPlainText()
         is Commit.Tree -> (htmlUrl ?: sha).toPlainText()
     }
@@ -153,6 +204,7 @@ suspend fun ControlRecord.toMessage(contact: Contact, type: MessageType, notice:
             appendLine("TITLE: $title ")
             appendLine("STATE: $state ")
             if (labels.isNotEmpty()) appendLine("LABELS: ${labels.joinToString { it.name }} ")
+            appendLine(body)
         }
         MessageType.XML -> buildXmlMessage(1) {
             actionData = htmlUrl
@@ -262,6 +314,7 @@ suspend fun Repo.toMessage(contact: Contact, type: MessageType, notice: String):
             appendLine("$notice with repo by ${owner.login} ")
             appendLine("URL: $htmlUrl ")
             appendLine("CREATED_AT: $createdAt ")
+            appendLine("STARGAZERS_COUNT: $stargazersCount")
             appendLine("LANGUAGE: $language ")
             appendLine("DESCRIPTION: $description ")
         }
@@ -318,4 +371,23 @@ suspend fun Milestone.toMessage(contact: Contact, type: MessageType, notice: Str
         }
         MessageType.JSON -> TODO()
     }
+}
+
+suspend fun Readme.toMessage(contact: Contact): Message {
+    if (contact is FileSupported) {
+        contact.launch(SupervisorJob()) {
+            val file = if (selenium) {
+                logger.info { "将尝试发送 ${sha}.pdf to $contact" }
+                pdf()
+            } else {
+                markdown()
+            }
+
+            file.toExternalResource().use {
+                contact.files.uploadNewFile(filepath = file.name, it)
+            }
+        }
+    }
+
+    return htmlUrl.toPlainText()
 }

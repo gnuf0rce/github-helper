@@ -5,6 +5,8 @@ import io.github.gnuf0rce.mirai.plugin.data.*
 import io.ktor.client.features.*
 import io.ktor.http.*
 import net.mamoe.mirai.utils.*
+import org.openqa.selenium.remote.*
+import xyz.cssxsh.mirai.plugin.*
 import java.io.*
 import java.net.*
 
@@ -65,6 +67,25 @@ internal val github by lazy {
                 }
             }
         }
+    }
+}
+
+internal val selenium: Boolean by lazy {
+    try {
+        MiraiSeleniumPlugin.setup()
+    } catch (exception: NoClassDefFoundError) {
+        logger.warning { "相关类加载失败，请安装 https://github.com/cssxsh/mirai-selenium-plugin $exception" }
+        false
+    }
+}
+
+// XXX: ...
+internal inline fun <reified T> useRemoteWebDriver(block: (RemoteWebDriver) -> T): T {
+    val driver = MiraiSeleniumPlugin.driver()
+    return try {
+        block(driver)
+    } finally {
+        driver.quit()
     }
 }
 

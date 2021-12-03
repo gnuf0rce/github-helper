@@ -7,13 +7,13 @@ import net.mamoe.mirai.console.command.*
 object GitHubStatsCommand : CompositeCommand(
     owner = GitHubHelperPlugin,
     "stats",
-    description = "Stats Notice"
+    description = "User Stats"
 ), GitHubCommand {
 
     @SubCommand
-    suspend fun CommandSender.card(name: String) {
+    suspend fun UserCommandSender.card(name: String) {
         val user = github.user(name).get()
 
-        sendMessage(user.card())
+        sendMessage(user.card(subject))
     }
 }
