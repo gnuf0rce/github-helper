@@ -45,7 +45,7 @@ data class Owner(
     // region Only User
 
     @SerialName("name")
-    override val name: String = "",
+    override val name: String? = null,
     @SerialName("company")
     val company: String? = null,
     @SerialName("blog")
