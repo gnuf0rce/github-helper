@@ -24,12 +24,17 @@ object GitHubConfig : ReadOnlyPluginConfig("GithubConfig") {
     @ValueDescription("放行活跃等级（百分制）")
     val percentage by value(0)
 
-    @ValueName("stats")
+    @ValueName("sign_member_join")
+    @ValueDescription("加群提醒")
+    val sign by value("新人入群请看群公告")
+
+    @ValueName("github_readme_stats")
     @ValueDescription("with https://github-readme-stats.vercel.app/")
     val stats by value(
         mapOf(
             "show_icons" to "true",
-            "theme" to "tokyonight"
+            "theme" to "tokyonight",
+            "count_private" to "true"
         )
     )
 }
