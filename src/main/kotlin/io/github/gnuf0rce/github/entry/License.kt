@@ -15,5 +15,5 @@ data class License(
     @SerialName("spdx_id")
     val spdxId: String,
     @SerialName("url")
-    override val url: String
+    override val url: String?
 ) : Entry, HtmlPage

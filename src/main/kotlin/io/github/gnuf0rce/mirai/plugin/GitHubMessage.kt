@@ -87,6 +87,17 @@ private val CONTRIB_REGEX = """(?<=contribs[^>]{0,1024}>[^\w]{0,1024})[^<\s]+"""
 
 private val OFFSET_REGEX = """(?<=dashoffset: )\d+\.?\d+""".toRegex()
 
+private fun Reactions.render(): String = buildString {
+    if (plus > 0) append("👍:$plus")
+    if (minus > 0) append("👎:$minus")
+    if (laugh > 0) append("😄:$laugh")
+    if (confused > 0) append("😕:$confused")
+    if (heart > 0) append("❤:$heart")
+    if (hooray > 0) append("🎉:$hooray")
+    if (rocket > 0) append("🚀:$rocket")
+    if (eyes > 0) append("👀:$eyes")
+}
+
 data class UserStats(
     /**
      * B+, A+, A++, S, S+
@@ -146,16 +157,17 @@ internal suspend fun UserInfo.stats(flush: Boolean = false, client: GitHubClient
 internal fun MessageChainBuilder.appendLine(image: Image) = append(image).appendLine()
 
 internal suspend fun UserInfo.card(contact: Contact): Message {
+    val image = avatar().uploadAsImage(contact)
     val stats = stats()
     return if (selenium) {
         ImageFolder.resolve("stats").resolve("${login}.png").uploadAsImage(contact)
     } else {
-        val year = Year.now()
         buildMessageChain {
+            appendLine(image)
             appendLine("${name ?: login}'s GitHub Stats")
             appendLine("Rank:                 ${stats.rank}/${stats.percentage}")
             appendLine("Total Stars Earned:   ${stats.stars}")
-            appendLine("Total Commits (${year}): ${stats.commits}")
+            appendLine("Total Commits (${Year.now()}): ${stats.commits}")
             appendLine("Total PRs:            ${stats.prs}")
             appendLine("Total Issues:         ${stats.issues}")
             appendLine("Contributed to:       ${stats.contrib}")
@@ -204,6 +216,7 @@ suspend fun ControlRecord.toMessage(contact: Contact, type: MessageType, notice:
             appendLine("TITLE: $title ")
             appendLine("STATE: $state ")
             if (labels.isNotEmpty()) appendLine("LABELS: ${labels.joinToString { it.name }} ")
+            appendLine(reactions?.render())
             appendLine(body)
         }
         MessageType.XML -> buildXmlMessage(1) {
@@ -251,6 +264,7 @@ suspend fun Release.toMessage(contact: Contact, type: MessageType, notice: Strin
             appendLine("PUBLISHED_AT: $publishedAt ")
             appendLine("URL: $htmlUrl ")
             appendLine("NAME: $name ")
+            appendLine(reactions?.render())
             appendLine(body)
         }
         MessageType.XML -> buildXmlMessage(1) {

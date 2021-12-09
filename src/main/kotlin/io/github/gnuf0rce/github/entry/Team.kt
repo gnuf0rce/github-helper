@@ -21,7 +21,7 @@ data class Team(
     @SerialName("permission")
     val permission: String,
     @SerialName("privacy")
-    val privacy: String,
+    val privacy: Privacy,
     @SerialName("repositories_url")
     val repositoriesUrl: String,
     @SerialName("slug")

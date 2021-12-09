@@ -55,7 +55,7 @@ data class Issue(
     @SerialName("pull_request")
     val pullRequest: PullRequest? = null,
     @SerialName("reactions")
-    val reactions: Reactions? = null,
+    override val reactions: Reactions? = null,
     @SerialName("repository_url")
     val repositoryUrl: String,
     @SerialName("state")

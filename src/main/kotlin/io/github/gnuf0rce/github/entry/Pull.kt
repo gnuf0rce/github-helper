@@ -82,6 +82,8 @@ data class Pull(
     override val number: Int,
     @SerialName("patch_url")
     val patchUrl: String,
+    @SerialName("reactions")
+    override val reactions: Reactions? = null,
     @SerialName("rebaseable")
     val rebaseable: Boolean? = null,
     @SerialName("requested_reviewers")

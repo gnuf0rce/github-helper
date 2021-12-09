@@ -1,3 +1,5 @@
+@file:Suppress("ClassName", "unused")
+
 package io.github.gnuf0rce.github.entry
 
 import kotlinx.serialization.*
@@ -24,10 +26,16 @@ enum class IssueFilter { assigned, created, mentioned, subscribed, all, repos }
 enum class IssueSort { created, updated, comments }
 
 @Serializable
-enum class MergeableState { unknown, dirty }
+enum class MergeableState { unknown, dirty, blocked }
 
 @Serializable
 enum class VerificationReason { valid, unsigned }
 
 @Serializable
 enum class Encoding { base64 }
+
+@Serializable
+enum class Privacy { secret, closed }
+
+@Serializable
+enum class RepoPermission { pull, push, admin }

@@ -15,7 +15,7 @@ sealed interface Record {
 }
 
 sealed interface Entry {
-    val url: String
+    val url: String?
     val nodeId: String
 }
 
@@ -25,6 +25,7 @@ sealed interface HtmlPage {
 
 sealed interface Content {
     val body: String?
+    val reactions: Reactions?
 }
 
 sealed interface UserInfo {

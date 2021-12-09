@@ -37,7 +37,7 @@ data class Release(
     @SerialName("published_at")
     val publishedAt: OffsetDateTime? = null,
     @SerialName("reactions")
-    val reactions: Reactions? = null,
+    override val reactions: Reactions? = null,
     @SerialName("tag_name")
     val tagName: String,
     @SerialName("tarball_url")
