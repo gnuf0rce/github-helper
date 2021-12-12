@@ -33,4 +33,5 @@ sealed interface UserInfo {
     val id: Long
     val login: String
     val name: String?
+    val htmlUrl: String
 }

@@ -12,6 +12,7 @@ import kotlinx.serialization.*
 import net.mamoe.mirai.*
 import net.mamoe.mirai.console.util.*
 import net.mamoe.mirai.console.util.ContactUtils.getContactOrNull
+import net.mamoe.mirai.console.util.ContactUtils.render
 import net.mamoe.mirai.contact.*
 import net.mamoe.mirai.message.data.*
 import net.mamoe.mirai.message.data.Image.Key.queryUrl
@@ -40,21 +41,24 @@ internal suspend fun UserInfo.avatar(flush: Boolean = false, client: GitHubClien
     }
 }
 
-internal suspend fun Readme.pdf(flush: Boolean = false): File {
+internal fun Readme.pdf(flush: Boolean = false): File {
     return ImageFolder.resolve("readme").resolve("${sha}.pdf").apply {
         if (exists().not() || flush) {
             parentFile.mkdirs()
             val bytes = useRemoteWebDriver { driver ->
-                driver.get(htmlUrl)
                 try {
-                    withTimeout(180_000) {
-                        do {
-                            delay(10_000)
-                        } while (!driver.isReady())
+                    driver.get(htmlUrl)
+                } catch (exception: WebDriverException) {
+                    if ("net::ERR_CONNECTION_RESET" in exception.rawMessage) {
+                        driver.navigate().refresh()
                     }
-                } catch (_: TimeoutCancellationException) {
-                    // ignore
                 }
+                val start = System.currentTimeMillis()
+                do {
+                    if (System.currentTimeMillis() - start > 180_000) {
+                        break
+                    }
+                } while (!driver.isReady())
                 driver.printToPDF()
             }
             writeBytes(bytes)
@@ -115,11 +119,11 @@ data class UserStats(
  * XXX: svg to text
  */
 @Suppress("BlockingMethodInNonBlockingContext")
-internal suspend fun UserInfo.stats(flush: Boolean = false, client: GitHubClient = github): UserStats {
+internal suspend fun UserInfo.stats(flush: Long = 86400_000, client: GitHubClient = github): UserStats {
     val stats = ImageFolder.resolve("stats")
     val (svg, png) = with(stats) { resolve("${login}.svg") to resolve("${login}.png") }
 
-    if (svg.exists().not() || flush) {
+    if (svg.exists().not() || (System.currentTimeMillis() - svg.lastModified()) >= flush) {
         stats.mkdirs()
         svg.writeBytes(client.useHttpClient { http ->
             http.get(STATS_API) {
@@ -129,7 +133,7 @@ internal suspend fun UserInfo.stats(flush: Boolean = false, client: GitHubClient
         })
     }
 
-    if (selenium && (png.exists().not() || flush)) {
+    if (selenium && (png.exists().not() || (System.currentTimeMillis() - png.lastModified()) >= flush)) {
         val screenshot = useRemoteWebDriver { driver ->
             driver.get("file:///${svg.absolutePath}")
             delay(10_000)
@@ -160,7 +164,11 @@ internal suspend fun UserInfo.card(contact: Contact): Message {
     val image = avatar().uploadAsImage(contact)
     val stats = stats()
     return if (selenium) {
-        ImageFolder.resolve("stats").resolve("${login}.png").uploadAsImage(contact)
+        buildMessageChain {
+            appendLine(image)
+            appendLine("Percentage: ${stats.percentage}")
+            appendLine(ImageFolder.resolve("stats").resolve("${login}.png").uploadAsImage(contact))
+        }
     } else {
         buildMessageChain {
             appendLine(image)
@@ -172,6 +180,24 @@ internal suspend fun UserInfo.card(contact: Contact): Message {
             appendLine("Total Issues:         ${stats.issues}")
             appendLine("Contributed to:       ${stats.contrib}")
         }
+    }
+}
+
+internal suspend fun UserInfo.contribution(contact: Contact): Message {
+    return if (selenium) {
+        val png = ImageFolder.resolve("contribution").resolve("${login}.png")
+        if (png.exists().not()) {
+            png.parentFile.mkdirs()
+            val screenshot = useRemoteWebDriver { driver ->
+                driver.get(htmlUrl)
+                delay(10_000)
+                driver.findElement(By.className("ContributionCalendar")).getScreenshotAs(OutputType.BYTES)
+            }
+            png.writeBytes(screenshot)
+        }
+        png.uploadAsImage(contact)
+    } else {
+        "目前只有安装了 selenium 才能工作".toPlainText()
     }
 }
 
@@ -217,7 +243,7 @@ suspend fun ControlRecord.toMessage(contact: Contact, type: MessageType, notice:
             appendLine("STATE: $state ")
             if (labels.isNotEmpty()) appendLine("LABELS: ${labels.joinToString { it.name }} ")
             appendLine(reactions?.render())
-            appendLine(body)
+            if ((body?.length ?: 0) < 50) appendLine(body)
         }
         MessageType.XML -> buildXmlMessage(1) {
             actionData = htmlUrl
@@ -265,7 +291,7 @@ suspend fun Release.toMessage(contact: Contact, type: MessageType, notice: Strin
             appendLine("URL: $htmlUrl ")
             appendLine("NAME: $name ")
             appendLine(reactions?.render())
-            appendLine(body)
+            if ((body?.length ?: 0) < 50) appendLine(body)
         }
         MessageType.XML -> buildXmlMessage(1) {
             actionData = htmlUrl
@@ -391,7 +417,7 @@ suspend fun Readme.toMessage(contact: Contact): Message {
     if (contact is FileSupported) {
         contact.launch(SupervisorJob()) {
             val file = if (selenium) {
-                logger.info { "将尝试发送 ${sha}.pdf to $contact" }
+                logger.info { "将尝试发送 ${sha}.pdf to ${contact.render()}" }
                 pdf()
             } else {
                 markdown()
