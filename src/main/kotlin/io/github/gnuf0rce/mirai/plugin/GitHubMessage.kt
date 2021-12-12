@@ -180,7 +180,7 @@ internal suspend fun UserInfo.card(contact: Contact): Message {
  */
 suspend fun Owner.toMessage(contact: Contact): Message {
     return when (type) {
-        Owner.Type.User -> avatar().uploadAsImage(contact) + "\n" + card(contact)
+        Owner.Type.User -> card(contact)
         Owner.Type.Organization -> avatar().uploadAsImage(contact)
     }
 }
