@@ -1,8 +1,4 @@
-@file:Suppress("unused")
-
 import org.gradle.api.artifacts.dsl.DependencyHandler
-
-fun DependencyHandler.kotlinx(module: String, version: String) = "org.jetbrains.kotlinx:kotlinx-$module:$version"
 
 fun DependencyHandler.ktor(module: String, version: String) = "io.ktor:ktor-$module:$version"
 

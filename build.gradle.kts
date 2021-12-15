@@ -3,11 +3,11 @@ plugins {
     kotlin("plugin.serialization") version Versions.kotlin
 
     id("net.mamoe.mirai-console") version Versions.mirai
-    id("net.mamoe.maven-central-publish") version "0.6.1"
+    id("net.mamoe.maven-central-publish") version "0.7.0"
 }
 
 group = "io.github.gnuf0rce"
-version = "1.1.5"
+version = "1.1.6"
 
 mavenCentralPublish {
     useCentralS01()
@@ -19,6 +19,7 @@ mavenCentralPublish {
 }
 
 mirai {
+    jvmTarget = JavaVersion.VERSION_11
     configureShadow {
         listOf(
             "kotlin",
@@ -34,9 +35,8 @@ mirai {
 }
 
 repositories {
-    clear()
     mavenLocal()
-    maven(url = "https://maven.aliyun.com/repository/public")
+    maven(url = "https://maven.aliyun.com/repository/central")
     mavenCentral()
     maven(url = "https://maven.aliyun.com/repository/gradle-plugin")
     gradlePluginPortal()
@@ -57,6 +57,7 @@ dependencies {
     implementation(ktor("client-serialization", Versions.ktor)) {
         exclude(group = "io.ktor", module = "ktor-client-core")
     }
+    compileOnly("xyz.cssxsh.mirai:mirai-selenium-plugin:1.0.5")
     // test
     testImplementation("com.vladsch.flexmark:flexmark-all:0.62.2")
     testImplementation("net.mamoe.yamlkt:yamlkt-jvm:0.10.2")

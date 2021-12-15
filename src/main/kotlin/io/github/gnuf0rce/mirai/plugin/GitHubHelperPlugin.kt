@@ -20,7 +20,7 @@ object GitHubHelperPlugin : KotlinPlugin(
     JvmPluginDescription(
         id = "io.github.gnuf0rce.github-helper",
         name = "github-helper",
-        version = "1.1.5",
+        version = "1.1.6",
     ) {
         author("cssxsh")
 
@@ -69,7 +69,7 @@ object GitHubHelperPlugin : KotlinPlugin(
                     val user = github.user(login = login).get()
                     val stats = user.stats()
                     if (stats.percentage >= GitHubConfig.percentage) {
-                        logger.info { "同意 $fromId - $login - ${stats.rank}" }
+                        logger.info { "同意 $fromId - $login - ${stats.rank}/${stats.percentage}" }
                         accept()
                         delay(10_000)
                         val member = requireNotNull(group[fromId]) { "获取${fromId}信息失败" }

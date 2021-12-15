@@ -24,15 +24,11 @@ open class GitHubClient(open val token: String?) : CoroutineScope, Closeable {
 
     protected open val client = HttpClient(OkHttp) {
         BrowserUserAgent()
-        ContentEncoding {
-            gzip()
-            deflate()
-            identity()
-        }
+        ContentEncoding()
         install(HttpTimeout) {
-            requestTimeoutMillis = timeout
-            connectTimeoutMillis = timeout
             socketTimeoutMillis = timeout
+            connectTimeoutMillis = timeout
+            requestTimeoutMillis = null
         }
         Json {
             serializer = KotlinxSerializer(GitHubJson)
