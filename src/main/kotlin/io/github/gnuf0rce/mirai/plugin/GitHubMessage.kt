@@ -106,12 +106,12 @@ data class UserStats(
     /**
      * B+, A+, A++, S, S+
      */
-    val rank: String?,
-    val stars: String?,
-    val commits: String?,
-    val prs: String?,
-    val issues: String?,
-    val contrib: String?,
+    val rank: String,
+    val stars: String,
+    val commits: String,
+    val prs: String,
+    val issues: String,
+    val contrib: String,
     val percentage: Int
 )
 
@@ -144,18 +144,23 @@ internal suspend fun UserInfo.stats(flush: Long = 86400_000, client: GitHubClien
 
     val xml = svg.readText()
 
-    return UserStats(
-        rank = RANK_REGEX.find(xml)?.value,
-        stars = STARS_REGEX.find(xml)?.value,
-        commits = COMMITS_REGEX.find(xml)?.value,
-        prs = PRS_REGEX.find(xml)?.value,
-        issues = ISSUES_REGEX.find(xml)?.value,
-        contrib = CONTRIB_REGEX.find(xml)?.value,
-        percentage = OFFSET_REGEX.find(xml)?.let { pre ->
-            val next = OFFSET_REGEX.find(xml, pre.range.last)!!
-            (1 - next.value.toDouble() / pre.value.toDouble()) * 100
-        }?.toInt() ?: 0
-    )
+    return try {
+        UserStats(
+            rank = requireNotNull(RANK_REGEX.find(xml)) { "UserStats 解析失败" }.value,
+            stars = requireNotNull(STARS_REGEX.find(xml)) { "UserStats 解析失败" }.value,
+            commits = requireNotNull(COMMITS_REGEX.find(xml)) { "UserStats 解析失败" }.value,
+            prs = requireNotNull(PRS_REGEX.find(xml)) { "UserStats 解析失败" }.value,
+            issues = requireNotNull(ISSUES_REGEX.find(xml)) { "UserStats 解析失败" }.value,
+            contrib = requireNotNull(CONTRIB_REGEX.find(xml)) { "UserStats 解析失败" }.value,
+            percentage = requireNotNull(OFFSET_REGEX.find(xml)) { "UserStats 解析失败" }.let { pre ->
+                val next = requireNotNull(OFFSET_REGEX.find(xml, pre.range.last)) { "UserStats 解析失败" }
+                (1 - next.value.toDouble() / pre.value.toDouble()) * 100
+            }.toInt()
+        )
+    } catch (cause: Throwable) {
+        svg.resolve("${login}.error.svg")
+        throw cause
+    }
 }
 
 internal fun MessageChainBuilder.appendLine(image: Image) = append(image).appendLine()
