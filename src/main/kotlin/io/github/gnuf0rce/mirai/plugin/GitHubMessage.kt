@@ -121,7 +121,8 @@ data class UserStats(
 @Suppress("BlockingMethodInNonBlockingContext")
 internal suspend fun UserInfo.stats(flush: Long = 86400_000, client: GitHubClient = github): UserStats {
     val stats = ImageFolder.resolve("stats")
-    val (svg, png) = with(stats) { resolve("${login}.svg") to resolve("${login}.png") }
+    val svg = stats.resolve("${login}.svg")
+    val png = stats.resolve("${login}.png")
 
     if (svg.exists().not() || (System.currentTimeMillis() - svg.lastModified()) >= flush) {
         stats.mkdirs()
@@ -152,13 +153,14 @@ internal suspend fun UserInfo.stats(flush: Long = 86400_000, client: GitHubClien
             prs = requireNotNull(PRS_REGEX.find(xml)) { "UserStats 解析失败" }.value,
             issues = requireNotNull(ISSUES_REGEX.find(xml)) { "UserStats 解析失败" }.value,
             contrib = requireNotNull(CONTRIB_REGEX.find(xml)) { "UserStats 解析失败" }.value,
-            percentage = requireNotNull(OFFSET_REGEX.find(xml)) { "UserStats 解析失败" }.let { pre ->
+            percentage = kotlin.run {
+                val pre = requireNotNull(OFFSET_REGEX.find(xml)) { "UserStats 解析失败" }
                 val next = requireNotNull(OFFSET_REGEX.find(xml, pre.range.last)) { "UserStats 解析失败" }
-                (1 - next.value.toDouble() / pre.value.toDouble()) * 100
-            }.toInt()
+                ((1 - next.value.toDouble() / pre.value.toDouble()) * 100).toInt()
+            }
         )
     } catch (cause: Throwable) {
-        svg.resolve("${login}.error.svg")
+        svg.renameTo(stats.resolve("${login}.error.svg"))
         throw cause
     }
 }
@@ -248,7 +250,7 @@ suspend fun ControlRecord.toMessage(contact: Contact, type: MessageType, notice:
             appendLine("STATE: $state ")
             if (labels.isNotEmpty()) appendLine("LABELS: ${labels.joinToString { it.name }} ")
             appendLine(reactions?.render())
-            if ((body?.length ?: 0) < 50) appendLine(body)
+            if ((body?.length ?: Int.MAX_VALUE) < 50) appendLine(body)
         }
         MessageType.XML -> buildXmlMessage(1) {
             actionData = htmlUrl
@@ -296,7 +298,7 @@ suspend fun Release.toMessage(contact: Contact, type: MessageType, notice: Strin
             appendLine("URL: $htmlUrl ")
             appendLine("NAME: $name ")
             appendLine(reactions?.render())
-            if ((body?.length ?: 0) < 50) appendLine(body)
+            if ((body?.length ?: Int.MAX_VALUE) < 50) appendLine(body)
         }
         MessageType.XML -> buildXmlMessage(1) {
             actionData = htmlUrl
