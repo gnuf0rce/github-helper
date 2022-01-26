@@ -129,10 +129,10 @@ internal val ReleaseReplier: MessageReplier = replier@{ result ->
     try {
         val (owner, repo, name) = result.destructured
         var page = 1
-        lateinit var entry: Release
+        val entry: Release
         while (true) {
             val list = github.repo(owner, repo).releases.list(page++)
-            if (list.isEmpty()) throw NotImplementedError("$name with ${owner}/${repo}")
+            if (list.isEmpty()) throw NotImplementedError("no release $name with ${owner}/${repo}")
             entry = list.find { it.tagName == name } ?: continue
             break
         }
