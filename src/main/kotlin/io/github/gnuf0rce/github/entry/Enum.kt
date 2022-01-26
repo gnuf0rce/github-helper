@@ -1,4 +1,4 @@
-@file:Suppress("ClassName", "unused")
+@file:Suppress("EnumEntryName", "unused")
 
 package io.github.gnuf0rce.github.entry
 

@@ -1,8 +1,8 @@
 plugins {
-    kotlin("jvm") version Versions.kotlin
-    kotlin("plugin.serialization") version Versions.kotlin
+    kotlin("jvm") version "1.6.0"
+    kotlin("plugin.serialization") version "1.6.0"
 
-    id("net.mamoe.mirai-console") version Versions.mirai
+    id("net.mamoe.mirai-console") version "2.10.0-RC2"
     id("net.mamoe.maven-central-publish") version "0.7.0"
 }
 
@@ -21,16 +21,7 @@ mavenCentralPublish {
 mirai {
     jvmTarget = JavaVersion.VERSION_11
     configureShadow {
-        listOf(
-            "kotlin",
-            "org/intellij",
-            "org/jetbrains",
-            "org/slf4j"
-        ).forEach { prefix ->
-            exclude { element ->
-                element.path.startsWith(prefix)
-            }
-        }
+        exclude("module-info.class")
     }
 }
 
@@ -51,11 +42,19 @@ kotlin {
 }
 
 dependencies {
-    implementation(ktor("client-encoding", Versions.ktor)) {
+    implementation("io.ktor:ktor-client-serialization:1.6.5") {
+        exclude(group = "org.jetbrains.kotlin")
+        exclude(group = "org.jetbrains.kotlinx")
+        exclude(group = "org.slf4j")
         exclude(group = "io.ktor", module = "ktor-client-core")
+        exclude(group = "io.ktor", module = "ktor-client-core-jvm")
     }
-    implementation(ktor("client-serialization", Versions.ktor)) {
+    implementation("io.ktor:ktor-client-encoding:1.6.5") {
+        exclude(group = "org.jetbrains.kotlin")
+        exclude(group = "org.jetbrains.kotlinx")
+        exclude(group = "org.slf4j")
         exclude(group = "io.ktor", module = "ktor-client-core")
+        exclude(group = "io.ktor", module = "ktor-client-core-jvm")
     }
     compileOnly("xyz.cssxsh.mirai:mirai-selenium-plugin:1.0.5")
     // test
