@@ -249,8 +249,8 @@ suspend fun ControlRecord.toMessage(contact: Contact, type: MessageType, notice:
             appendLine("TITLE: $title ")
             appendLine("STATE: $state ")
             if (labels.isNotEmpty()) appendLine("LABELS: ${labels.joinToString { it.name }} ")
-            appendLine(reactions?.render())
-            if ((body?.length ?: Int.MAX_VALUE) < 50) appendLine(body)
+            if (reactions != null) appendLine(reactions!!.render())
+            if (body != null && body!!.length < 50) appendLine(body)
         }
         MessageType.XML -> buildXmlMessage(1) {
             actionData = htmlUrl
@@ -297,8 +297,8 @@ suspend fun Release.toMessage(contact: Contact, type: MessageType, notice: Strin
             appendLine("PUBLISHED_AT: $publishedAt ")
             appendLine("URL: $htmlUrl ")
             appendLine("NAME: $name ")
-            appendLine(reactions?.render())
-            if ((body?.length ?: Int.MAX_VALUE) < 50) appendLine(body)
+            if (reactions != null) appendLine(reactions.render())
+            if (body != null && body.length < 50) appendLine(body)
         }
         MessageType.XML -> buildXmlMessage(1) {
             actionData = htmlUrl
