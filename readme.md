@@ -80,6 +80,8 @@
 
 ## 自动通过加群问题放行开发者
 
+`1.2.0` 起对接到 [mirai-administrator](https://github.com/cssxsh/mirai-administrator) 实现此功能
+
 举例：
 
 ```

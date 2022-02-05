@@ -56,7 +56,9 @@ dependencies {
         exclude(group = "io.ktor", module = "ktor-client-core")
         exclude(group = "io.ktor", module = "ktor-client-core-jvm")
     }
-    compileOnly("xyz.cssxsh.mirai:mirai-selenium-plugin:1.0.5")
+    compileOnly("net.mamoe:mirai-core-utils:2.10.0")
+    compileOnly("xyz.cssxsh.mirai:mirai-selenium-plugin:2.0.7")
+    compileOnly("xyz.cssxsh.mirai:mirai-administrator:1.0.0-RC3")
     // test
     testImplementation("com.vladsch.flexmark:flexmark-all:0.62.2")
     testImplementation("net.mamoe.yamlkt:yamlkt-jvm:0.10.2")
