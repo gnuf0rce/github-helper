@@ -9,7 +9,7 @@ data class GitHubTask(
     @SerialName("id")
     val id: String,
     @SerialName("contacts")
-    val contacts: MutableSet<Long> = mutableSetOf(),
+    val contacts: MutableSet<Long> = HashSet(),
     @SerialName("last")
     @Serializable(OffsetDateTimeSerializer::class)
     var last: OffsetDateTime = OffsetDateTime.now(),

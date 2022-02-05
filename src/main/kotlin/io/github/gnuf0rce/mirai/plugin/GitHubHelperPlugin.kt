@@ -20,7 +20,7 @@ object GitHubHelperPlugin : KotlinPlugin(
         author("cssxsh")
 
         dependsOn("xyz.cssxsh.mirai.plugin.mirai-selenium-plugin", true)
-        dependsOn("xyz.cssxsh.mirai.mirai-administrator", true)
+        dependsOn("xyz.cssxsh.mirai.plugin.mirai-administrator", true)
     }
 ) {
 

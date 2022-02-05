@@ -4,14 +4,14 @@ import net.mamoe.mirai.console.data.*
 
 object GitHubRepoTaskData : AutoSavePluginData("RepoTaskData") {
     @ValueName("commits")
-    val commits by value(mutableMapOf<String, GitHubTask>())
+    val commits by value<MutableMap<String, GitHubTask>>()
 
     @ValueName("issues")
-    val issues by value(mutableMapOf<String, GitHubTask>())
+    val issues by value<MutableMap<String, GitHubTask>>()
 
     @ValueName("pulls")
-    val pulls by value(mutableMapOf<String, GitHubTask>())
+    val pulls by value<MutableMap<String, GitHubTask>>()
 
     @ValueName("releases")
-    val releases by value(mutableMapOf<String, GitHubTask>())
+    val releases by value<MutableMap<String, GitHubTask>>()
 }

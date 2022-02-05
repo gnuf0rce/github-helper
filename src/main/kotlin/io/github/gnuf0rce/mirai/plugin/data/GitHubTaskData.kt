@@ -4,5 +4,5 @@ import net.mamoe.mirai.console.data.*
 
 object GitHubTaskData : AutoSavePluginData("TaskData") {
     @ValueName("issues")
-    val issues by value(mutableMapOf<String, GitHubTask>())
+    val issues by value<MutableMap<String, GitHubTask>>()
 }
