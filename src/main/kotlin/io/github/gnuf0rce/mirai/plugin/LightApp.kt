@@ -1,14 +1,11 @@
 package io.github.gnuf0rce.mirai.plugin
 
-import kotlinx.serialization.*
 import kotlinx.serialization.json.*
 import net.mamoe.mirai.message.data.*
 import kotlin.reflect.full.*
 
-
-@OptIn(ExperimentalSerializationApi::class)
 internal inline fun LightApp(json: Json = Json, block: JsonObjectBuilder.() -> Unit): LightApp {
-    return LightApp(json.encodeToString(buildJsonObject(block)))
+    return LightApp(json.encodeToString(JsonObject.serializer(), buildJsonObject(block)))
 }
 
 sealed class StructMessageBuilder {

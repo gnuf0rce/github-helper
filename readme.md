@@ -27,56 +27,57 @@
 
 ### GitHubIssuesCommand
 
-| 指令                             | 描述             |
-|:---------------------------------|:-----------------|
-| `/<issues> <add> [contact]?`     | 添加订阅         |
-| `/<issues> <remove> [contact]?`  | 移除订阅         |
+| 指令                               | 描述       |
+|:---------------------------------|:---------|
+| `/<issues> <add> [contact]?`     | 添加订阅     |
+| `/<issues> <remove> [contact]?`  | 移除订阅     |
 | `/<issues> <interval> [millis]?` | 设置订阅轮询间隔 |
-| `/<issues> <list>?`              | 查看订阅列表     |
+| `/<issues> <list>?`              | 查看订阅列表   |
 
 这个指令用于获取当前用户的`issues`，所以需要有效 `token`
 
 ### GitHubRepoCommitCommand
 
-| 指令                                         | 描述             |
-|:---------------------------------------------|:-----------------|
-| `/<repo-commit> <add> [repo] [contact]?`     | 添加订阅         |
-| `/<repo-commit> <remove> [repo] [contact]?`  | 移除订阅         |
+| 指令                                           | 描述       |
+|:---------------------------------------------|:---------|
+| `/<repo-commit> <add> [repo] [contact]?`     | 添加订阅     |
+| `/<repo-commit> <remove> [repo] [contact]?`  | 移除订阅     |
 | `/<repo-commit> <interval> [repo] [millis]?` | 设置订阅轮询间隔 |
-| `/<repo-commit> <list> [contact]?`           | 查看订阅列表     |
+| `/<repo-commit> <list> [contact]?`           | 查看订阅列表   |
 
 ### GitHubRepoIssueCommand
 
-| 指令                                        | 描述             |
-|:--------------------------------------------|:-----------------|
-| `/<repo-issue> <add> [repo] [contact]?`     | 添加订阅         |
-| `/<repo-issue> <remove> [repo] [contact]?`  | 移除订阅         |
+| 指令                                          | 描述       |
+|:--------------------------------------------|:---------|
+| `/<repo-issue> <add> [repo] [contact]?`     | 添加订阅     |
+| `/<repo-issue> <remove> [repo] [contact]?`  | 移除订阅     |
 | `/<repo-issue> <interval> [repo] [millis]?` | 设置订阅轮询间隔 |
-| `/<repo-issue> <list> [contact]?`           | 查看订阅列表     |
+| `/<repo-issue> <list> [contact]?`           | 查看订阅列表   |
 
 ### GitHubRepoPullCommand
 
-| 指令                                       | 描述             |
-|:-------------------------------------------|:-----------------|
-| `/<repo-pull> <add> [repo] [contact]?`     | 添加订阅         |
-| `/<repo-pull> <remove> [repo] [contact]?`  | 移除订阅         |
+| 指令                                         | 描述       |
+|:-------------------------------------------|:---------|
+| `/<repo-pull> <add> [repo] [contact]?`     | 添加订阅     |
+| `/<repo-pull> <remove> [repo] [contact]?`  | 移除订阅     |
 | `/<repo-pull> <interval> [repo] [millis]?` | 设置订阅轮询间隔 |
-| `/<repo-pull> <list> [contact]?`           | 查看订阅列表     |
+| `/<repo-pull> <list> [contact]?`           | 查看订阅列表   |
 
 ### GitHubRepoReleaseCommand
 
-| 指令                                          | 描述             |
-|:----------------------------------------------|:-----------------|
-| `/<repo-release> <add> [repo] [contact]?`     | 添加订阅         |
-| `/<repo-release> <remove> [repo] [contact]?`  | 移除订阅         |
+| 指令                                            | 描述       |
+|:----------------------------------------------|:---------|
+| `/<repo-release> <add> [repo] [contact]?`     | 添加订阅     |
+| `/<repo-release> <remove> [repo] [contact]?`  | 移除订阅     |
 | `/<repo-release> <interval> [repo] [millis]?` | 设置订阅轮询间隔 |
-| `/<repo-release> <list> [contact]?`           | 查看订阅列表     |
+| `/<repo-release> <list> [contact]?`           | 查看订阅列表   |
 
 ### GitHubStatsCommand
 
-| 指令                     | 描述     |
-|:-------------------------|:---------|
-| `/<stats> <card> [name]` | 查看状态 |
+| 指令                               | 描述   |
+|:---------------------------------|:-----|
+| `/<stats> <card> [name]`         | 查看状态 |
+| `/<stats> <contribution> [name]` | 查看贡献 |
 
 ## 自动通过加群问题放行开发者
 

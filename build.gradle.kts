@@ -2,12 +2,12 @@ plugins {
     kotlin("jvm") version "1.6.0"
     kotlin("plugin.serialization") version "1.6.0"
 
-    id("net.mamoe.mirai-console") version "2.10.0-RC2"
-    id("net.mamoe.maven-central-publish") version "0.7.0"
+    id("net.mamoe.mirai-console") version "2.10.0"
+    id("net.mamoe.maven-central-publish") version "0.7.1"
 }
 
 group = "io.github.gnuf0rce"
-version = "1.1.6"
+version = "1.2.0"
 
 mavenCentralPublish {
     useCentralS01()
@@ -27,9 +27,7 @@ mirai {
 
 repositories {
     mavenLocal()
-    maven(url = "https://maven.aliyun.com/repository/central")
     mavenCentral()
-    maven(url = "https://maven.aliyun.com/repository/gradle-plugin")
     gradlePluginPortal()
 }
 
@@ -63,7 +61,7 @@ dependencies {
     testImplementation("com.vladsch.flexmark:flexmark-all:0.62.2")
     testImplementation("net.mamoe.yamlkt:yamlkt-jvm:0.10.2")
     testImplementation("org.apache.xmlgraphics:batik-transcoder:1.14")
-    testImplementation(kotlin("test", Versions.kotlin))
+    testImplementation(kotlin("test", "1.6.0"))
 }
 
 tasks {

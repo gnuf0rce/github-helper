@@ -10,7 +10,6 @@ import io.ktor.client.features.json.*
 import io.ktor.client.features.json.serializer.*
 import io.ktor.client.request.*
 import io.ktor.http.*
-import io.ktor.util.*
 import kotlinx.coroutines.*
 import kotlinx.serialization.*
 import java.io.*
@@ -42,13 +41,13 @@ open class GitHubClient(open val token: String?) : CoroutineScope, Closeable {
         }
         HttpResponseValidator {
             handleResponseException { cause ->
-                if (cause is ClientRequestException && "documentation_url" in cause.message.orEmpty()) {
-                    @OptIn(KtorExperimentalAPI::class, ExperimentalSerializationApi::class)
+                if (cause is ClientRequestException && "documentation_url" in cause.message) {
+                    @OptIn(ExperimentalSerializationApi::class)
                     throw GitHubApiException(
                         cause, try {
                             cause.response.call.save().response.receive()
-                        } catch (e: Throwable) {
-                            val json = cause.message!!.substringAfter("Text: \"").removeSuffix("\"")
+                        } catch (_: Throwable) {
+                            val json = cause.message.substringAfter("Text: \"").removeSuffix("\"")
                             GitHubJson.decodeFromString(json)
                         }
                     )

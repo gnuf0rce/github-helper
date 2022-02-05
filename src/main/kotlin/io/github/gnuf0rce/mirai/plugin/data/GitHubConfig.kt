@@ -34,7 +34,8 @@ object GitHubConfig : ReadOnlyPluginConfig("GithubConfig") {
         mapOf(
             "show_icons" to "true",
             "theme" to "tokyonight",
-            "count_private" to "true"
+            "count_private" to "true",
+            "include_all_commits" to "true"
         )
     )
 }

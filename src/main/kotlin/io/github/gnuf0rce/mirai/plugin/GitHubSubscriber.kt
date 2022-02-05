@@ -5,12 +5,9 @@ import io.github.gnuf0rce.github.entry.*
 import io.github.gnuf0rce.github.exception.*
 import io.github.gnuf0rce.mirai.plugin.data.*
 import kotlinx.coroutines.*
-import net.mamoe.mirai.console.util.*
-import net.mamoe.mirai.console.util.CoroutineScopeUtils.childScope
 import net.mamoe.mirai.message.data.*
 import net.mamoe.mirai.utils.*
 
-@OptIn(ConsoleExperimentalApi::class)
 abstract class GitHubSubscriber<T>(private val name: String, parent: CoroutineScope) :
     CoroutineScope by parent.childScope(name)
     where T : LifeCycle, T : HtmlPage {
