@@ -102,3 +102,14 @@
 * `percentage_member_join` 加群放行活跃等级（百分制），默认0，不开启功能
 * `sign_member_join` 加群放行提示信息
 * `github_readme_stats` stats card 绘制参数
+
+## 安装
+
+### MCL 指令安装
+
+`./mcl --update-package io.github.gnuf0rce:github-helper --channel stable --type plugin`
+
+### 手动安装
+
+* 运行 [Mirai Console](https://github.com/mamoe/mirai-console) 生成`plugins`文件夹
+* 从 [Releases](https://github.com/gnuf0rce/github-helper/releases) 下载`jar`并将其放入`plugins`文件夹中
