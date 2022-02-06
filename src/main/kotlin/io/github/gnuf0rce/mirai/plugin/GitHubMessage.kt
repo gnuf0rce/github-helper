@@ -147,15 +147,15 @@ internal suspend fun UserInfo.stats(flush: Long = 86400_000, client: GitHubClien
 
     return try {
         UserStats(
-            rank = requireNotNull(RANK_REGEX.find(xml)) { "UserStats 解析失败" }.value,
-            stars = requireNotNull(STARS_REGEX.find(xml)) { "UserStats 解析失败" }.value,
-            commits = requireNotNull(COMMITS_REGEX.find(xml)) { "UserStats 解析失败" }.value,
-            prs = requireNotNull(PRS_REGEX.find(xml)) { "UserStats 解析失败" }.value,
-            issues = requireNotNull(ISSUES_REGEX.find(xml)) { "UserStats 解析失败" }.value,
-            contrib = requireNotNull(CONTRIB_REGEX.find(xml)) { "UserStats 解析失败" }.value,
+            rank = requireNotNull(RANK_REGEX.find(xml)) { "UserStats 解析 rank 失败" }.value,
+            stars = requireNotNull(STARS_REGEX.find(xml)) { "UserStats 解析 stars 失败" }.value,
+            commits = requireNotNull(COMMITS_REGEX.find(xml)) { "UserStats 解析 commits 失败" }.value,
+            prs = requireNotNull(PRS_REGEX.find(xml)) { "UserStats 解析 prs 失败" }.value,
+            issues = requireNotNull(ISSUES_REGEX.find(xml)) { "UserStats 解析 issues 失败" }.value,
+            contrib = requireNotNull(CONTRIB_REGEX.find(xml)) { "UserStats 解析 contrib 失败" }.value,
             percentage = kotlin.run {
-                val pre = requireNotNull(OFFSET_REGEX.find(xml)) { "UserStats 解析失败" }
-                val next = requireNotNull(OFFSET_REGEX.find(xml, pre.range.last)) { "UserStats 解析失败" }
+                val pre = requireNotNull(OFFSET_REGEX.find(xml)) { "UserStats 解析 percentage 失败" }
+                val next = requireNotNull(OFFSET_REGEX.find(xml, pre.range.last)) { "UserStats 解析 percentage 失败" }
                 ((1 - next.value.toDouble() / pre.value.toDouble()) * 100).toInt()
             }
         )
@@ -218,6 +218,9 @@ suspend fun Owner.toMessage(contact: Contact): Message {
     }
 }
 
+/**
+ * TODO: License ...
+ */
 suspend fun HtmlPage.toMessage(contact: Contact, type: MessageType, notice: String): Message {
     return when (this) {
         is Issue -> toMessage(contact, type, notice)
