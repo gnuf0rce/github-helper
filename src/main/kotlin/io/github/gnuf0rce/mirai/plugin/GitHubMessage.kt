@@ -193,12 +193,31 @@ internal suspend fun UserInfo.card(contact: Contact): Message {
 internal suspend fun UserInfo.contribution(contact: Contact): Message {
     return if (selenium) {
         val png = ImageFolder.resolve("contribution").resolve("${login}.png")
-        if (png.exists().not()) {
+        if (png.exists().not() || (System.currentTimeMillis() - png.lastModified()) >= 86400_000) {
             png.parentFile.mkdirs()
             val screenshot = useRemoteWebDriver { driver ->
+                driver.manage().window().size = Dimension(1920,1080)
                 driver.get(htmlUrl)
                 delay(10_000)
-                driver.findElement(By.className("ContributionCalendar")).getScreenshotAs(OutputType.BYTES)
+                driver.findElement(By.cssSelector(".ContributionCalendar")).getScreenshotAs(OutputType.BYTES)
+            }
+            png.writeBytes(screenshot)
+        }
+        png.uploadAsImage(contact)
+    } else {
+        "目前只有安装了 selenium 才能工作".toPlainText()
+    }
+}
+
+internal suspend fun UserInfo.trophy(contact: Contact): Message {
+    return if (selenium) {
+        val png = ImageFolder.resolve("trophy").resolve("${login}.png")
+        if (png.exists().not() || (System.currentTimeMillis() - png.lastModified()) >= 86400_000) {
+            png.parentFile.mkdirs()
+            val screenshot = useRemoteWebDriver { driver ->
+                driver.get("https://github-profile-trophy.vercel.app/?username=${login}&column=4")
+                delay(10_000)
+                driver.findElement(By.cssSelector("svg")).getScreenshotAs(OutputType.BYTES)
             }
             png.writeBytes(screenshot)
         }
