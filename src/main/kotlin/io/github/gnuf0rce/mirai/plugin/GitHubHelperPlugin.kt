@@ -33,12 +33,10 @@ object GitHubHelperPlugin : KotlinPlugin(
         GitHubRepoTaskData.reload()
         GitHubTaskData.reload()
 
-        for (command in GitHubCommand) {
-            command.register()
-        }
+        for (command in GitHubCommand) command.register()
 
         globalEventChannel().subscribeOnce<BotOnlineEvent> {
-            GitHubSubscriber.start()
+            for (subscriber in GitHubSubscriber) subscriber.start()
         }
 
         logger.info { "url auto reply: /perm add u* ${ReplierPermission.id}" }
@@ -51,9 +49,7 @@ object GitHubHelperPlugin : KotlinPlugin(
     }
 
     override fun onDisable() {
-        for (command in GitHubCommand) {
-            command.unregister()
-        }
-        GitHubSubscriber.stop()
+        for (command in GitHubCommand) command.unregister()
+        for (subscriber in GitHubSubscriber) subscriber.stop()
     }
 }

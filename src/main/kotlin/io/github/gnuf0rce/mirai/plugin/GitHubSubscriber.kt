@@ -12,30 +12,20 @@ abstract class GitHubSubscriber<T>(private val name: String, parent: CoroutineSc
     CoroutineScope by parent.childScope(name)
     where T : LifeCycle, T : HtmlPage {
 
-    companion object {
+    companion object : Sequence<GitHubSubscriber<*>> {
         val repos = mutableMapOf<String, GitHubRepo>().withDefault { full -> github.repo(full) }
         const val PER_PAGE = 30
 
         val GitHubTask.repo get() = repos.getValue(id)
         val current by lazy { GitHubCurrent(github) }
 
-        private val all = mutableListOf<GitHubSubscriber<*>>()
+        private val instances: MutableList<GitHubSubscriber<*>> = ArrayList()
 
-        fun start() {
-            for (subscriber in all) {
-                subscriber.start()
-            }
-        }
-
-        fun stop() {
-            for (subscriber in all) {
-                subscriber.stop()
-            }
-        }
+        override fun iterator(): Iterator<GitHubSubscriber<*>> = instances.iterator()
     }
 
     init {
-        let(all::add)
+        let(instances::add)
     }
 
     private val jobs = mutableMapOf<String, Job>()
