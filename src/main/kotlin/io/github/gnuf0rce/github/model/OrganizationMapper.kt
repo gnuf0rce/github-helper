@@ -5,13 +5,13 @@ import io.github.gnuf0rce.github.entry.*
 import io.ktor.http.*
 
 /**
- * 1. [https://api.github.com/users/{user}]
- * 2. [https://api.github.com/users/{user}/repos]
+ * 1. [https://api.github.com/orgs/{org}]
+ * 2. [https://api.github.com/orgs/{org}/repos]
  */
-open class UserMapper(parent: Url, override val github: GitHubClient) :
+open class OrganizationMapper(parent: Url, override val github: GitHubClient) :
     GitHubMapper(parent, "") {
 
-    open suspend fun get() = get<User>()
+    open suspend fun get() = get<Organization>()
 
     open suspend fun repos(page: Int, per: Int = 30) = page<Repo>(page, per, "repos")
 }

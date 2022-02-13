@@ -10,9 +10,9 @@ data class Pull(
     @SerialName("additions")
     val additions: Int = 0,
     @SerialName("assignee")
-    override val assignee: Owner? = null,
+    override val assignee: User? = null,
     @SerialName("assignees")
-    override val assignees: List<Owner> = emptyList(),
+    override val assignees: List<User> = emptyList(),
     @SerialName("author_association")
     override val authorAssociation: Association,
     @SerialName("auto_merge")
@@ -27,7 +27,7 @@ data class Pull(
     @SerialName("closed_at")
     override val closedAt: OffsetDateTime?,
     @SerialName("closed_by")
-    override val closedBy: Owner? = null,
+    override val closedBy: User? = null,
     @SerialName("comments")
     override val comments: Int = 0,
     @SerialName("comments_url")
@@ -68,7 +68,7 @@ data class Pull(
     @SerialName("merged")
     val merged: Boolean = false,
     @SerialName("merged_by")
-    val mergedBy: Owner? = null,
+    val mergedBy: User? = null,
     @SerialName("merge_commit_sha")
     val mergeCommitSha: String,
     @Contextual
@@ -87,7 +87,7 @@ data class Pull(
     @SerialName("rebaseable")
     val rebaseable: Boolean? = null,
     @SerialName("requested_reviewers")
-    val requestedReviewers: List<Owner> = emptyList(),
+    val requestedReviewers: List<User> = emptyList(),
     @SerialName("requested_teams")
     val requestedTeams: List<Team> = emptyList(),
     @SerialName("review_comment_url")
@@ -108,7 +108,9 @@ data class Pull(
     @SerialName("url")
     override val url: String,
     @SerialName("user")
-    override val user: Owner
+    override val user: User,
+    @SerialName("repository")
+    override val repository: Repo? = null
 ) : Entry, LifeCycle, HtmlPage, ControlRecord {
 
     @Serializable
@@ -122,10 +124,10 @@ data class Pull(
         @SerialName("sha")
         val sha: String,
         @SerialName("user")
-        val user: Owner
+        val user: User
     ) : Owner.Product {
 
-        override val owner: Owner
+        override val owner: User
             get() = user
     }
 

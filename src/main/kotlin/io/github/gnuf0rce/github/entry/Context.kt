@@ -27,11 +27,3 @@ sealed interface Content {
     val body: String?
     val reactions: Reactions?
 }
-
-sealed interface UserInfo {
-    val avatarUrl: String
-    val id: Long
-    val login: String
-    val name: String?
-    val htmlUrl: String
-}

@@ -4,6 +4,7 @@ package io.github.gnuf0rce.mirai.plugin
 
 import io.github.gnuf0rce.github.*
 import io.github.gnuf0rce.github.entry.*
+import io.github.gnuf0rce.github.entry.User
 import io.github.gnuf0rce.mirai.plugin.data.*
 import io.ktor.client.request.*
 import io.ktor.http.*
@@ -29,7 +30,7 @@ internal fun Contact(id: Long): Contact = Bot.instances.firstNotNullOf { it.getC
 @Serializable
 enum class MessageType { TEXT, XML, JSON }
 
-internal suspend fun UserInfo.avatar(flush: Boolean = false, client: GitHubClient = github): File {
+internal suspend fun Owner.avatar(flush: Boolean = false, client: GitHubClient = github): File {
     val url = Url(avatarUrl)
     return ImageFolder.resolve("avatar").resolve(url.filename).apply {
         if (exists().not() || flush) {
@@ -119,7 +120,7 @@ data class UserStats(
  * XXX: svg to text
  */
 @Suppress("BlockingMethodInNonBlockingContext")
-internal suspend fun UserInfo.stats(flush: Long = 86400_000, client: GitHubClient = github): UserStats {
+internal suspend fun User.stats(flush: Long = 86400_000, client: GitHubClient = github): UserStats {
     val stats = ImageFolder.resolve("stats")
     val svg = stats.resolve("${login}.svg")
     val png = stats.resolve("${login}.png")
@@ -167,7 +168,7 @@ internal suspend fun UserInfo.stats(flush: Long = 86400_000, client: GitHubClien
 
 internal fun MessageChainBuilder.appendLine(image: Image) = append(image).appendLine()
 
-internal suspend fun UserInfo.card(contact: Contact): Message {
+internal suspend fun User.card(contact: Contact): Message {
     val image = avatar().uploadAsImage(contact)
     val stats = stats()
     return if (selenium) {
@@ -190,7 +191,7 @@ internal suspend fun UserInfo.card(contact: Contact): Message {
     }
 }
 
-internal suspend fun UserInfo.contribution(contact: Contact): Message {
+internal suspend fun User.contribution(contact: Contact): Message {
     return if (selenium) {
         val png = ImageFolder.resolve("contribution").resolve("${login}.png")
         if (png.exists().not() || (System.currentTimeMillis() - png.lastModified()) >= 86400_000) {
@@ -209,7 +210,7 @@ internal suspend fun UserInfo.contribution(contact: Contact): Message {
     }
 }
 
-internal suspend fun UserInfo.trophy(contact: Contact): Message {
+internal suspend fun User.trophy(contact: Contact): Message {
     return if (selenium) {
         val png = ImageFolder.resolve("trophy").resolve("${login}.png")
         if (png.exists().not() || (System.currentTimeMillis() - png.lastModified()) >= 86400_000) {
@@ -231,9 +232,9 @@ internal suspend fun UserInfo.trophy(contact: Contact): Message {
  * TODO: more info ...
  */
 suspend fun Owner.toMessage(contact: Contact): Message {
-    return when (type) {
-        Owner.Type.User -> card(contact)
-        Owner.Type.Organization -> avatar().uploadAsImage(contact)
+    return when (this) {
+        is User -> card(contact)
+        is Organization -> avatar().uploadAsImage(contact)
     }
 }
 

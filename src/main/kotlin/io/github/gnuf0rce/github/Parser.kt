@@ -12,4 +12,6 @@ fun GitHubClient.repo(full: String): GitHubRepo {
 
 fun GitHubClient.user(login: String) = GitHubUser(user = login, github = this)
 
+fun GitHubClient.organization(login: String) = GitHubOrganization(org = login, github = this)
+
 fun GitHubClient.current() = GitHubCurrent(github = this)

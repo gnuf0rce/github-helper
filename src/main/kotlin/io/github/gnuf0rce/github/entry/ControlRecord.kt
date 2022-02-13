@@ -9,10 +9,10 @@ import kotlinx.serialization.*
 sealed interface ControlRecord : Entry, LifeCycle, HtmlPage, Content, Owner.Product {
     override val htmlUrl: String
     val title: String
-    val user: Owner
-    val assignee: Owner?
-    val assignees: List<Owner>
-    val closedBy: Owner?
+    val user: User
+    val assignee: User?
+    val assignees: List<User>
+    val closedBy: User?
     val state: State
     val number: Int
     val labels: List<Label>
@@ -22,8 +22,9 @@ sealed interface ControlRecord : Entry, LifeCycle, HtmlPage, Content, Owner.Prod
     val milestone: Milestone?
     val draft: Boolean
     val locked: Boolean
+    val repository: Repo?
 
-    override val owner: Owner
+    override val owner: User
         get() = user
 
     @Serializable

@@ -16,7 +16,7 @@ open class CurrentMapper(parent: Url, override val github: GitHubClient = GitHub
     suspend fun issues(page: Int, per: Int = 30, context: JsonObject? = null) =
         page<JsonObject, Issue>(page, per, context, "issues")
 
-    suspend fun user() = get<Owner>("user")
+    suspend fun user() = get<User>("user")
 
     suspend fun rate() = get<RateLimit>("rate_limit")
 }
