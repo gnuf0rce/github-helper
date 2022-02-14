@@ -99,7 +99,8 @@
 * `proxy` Format http://127.0.0.1:8080 or socks://127.0.0.1:1080
 * `token` [Personal Access Tokens](https://github.com/settings/tokens)
 * `reply` Subscriber Reply Message Type `TEXT, XML, JSON`, JSON 尚不可用
-* `percentage_member_join` 加群放行活跃等级（百分制），默认0，不开启功能
+* `percentage_member_join` 加群放行 GitHub 活跃等级（百分制），默认0，不开启功能
+* `percentages` 加群放行 GitHub 活跃等级（百分制），默认0，不开启功能
 * `sign_member_join` 加群放行提示信息
 * `github_readme_stats` stats card 绘制参数
 

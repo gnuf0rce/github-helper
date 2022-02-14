@@ -24,6 +24,10 @@ object GitHubConfig : ReadOnlyPluginConfig("GithubConfig") {
     @ValueDescription("放行活跃等级（百分制）")
     val percentage by value(0)
 
+    @ValueName("percentages")
+    @ValueDescription("放行活跃等级（百分制）")
+    val percentages by value(mapOf(12345L to 49))
+
     @ValueName("sign_member_join")
     @ValueDescription("加群提醒")
     val sign by value("新人入群请看群公告")

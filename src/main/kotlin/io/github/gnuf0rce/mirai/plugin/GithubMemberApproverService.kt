@@ -18,7 +18,8 @@ class GithubMemberApproverService : MemberApprover {
     override suspend fun approve(event: MemberJoinEvent): ApproveResult = ApproveResult.Ignore
 
     override suspend fun approve(event: MemberJoinRequestEvent): ApproveResult {
-        if (GitHubConfig.percentage <= 0) return ApproveResult.Ignore
+        val percentage = GitHubConfig.percentages[event.groupId] ?: GitHubConfig.percentage
+        if (percentage <= 0) return ApproveResult.Ignore
         val login = event.message.substringAfterLast("答案：").trim()
         val comer = event.fromId
         return try {
@@ -29,7 +30,7 @@ class GithubMemberApproverService : MemberApprover {
 
             val user = github.user(login = login).get()
             val stats = user.stats()
-            if (stats.percentage >= GitHubConfig.percentage) {
+            if (stats.percentage >= percentage) {
                 logger.info { "同意 $comer - $login - ${stats.rank}/${stats.percentage}" }
                 group.globalEventChannel().subscribe<MemberJoinEvent> { join ->
                     if (join.member.id == comer && join.group.id == group.id) {
