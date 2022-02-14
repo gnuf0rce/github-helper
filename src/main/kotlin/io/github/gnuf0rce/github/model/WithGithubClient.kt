@@ -34,7 +34,7 @@ internal suspend inline fun <reified R> WithGithubClient.page(
     per: Int,
     path: String = "",
     block: MutableMap<String, Any?>.() -> Unit = {}
-): List<R> = page(page, per, mutableMapOf<String, Any?>().apply(block), path)
+): List<R> = page(page, per, HashMap<String, Any?>().apply(block), path)
 
 internal suspend inline fun <reified T, reified R> WithGithubClient.page(
     page: Int,

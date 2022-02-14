@@ -7,7 +7,7 @@ plugins {
 }
 
 group = "io.github.gnuf0rce"
-version = "1.1.7"
+version = "1.1.8"
 
 mavenCentralPublish {
     useCentralS01()
@@ -52,12 +52,10 @@ dependencies {
         exclude(group = "io.ktor", module = "ktor-client-core")
     }
     compileOnly("net.mamoe:mirai-core-utils:2.10.0")
-    compileOnly("xyz.cssxsh.mirai:mirai-selenium-plugin:2.0.7")
-    compileOnly("xyz.cssxsh.mirai:mirai-administrator:1.0.0")
+    compileOnly("xyz.cssxsh.mirai:mirai-selenium-plugin:2.0.8")
+    compileOnly("xyz.cssxsh.mirai:mirai-administrator:1.0.3")
     // test
-    testImplementation("com.vladsch.flexmark:flexmark-all:0.62.2")
-    testImplementation("net.mamoe.yamlkt:yamlkt-jvm:0.10.2")
-    testImplementation("org.apache.xmlgraphics:batik-transcoder:1.14")
+    testRuntimeOnly("xyz.cssxsh.mirai:mirai-selenium-plugin:2.0.8")
     testImplementation(kotlin("test", "1.6.0"))
 }
 

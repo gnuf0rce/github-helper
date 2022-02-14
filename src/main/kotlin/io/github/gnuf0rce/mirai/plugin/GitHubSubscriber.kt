@@ -13,11 +13,11 @@ abstract class GitHubSubscriber<T>(private val name: String, parent: CoroutineSc
     where T : LifeCycle, T : HtmlPage {
 
     companion object : Sequence<GitHubSubscriber<*>> {
-        val repos = mutableMapOf<String, GitHubRepo>().withDefault { full -> github.repo(full) }
+        val repos: MutableMap<String, GitHubRepo> = HashMap()
         const val PER_PAGE = 30
 
-        val GitHubTask.repo get() = repos.getValue(id)
-        val current by lazy { GitHubCurrent(github) }
+        val GitHubTask.repo get() = repos.getOrPut(id) { github.repo(id) }
+        val current by lazy { github.current() }
 
         private val instances: MutableList<GitHubSubscriber<*>> = ArrayList()
 
@@ -28,7 +28,7 @@ abstract class GitHubSubscriber<T>(private val name: String, parent: CoroutineSc
         let(instances::add)
     }
 
-    private val jobs = mutableMapOf<String, Job>()
+    private val jobs: MutableMap<String, Job> = HashMap()
 
     protected abstract val tasks: MutableMap<String, GitHubTask>
 
