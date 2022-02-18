@@ -3,6 +3,7 @@ package io.github.gnuf0rce.mirai.plugin
 import io.github.gnuf0rce.github.*
 import io.github.gnuf0rce.mirai.plugin.command.*
 import io.github.gnuf0rce.mirai.plugin.data.*
+import net.mamoe.mirai.*
 import net.mamoe.mirai.console.command.CommandManager.INSTANCE.register
 import net.mamoe.mirai.console.command.CommandManager.INSTANCE.unregister
 import net.mamoe.mirai.console.extension.*
@@ -28,6 +29,14 @@ object GitHubHelperPlugin : KotlinPlugin(
         System.setProperty(IGNORE_UNKNOWN_KEYS, "true")
     }
 
+    private fun waitOnline(block: () -> Unit) {
+        if (Bot.instances.isEmpty()) {
+            globalEventChannel().subscribeOnce<BotOnlineEvent> { block() }
+        } else {
+            block()
+        }
+    }
+
     override fun onEnable() {
         GitHubConfig.reload()
         GitHubRepoTaskData.reload()
@@ -35,7 +44,7 @@ object GitHubHelperPlugin : KotlinPlugin(
 
         for (command in GitHubCommand) command.register()
 
-        globalEventChannel().subscribeOnce<BotOnlineEvent> {
+        waitOnline {
             for (subscriber in GitHubSubscriber) subscriber.start()
         }
 
