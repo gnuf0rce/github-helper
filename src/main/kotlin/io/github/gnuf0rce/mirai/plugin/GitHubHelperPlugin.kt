@@ -16,7 +16,7 @@ object GitHubHelperPlugin : KotlinPlugin(
     JvmPluginDescription(
         id = "io.github.gnuf0rce.github-helper",
         name = "github-helper",
-        version = "1.1.8",
+        version = "1.1.9",
     ) {
         author("cssxsh")
 

@@ -102,6 +102,7 @@ data class Release(
     ) : Entry, LifeCycle {
 
         @Serializable
+        @Suppress("EnumEntryName", "unused")
         enum class State { uploaded }
 
         @Deprecated("Asset No Close", ReplaceWith("null"))

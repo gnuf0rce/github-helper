@@ -79,7 +79,6 @@ internal val selenium: Boolean by lazy {
     }
 }
 
-// XXX: ...
 internal inline fun <reified T> useRemoteWebDriver(block: (RemoteWebDriver) -> T): T {
     val driver = MiraiSeleniumPlugin.driver()
     return try {

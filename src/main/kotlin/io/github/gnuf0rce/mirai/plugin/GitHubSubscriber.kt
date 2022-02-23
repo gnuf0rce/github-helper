@@ -121,6 +121,7 @@ abstract class GitHubSubscriber<T>(private val name: String, parent: CoroutineSc
             }
             delay(current.interval)
         }
+        logger.info { "$name with $id run stop" }
     }
 
     fun start() {

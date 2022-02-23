@@ -18,8 +18,8 @@ import net.mamoe.mirai.contact.*
 import net.mamoe.mirai.message.data.*
 import net.mamoe.mirai.message.data.Image.Key.queryUrl
 import net.mamoe.mirai.utils.ExternalResource.Companion.uploadAsImage
-import net.mamoe.mirai.utils.*
 import net.mamoe.mirai.utils.ExternalResource.Companion.toExternalResource
+import net.mamoe.mirai.utils.*
 import org.openqa.selenium.*
 import xyz.cssxsh.selenium.*
 import java.io.File
@@ -116,9 +116,6 @@ data class UserStats(
     val percentage: Int
 )
 
-/**
- * XXX: svg to text
- */
 @Suppress("BlockingMethodInNonBlockingContext")
 internal suspend fun User.stats(flush: Long = 86400_000, client: GitHubClient = github): UserStats {
     val stats = ImageFolder.resolve("stats")
