@@ -49,8 +49,8 @@ internal fun Readme.pdf(flush: Boolean = false): File {
             val bytes = useRemoteWebDriver { driver ->
                 try {
                     driver.get(htmlUrl)
-                } catch (exception: WebDriverException) {
-                    if ("net::ERR_CONNECTION_RESET" in exception.rawMessage) {
+                } catch (exception: Throwable) {
+                    if (exception is WebDriverException && "net::ERR_CONNECTION_RESET" in exception.rawMessage) {
                         driver.navigate().refresh()
                     }
                 }
