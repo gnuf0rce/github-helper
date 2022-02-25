@@ -1,7 +1,7 @@
 package io.github.gnuf0rce.github
 
 
-internal val FULL_REGEX = """([\w-]+)/([\w-]+)""".toRegex()
+internal val FULL_REGEX = """([\w-.]+)/([\w-.]+)""".toRegex()
 
 fun GitHubClient.repo(owner: String, repo: String) = GitHubRepo(owner = owner, repo = repo, github = this)
 
