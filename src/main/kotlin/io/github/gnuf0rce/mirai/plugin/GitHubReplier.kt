@@ -38,7 +38,8 @@ internal val OwnerReplier: MessageReplier = replier@{ result ->
     if (hasReplierPermission().not()) return@replier null
     try {
         val (owner) = result.destructured
-        val entry = github.user(owner).get()
+        val entry = github.user(owner).get().takeIf { it.type == "User" }
+            ?: github.organization(owner).get()
         entry.toMessage(subject)
     } catch (cause: Throwable) {
         logger.warning({ "构建Repo(${result.value})信息失败" }, cause)

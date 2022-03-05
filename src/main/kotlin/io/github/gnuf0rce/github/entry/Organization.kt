@@ -35,7 +35,7 @@ data class Organization(
     @SerialName("repos_url")
     override val reposUrl: String,
     @SerialName("site_admin")
-    val siteAdmin: Boolean,
+    val siteAdmin: Boolean = true,
     @SerialName("starred_url")
     val starredUrl: String = "",
     @SerialName("subscriptions_url")
