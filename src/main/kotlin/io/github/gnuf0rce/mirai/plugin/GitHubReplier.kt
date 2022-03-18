@@ -31,7 +31,7 @@ private const val REPLIER_NOTICE = "replier"
 /**
  * 1. [https://github.com/{owner}/]
  */
-internal val OWNER_REGEX = """(?<=github\.com/)([\w-]+)(?![\w-]*/[\w-])""".toRegex()
+internal val OWNER_REGEX = """(?<=github\.com/)([\w-.]+)(?![\w-.]*/[\w-.])""".toRegex()
 
 internal val OwnerReplier: MessageReplier = replier@{ result ->
     logger.info { "${sender.render()} 匹配Owner(${result.value})" }
@@ -50,7 +50,7 @@ internal val OwnerReplier: MessageReplier = replier@{ result ->
 /**
  * 1. [https://github.com/{owner}/{repo}/]
  */
-internal val REPO_REGEX = """(?<=github\.com/)([\w-]+)/([\w-]+)(?![\w-]*/[\w-])""".toRegex()
+internal val REPO_REGEX = """(?<=github\.com/)([\w-.]+)/([\w-.]+)(?![\w-.]*/[\w-.])""".toRegex()
 
 internal val RepoReplier: MessageReplier = replier@{ result ->
     logger.info { "${sender.render()} 匹配Repo(${result.value})" }
@@ -68,7 +68,7 @@ internal val RepoReplier: MessageReplier = replier@{ result ->
 /**
  * 1. [https://github.com/{owner}/{repo}/commit/{sha}]
  */
-internal val COMMIT_REGEX = """(?<=github\.com/)([\w-]+)/([\w-]+)/commit/(\w+)""".toRegex()
+internal val COMMIT_REGEX = """(?<=github\.com/)([\w-.]+)/([\w-]+)/commit/(\w+)""".toRegex()
 
 internal val CommitReplier: MessageReplier = replier@{ result ->
     logger.info { "${sender.render()} 匹配Commit(${result.value})" }
@@ -86,7 +86,7 @@ internal val CommitReplier: MessageReplier = replier@{ result ->
 /**
  * 1. [https://github.com/{owner}/{repo}/issues/{number}]
  */
-internal val ISSUE_REGEX = """(?<=github\.com/)([\w-]+)/([\w-]+)/issues/(\d+)""".toRegex()
+internal val ISSUE_REGEX = """(?<=github\.com/)([\w-.]+)/([\w-.]+)/issues/(\d+)""".toRegex()
 
 internal val IssueReplier: MessageReplier = replier@{ result ->
     logger.info { "${sender.render()} 匹配Issue(${result.value})" }
@@ -104,7 +104,7 @@ internal val IssueReplier: MessageReplier = replier@{ result ->
 /**
  * 1. [https://github.com/{owner}/{repo}/pull/{number}]
  */
-internal val PULL_REGEX = """(?<=github\.com/)([\w-]+)/([\w-]+)/pull/(\d+)""".toRegex()
+internal val PULL_REGEX = """(?<=github\.com/)([\w-.]+)/([\w-.]+)/pull/(\d+)""".toRegex()
 
 internal val PullReplier: MessageReplier = replier@{ result ->
     logger.info { "${sender.render()} 匹配Pull(${result.value})" }
@@ -122,7 +122,7 @@ internal val PullReplier: MessageReplier = replier@{ result ->
 /**
  * 1. [https://github.com/{owner}/{repo}/releases/tag/{name}]
  */
-internal val RELEASE_REGEX = """(?<=github\.com/)([\w-]+)/([\w-]+)/releases/tag/([^/#"]+)""".toRegex()
+internal val RELEASE_REGEX = """(?<=github\.com/)([\w-.]+)/([\w-.]+)/releases/tag/([^/#"]+)""".toRegex()
 
 internal val ReleaseReplier: MessageReplier = replier@{ result ->
     logger.info { "${sender.render()} 匹配Release(${result.value})" }
@@ -147,7 +147,7 @@ internal val ReleaseReplier: MessageReplier = replier@{ result ->
 /**
  * 1. [https://github.com/{owner}/{repo}/milestone/{number}]
  */
-internal val MILESTONE_REGEX = """(?<=github\.com)([\w-]+)/([\w-]+)/milestone/(\d+)""".toRegex()
+internal val MILESTONE_REGEX = """(?<=github\.com)([\w-.]+)/([\w-.]+)/milestone/(\d+)""".toRegex()
 
 internal val MilestoneReplier: MessageReplier = replier@{ result ->
     logger.info { "${sender.render()} 匹配Milestone(${result.value})" }
