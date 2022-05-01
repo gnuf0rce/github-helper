@@ -102,7 +102,11 @@ abstract class GitHubSubscriber<T>(private val name: String, parent: CoroutineSc
         }
     }
 
-    private fun task(id: String) = synchronized(jobs) { tasks[id] }?.takeIf { it.contacts.isNotEmpty() }
+    private fun task(id: String): GitHubTask? = synchronized(jobs) {
+        tasks.compute(id) { _, old ->
+            old?.takeIf { it.contacts.isNotEmpty() }
+        }
+    }
 
     private fun launch(id: String) = launch(SupervisorJob()) {
         logger.info { "$name with $id run start" }
