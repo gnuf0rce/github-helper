@@ -2,12 +2,12 @@ plugins {
     kotlin("jvm") version "1.6.0"
     kotlin("plugin.serialization") version "1.6.0"
 
-    id("net.mamoe.mirai-console") version "2.10.0"
+    id("net.mamoe.mirai-console") version "2.10.1"
     id("net.mamoe.maven-central-publish") version "0.7.1"
 }
 
 group = "io.github.gnuf0rce"
-version = "1.1.9"
+version = "1.1.10"
 
 mavenCentralPublish {
     useCentralS01()
@@ -18,16 +18,9 @@ mavenCentralPublish {
     }
 }
 
-mirai {
-    configureShadow {
-        exclude("module-info.class")
-    }
-}
-
 repositories {
     mavenLocal()
     mavenCentral()
-    gradlePluginPortal()
 }
 
 kotlin {
@@ -51,11 +44,11 @@ dependencies {
         exclude(group = "org.slf4j")
         exclude(group = "io.ktor", module = "ktor-client-core")
     }
-    compileOnly("net.mamoe:mirai-core-utils:2.10.0")
-    compileOnly("xyz.cssxsh.mirai:mirai-selenium-plugin:2.0.8")
-    compileOnly("xyz.cssxsh.mirai:mirai-administrator:1.0.3")
+    compileOnly("net.mamoe:mirai-core-utils:2.10.1")
+    compileOnly("xyz.cssxsh.mirai:mirai-selenium-plugin:2.0.10")
+    compileOnly("xyz.cssxsh.mirai:mirai-administrator:1.0.6")
     // test
-    testRuntimeOnly("xyz.cssxsh.mirai:mirai-selenium-plugin:2.0.8")
+    testRuntimeOnly("xyz.cssxsh.mirai:mirai-selenium-plugin:2.0.10")
     testImplementation(kotlin("test", "1.6.0"))
 }
 

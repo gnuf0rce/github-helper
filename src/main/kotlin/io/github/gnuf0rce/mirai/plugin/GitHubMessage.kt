@@ -49,10 +49,8 @@ internal fun Readme.pdf(flush: Boolean = false): File {
             val bytes = useRemoteWebDriver { driver ->
                 try {
                     driver.get(htmlUrl)
-                } catch (exception: Throwable) {
-                    if (exception is WebDriverException && "net::ERR_CONNECTION_RESET" in exception.rawMessage) {
-                        driver.navigate().refresh()
-                    }
+                } catch (exception: WebDriverException) {
+                    driver.navigate().refresh()
                 }
                 val start = System.currentTimeMillis()
                 do {
@@ -194,7 +192,7 @@ internal suspend fun User.contribution(contact: Contact): Message {
         if (png.exists().not() || (System.currentTimeMillis() - png.lastModified()) >= 86400_000) {
             png.parentFile.mkdirs()
             val screenshot = useRemoteWebDriver { driver ->
-                driver.manage().window().size = Dimension(1920,1080)
+                driver.manage().window().size = Dimension(1920, 1080)
                 driver.get(htmlUrl)
                 delay(10_000)
                 driver.findElement(By.cssSelector(".ContributionCalendar")).getScreenshotAs(OutputType.BYTES)
