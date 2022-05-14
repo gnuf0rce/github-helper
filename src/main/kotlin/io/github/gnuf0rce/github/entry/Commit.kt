@@ -6,7 +6,7 @@ import java.time.*
 @Serializable
 data class Commit(
     @SerialName("author")
-    val author: User,
+    val author: User?,
     @SerialName("comments_url")
     val commentsUrl: String,
     /**
@@ -15,7 +15,7 @@ data class Commit(
     @SerialName("commit")
     val detail: Detail,
     @SerialName("committer")
-    val committer: User,
+    val committer: User?,
     @SerialName("html_url")
     override val htmlUrl: String,
     @SerialName("node_id")
@@ -33,7 +33,7 @@ data class Commit(
 ) : Entry, Record, LifeCycle, HtmlPage, Owner.Product {
 
     override val owner: User
-        get() = author
+        get() = author ?: committer ?: throw NoSuchElementException("No owner for the commit")
 
     @Deprecated("Commit No Close", ReplaceWith("null"))
     override val closedAt: OffsetDateTime?
