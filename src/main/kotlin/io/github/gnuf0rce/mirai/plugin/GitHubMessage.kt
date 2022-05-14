@@ -342,11 +342,11 @@ suspend fun Release.toMessage(contact: Contact, type: MessageType, notice: Strin
 }
 
 suspend fun Commit.toMessage(contact: Contact, type: MessageType, notice: String): Message {
-    val image = author.avatar().uploadAsImage(contact)
+    val image = author?.avatar()?.uploadAsImage(contact)
     return when (type) {
         MessageType.TEXT -> buildMessageChain {
-            appendLine(image)
-            appendLine("$notice with commit by ${author.login} ")
+            if (image != null) appendLine(image)
+            appendLine("$notice with commit by ${author?.login ?: detail.author.email} ")
             appendLine("URL: $htmlUrl ")
             appendLine("CREATED_AT: $createdAt ")
             appendLine(detail.message)
@@ -360,7 +360,7 @@ suspend fun Commit.toMessage(contact: Contact, type: MessageType, notice: String
 
             item {
                 layout = 2
-                picture(coverUrl = image.queryUrl())
+                if (image != null) picture(coverUrl = image.queryUrl())
                 title(text = sha)
                 summary(text = detail.message)
             }
