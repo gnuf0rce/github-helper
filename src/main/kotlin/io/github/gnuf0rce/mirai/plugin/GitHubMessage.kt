@@ -47,11 +47,7 @@ internal fun Readme.pdf(flush: Boolean = false): File {
         if (exists().not() || flush) {
             parentFile.mkdirs()
             val bytes = useRemoteWebDriver { driver ->
-                try {
-                    driver.get(htmlUrl)
-                } catch (exception: WebDriverException) {
-                    driver.navigate().refresh()
-                }
+                driver.get(htmlUrl)
                 val start = System.currentTimeMillis()
                 do {
                     if (System.currentTimeMillis() - start > 180_000) {
