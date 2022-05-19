@@ -26,4 +26,11 @@ public open class PullsMapper(parent: Url, override val github: GitHubClient) :
     public open suspend fun new(context: Temp): Pull = post(context = context)
 
     public open suspend fun get(index: Int): Pull = get(path = "$index")
+
+    public open suspend fun comments(index: Int, page: Int, per: Int = 30, block: CommentQuery.() -> Unit = {})
+        : List<PullRequestReviewComment> =
+        page(page = page, per = per, context = CommentQuery().apply(block).toJsonObject(), path = "$index/comments")
+
+    public open suspend fun comment(index: Int, block: CommentQuery.() -> Unit = {}): PullRequestReviewComment =
+        post(context = CommentQuery().apply(block).toJsonObject(), path = "$index/comments")
 }

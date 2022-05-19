@@ -33,9 +33,9 @@ public data class Pull(
     @SerialName("body")
     override val body: String?,
     @SerialName("body_text")
-    override val text: String?,
+    override val text: String,
     @SerialName("body_html")
-    override val html: String?,
+    override val html: String,
     @SerialName("changed_files")
     val changedFiles: Int = 0,
     @Contextual
@@ -125,7 +125,9 @@ public data class Pull(
     @SerialName("user")
     override val user: User,
     @SerialName("repository")
-    override val repository: Repo? = null
+    override val repository: Repo? = null,
+    @SerialName("performed_via_github_app")
+    val performedViaGithubApp: GithubAppInfo? = null,
 ) : Entry, LifeCycle, WebPage, ControlRecord {
 
     @Serializable
@@ -139,10 +141,10 @@ public data class Pull(
         @SerialName("sha")
         val sha: String,
         @SerialName("user")
-        val user: User
+        val user: Owner
     ) : Owner.Product {
 
-        override val owner: User
+        override val owner: Owner
             get() = user
     }
 
@@ -164,11 +166,5 @@ public data class Pull(
         val self: Link,
         @SerialName("statuses")
         val statuses: Link
-    )
-
-    @Serializable
-    public data class Link(
-        @SerialName("href")
-        val href: String
     )
 }

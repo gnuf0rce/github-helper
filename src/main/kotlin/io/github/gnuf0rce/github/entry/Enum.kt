@@ -55,3 +55,12 @@ public enum class ReadmeType { file }
 
 @Serializable
 public enum class ReleaseState { uploaded }
+
+@Serializable
+public enum class AuthorAssociation { COLLABORATOR, CONTRIBUTOR, FIRST_TIMER, FIRST_TIME_CONTRIBUTOR, MANNEQUIN, MEMBER, NONE, OWNER }
+
+@Serializable
+public enum class Side { LEFT, RIGHT }
+
+@Serializable
+public enum class FileStatus { added, removed, modified, renamed, copied, changed, unchanged }

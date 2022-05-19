@@ -19,7 +19,8 @@ public open class CommitMapper(parent: Url, sha: String, override val github: Gi
 
     public open suspend fun load(): Commit = get()
 
-    public open suspend fun comments(page: Int, per: Int = 30): List<Temp> = page(page = page, per = per, path = "comments")
+    public open suspend fun comments(page: Int, per: Int = 30): List<Temp> =
+        page(page = page, per = per, path = "comments")
 
     public open suspend fun comment(context: Temp): Temp = post(context = context, path = "comments")
 

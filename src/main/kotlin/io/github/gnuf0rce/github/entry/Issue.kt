@@ -27,9 +27,9 @@ public data class Issue(
     @SerialName("body")
     override val body: String?,
     @SerialName("body_text")
-    override val text: String?,
+    override val text: String,
     @SerialName("body_html")
-    override val html: String?,
+    override val html: String,
     @Contextual
     @SerialName("closed_at")
     override val closedAt: OffsetDateTime?,
@@ -65,8 +65,6 @@ public data class Issue(
     override val nodeId: String,
     @SerialName("number")
     override val number: Int,
-    @SerialName("performed_via_github_app")
-    val performedViaGithubApp: String? = null,
     @SerialName("pull_request")
     val pullRequest: PullRequest? = null,
     @SerialName("reactions")
@@ -87,7 +85,9 @@ public data class Issue(
     @SerialName("user")
     override val user: User,
     @SerialName("repository")
-    override val repository: Repo? = null
+    override val repository: Repo? = null,
+    @SerialName("performed_via_github_app")
+    val performedViaGithubApp: GithubAppInfo? = null,
 ) : Entry, LifeCycle, WebPage, ControlRecord {
 
     @Serializable

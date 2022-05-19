@@ -37,10 +37,11 @@ public sealed interface ControlRecord : Entry, LifeCycle, WebPage, Content, Owne
     override val owner: User
         get() = user
 
+    // XXX: 可能是字符串
     @Serializable
     public data class Label(
         @SerialName("color")
-        val color: String,
+        val color: String?,
         @SerialName("default")
         val default: Boolean,
         @SerialName("description")

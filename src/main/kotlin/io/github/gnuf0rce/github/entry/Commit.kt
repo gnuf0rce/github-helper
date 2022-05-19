@@ -135,6 +135,8 @@ public data class Commit(
         val deletions: Int,
         @SerialName("filename")
         val filename: String,
+        @SerialName("previous_filename")
+        val previousFilename: String = "",
         @SerialName("patch")
         val patch: String,
         @SerialName("raw_url")
@@ -142,7 +144,7 @@ public data class Commit(
         @SerialName("sha")
         override val sha: String,
         @SerialName("status")
-        val status: String
+        val status: FileStatus
     ) : Record {
 
         override val url: String

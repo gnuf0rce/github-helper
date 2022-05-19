@@ -37,9 +37,9 @@ public open class IssuesMapper(parent: Url, override val github: GitHubClient) :
     public open suspend fun unlock(index: Int): Unit = delete(path = "$index/lock")
 
     public open suspend fun comments(index: Int, page: Int, per: Int = 30, block: CommentQuery.() -> Unit = {})
-        : List<Comment> =
+        : List<IssueComment> =
         page(page = page, per = per, context = CommentQuery().apply(block).toJsonObject(), path = "$index/comments")
 
-    public open suspend fun comment(index: Int, block: CommentQuery.() -> Unit = {}): Comment =
+    public open suspend fun comment(index: Int, block: CommentQuery.() -> Unit = {}): IssueComment =
         post(context = CommentQuery().apply(block).toJsonObject(), path = "$index/comments")
 }
