@@ -1,3 +1,13 @@
+/*
+ * Copyright 2021-2022 dsstudio Technologies and contributors.
+ *
+ *  此源代码的使用受 GNU AFFERO GENERAL PUBLIC LICENSE version 3 许可证的约束, 可以在以下链接找到该许可证.
+ *  Use of this source code is governed by the GNU AGPLv3 license that can be found through the following link.
+ *
+ *  https://github.com/gnuf0rce/github-helper/blob/master/LICENSE
+ */
+
+
 @file:Suppress("EnumEntryName", "unused")
 
 package io.github.gnuf0rce.github.entry
@@ -5,37 +15,43 @@ package io.github.gnuf0rce.github.entry
 import kotlinx.serialization.*
 
 @Serializable
-enum class Visibility { public, private }
+public enum class Visibility { public, private }
 
 @Serializable
-enum class State { open, closed, all }
+public enum class State { open, closed, all }
 
 @Serializable
-enum class Direction { asc, desc }
+public enum class Direction { asc, desc }
 
 @Serializable
-enum class Affiliation { outside, direct, all }
+public enum class Affiliation { outside, direct, all }
 
 @Serializable
-enum class Association { OWNER, MEMBER, CONTRIBUTOR, NONE }
+public enum class Association { OWNER, MEMBER, CONTRIBUTOR, NONE }
 
 @Serializable
-enum class IssueFilter { assigned, created, mentioned, subscribed, all, repos }
+public enum class IssueFilter { assigned, created, mentioned, subscribed, all, repos }
 
 @Serializable
-enum class IssueSort { created, updated, comments }
+public enum class ElementSort { created, updated, comments }
 
 @Serializable
-enum class MergeableState { unknown, dirty, blocked, clean }
+public enum class MergeableState { unknown, dirty, blocked, clean }
 
 @Serializable
-enum class VerificationReason { valid, unsigned }
+public enum class VerificationReason { valid, unsigned }
 
 @Serializable
-enum class Encoding { base64 }
+public enum class Encoding { base64 }
 
 @Serializable
-enum class Privacy { secret, closed }
+public enum class Privacy { secret, closed }
 
 @Serializable
-enum class RepoPermission { pull, push, admin }
+public enum class RepoPermission { pull, push, admin }
+
+@Serializable
+public enum class ReadmeType { file }
+
+@Serializable
+public enum class ReleaseState { uploaded }

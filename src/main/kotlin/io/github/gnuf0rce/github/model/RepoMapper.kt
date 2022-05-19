@@ -1,69 +1,88 @@
+/*
+ * Copyright 2021-2022 dsstudio Technologies and contributors.
+ *
+ *  此源代码的使用受 GNU AFFERO GENERAL PUBLIC LICENSE version 3 许可证的约束, 可以在以下链接找到该许可证.
+ *  Use of this source code is governed by the GNU AGPLv3 license that can be found through the following link.
+ *
+ *  https://github.com/gnuf0rce/github-helper/blob/master/LICENSE
+ */
+
+
 package io.github.gnuf0rce.github.model
 
 import io.github.gnuf0rce.github.*
 import io.github.gnuf0rce.github.entry.*
 import io.ktor.http.*
-import kotlinx.serialization.json.*
+import java.util.*
 
 /**
  * 1. [https://api.github.com/repos/{owner}/{repo}]
  */
-open class RepoMapper(parent: Url, override val github: GitHubClient) :
-    GitHubMapper(parent, "") {
+public open class RepoMapper(parent: Url, override val github: GitHubClient) :
+    GitHubMapper(parent = parent, path = "") {
 
-    open suspend fun get() = get<Repo>()
+    public open suspend fun load(): Repo = get()
 
-    open suspend fun patch(context: JsonObject) = patch<JsonObject, JsonObject>(context)
+    public open suspend fun update(context: Temp): Temp = patch(context = context)
 
-    open suspend fun delete() = delete<Unit>()
+    public open suspend fun delete(): Unit = delete<Unit>()
 
-    open suspend fun fixes(open: Boolean) = open<JsonObject>(open, "automated-security-fixes")
+    public open suspend fun fixes(open: Boolean): Temp = open(open = open, path = "automated-security-fixes")
 
-    open suspend fun contributors(page: Int, per: Int = 30, anon: Boolean = false) =
-        page<Map<String, Boolean>, JsonObject>(page, per, mapOf("anon" to anon), "contributors")
+    public open suspend fun contributors(page: Int, per: Int = 30, anon: Boolean = false): List<Temp> =
+        page(page = page, per = per, context = mapOf("anon" to anon), path = "contributors")
 
-    open suspend fun dispatches(context: JsonObject) = post<JsonObject, Unit>(context, "dispatches")
+    public open suspend fun dispatches(context: Temp): Unit = post(context = context, path = "dispatches")
 
-    open suspend fun languages() = get<Map<String, Long>>("languages")
+    public open suspend fun languages(): Map<String, Long> = get(path = "languages")
 
-    open suspend fun tags(page: Int, per: Int = 30) = page<JsonObject>(page, per, "tags")
+    public open suspend fun tags(page: Int, per: Int = 30): List<Temp> = page(page = page, per = per, path = "tags")
 
-    open suspend fun teams(page: Int, per: Int = 30) = page<JsonObject>(page, per, "teams")
+    public open suspend fun teams(page: Int, per: Int = 30): List<Temp> = page(page = page, per = per, path = "teams")
 
-    open suspend fun topics(page: Int, per: Int = 30) = get<Map<String, List<String>>>("topics")["names"]
+    public open suspend fun topics(page: Int, per: Int = 30): List<String>? =
+        get<Map<String, List<String>>>("topics")["names"]
 
-    open suspend fun topics(names: List<String>) =
-        put<Map<String, List<String>>, Map<String, List<String>>>(mapOf("names" to names), "topics")["names"]
+    public open suspend fun topics(names: List<String>): List<String>? =
+        put<Map<String, List<String>>, Map<String, List<String>>>(
+            context = mapOf("names" to names),
+            path = "topics"
+        )["names"]
 
-    open suspend fun transfer(context: JsonObject) = post<JsonObject, JsonObject>(context, "transfer")
+    public open suspend fun transfer(context: Temp): Temp = post(context = context, path = "transfer")
 
-    open suspend fun alerts() = get<Unit>("vulnerability-alerts")
+    public open suspend fun alerts(): Unit = get(path = "vulnerability-alerts")
 
-    open suspend fun alerts(open: Boolean) = open<Unit>(open, "vulnerability-alerts")
+    public open suspend fun alerts(open: Boolean): Unit = open(open = open, path = "vulnerability-alerts")
 
-    open suspend fun generate(context: JsonObject) = post<JsonObject, JsonObject>(context, "generate")
+    public open suspend fun generate(context: Temp): Temp = post(context = context, path = "generate")
 
-    open val issues by lazy { IssuesMapper(base, github) }
+    public open val issues: IssuesMapper by lazy { IssuesMapper(parent = base, github = github) }
 
-    open val pulls by lazy { PullsMapper(base, github) }
+    public open val pulls: PullsMapper by lazy { PullsMapper(parent = base, github = github) }
 
-    open val autolinks by lazy { AutoLinksMapper(base, github) }
+    public open val autolinks: AutoLinksMapper by lazy { AutoLinksMapper(parent = base, github = github) }
 
-    open val branches by lazy { BranchesMapper(base, github) }
+    public open val branches: BranchesMapper by lazy { BranchesMapper(parent = base, github = github) }
 
-    open val collaborators by lazy { CollaboratorsMapper(base, github) }
+    public open val collaborators: CollaboratorsMapper by lazy { CollaboratorsMapper(parent = base, github = github) }
 
-    open val comments by lazy { CommentsMapper(base, github) }
+    public open val releases: ReleasesMapper by lazy { ReleasesMapper(parent = base, github = github) }
 
-    open val releases by lazy { ReleasesMapper(base, github) }
+    public open val milestones: MilestonesMapper by lazy { MilestonesMapper(parent = base, github = github) }
 
-    open val milestones by lazy { MilestonesMapper(base, github) }
+    public open suspend fun commits(page: Int, per: Int = 30): List<Commit> =
+        page(page = page, per = per, path = "commits")
 
-    open suspend fun commits(page: Int, per: Int = 30) = page<Commit>(page, per, "commits")
+    protected open val commits: MutableMap<String, CommitMapper> = WeakHashMap()
 
-    open fun commit(sha: String) = CommitMapper(base, sha, github)
+    public open fun commit(sha: String): CommitMapper =
+        commits.getOrPut(sha) { CommitMapper(parent = base, sha = sha, github = github) }
 
-    open fun context(path: String) = ContentMapper(base, path, github)
+    protected open val contents: MutableMap<String, ContentMapper> = WeakHashMap()
 
-    open suspend fun readme(dir: String = "") = get<Readme>("readme/$dir")
+    public open fun content(path: String): ContentMapper =
+        contents.getOrPut(path) { ContentMapper(parent = base, path = path, github = github) }
+
+    public open suspend fun readme(dir: String = ""): Readme = get(path = "readme/$dir")
 }

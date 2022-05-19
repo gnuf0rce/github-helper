@@ -1,34 +1,44 @@
+/*
+ * Copyright 2021-2022 dsstudio Technologies and contributors.
+ *
+ *  此源代码的使用受 GNU AFFERO GENERAL PUBLIC LICENSE version 3 许可证的约束, 可以在以下链接找到该许可证.
+ *  Use of this source code is governed by the GNU AGPLv3 license that can be found through the following link.
+ *
+ *  https://github.com/gnuf0rce/github-helper/blob/master/LICENSE
+ */
+
+
 package io.github.gnuf0rce.github.entry
 
 import kotlinx.serialization.*
 
 /**
- * @see [Pull]
- * @see [Issue]
+ * @see Pull
+ * @see Issue
  */
-sealed interface ControlRecord : Entry, LifeCycle, HtmlPage, Content, Owner.Product {
+public sealed interface ControlRecord : Entry, LifeCycle, WebPage, Content, Owner.Product {
     override val htmlUrl: String
-    val title: String
-    val user: User
-    val assignee: User?
-    val assignees: List<User>
-    val closedBy: User?
-    val state: State
-    val number: Int
-    val labels: List<Label>
-    val authorAssociation: Association
-    val comments: Int
-    val commentsUrl: String
-    val milestone: Milestone?
-    val draft: Boolean
-    val locked: Boolean
-    val repository: Repo?
+    public val title: String
+    public val user: User
+    public val assignee: User?
+    public val assignees: List<User>
+    public val closedBy: User?
+    public val state: State
+    public val number: Int
+    public val labels: List<Label>
+    public val authorAssociation: Association
+    public val comments: Int
+    public val commentsUrl: String
+    public val milestone: Milestone?
+    public val draft: Boolean
+    public val locked: Boolean
+    public val repository: Repo?
 
     override val owner: User
         get() = user
 
     @Serializable
-    data class Label(
+    public data class Label(
         @SerialName("color")
         val color: String,
         @SerialName("default")

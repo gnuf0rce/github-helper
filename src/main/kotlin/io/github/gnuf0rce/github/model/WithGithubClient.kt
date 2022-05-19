@@ -1,14 +1,25 @@
+/*
+ * Copyright 2021-2022 dsstudio Technologies and contributors.
+ *
+ *  此源代码的使用受 GNU AFFERO GENERAL PUBLIC LICENSE version 3 许可证的约束, 可以在以下链接找到该许可证.
+ *  Use of this source code is governed by the GNU AGPLv3 license that can be found through the following link.
+ *
+ *  https://github.com/gnuf0rce/github-helper/blob/master/LICENSE
+ */
+
+
 package io.github.gnuf0rce.github.model
 
 import io.github.gnuf0rce.github.*
 import io.ktor.client.request.*
 import io.ktor.http.*
-import io.ktor.util.*
 import kotlinx.serialization.json.*
 
-interface WithGithubClient {
-    val base: Url
-    val github: GitHubClient
+public typealias Temp = JsonObject
+
+public interface WithGithubClient {
+    public val base: Url
+    public val github: GitHubClient
 }
 
 internal fun Url.resolve(path: String) = if (path.isEmpty()) this else copy(encodedPath = encodedPath + "/${path}")
@@ -55,12 +66,6 @@ internal suspend inline fun <reified R> WithGithubClient.delete(
 }
 
 internal suspend inline fun <reified T, reified R> WithGithubClient.post(
-    path: String = "",
-    block: JsonObjectBuilder.() -> Unit = {}
-): R = post(buildJsonObject(block), path)
-
-
-internal suspend inline fun <reified T, reified R> WithGithubClient.post(
     context: T,
     path: String = ""
 ): R = rest(path) {
@@ -69,23 +74,12 @@ internal suspend inline fun <reified T, reified R> WithGithubClient.post(
 }
 
 internal suspend inline fun <reified T, reified R> WithGithubClient.put(
-    path: String = "",
-    block: JsonObjectBuilder.() -> Unit = {}
-): R = put(buildJsonObject(block), path)
-
-internal suspend inline fun <reified T, reified R> WithGithubClient.put(
     context: T,
     path: String = ""
 ): R = rest(path) {
     method = HttpMethod.Put
     context(context)
 }
-
-internal suspend inline fun <reified T, reified R> WithGithubClient.patch(
-    path: String = "",
-    block: JsonObjectBuilder.() -> Unit = {}
-): R = patch(buildJsonObject(block), path)
-
 
 internal suspend inline fun <reified T, reified R> WithGithubClient.patch(
     context: T,
@@ -108,14 +102,13 @@ internal inline fun <reified T> HttpRequestBuilder.context(context: T) {
         HttpMethod.Get, HttpMethod.Delete -> {
             when (context) {
                 is Parameters -> {
-                    @OptIn(InternalAPI::class)
                     url.parameters.appendAll(context)
                 }
                 is Map<*, *> -> {
                     for ((key, value) in context) parameter(key.toString(), value)
                 }
                 else -> {
-                    throw IllegalArgumentException("${T::class} can not used as context")
+                    throw IllegalArgumentException("${T::class} can not used as parameters in ${url.buildString()}")
                 }
             }
         }

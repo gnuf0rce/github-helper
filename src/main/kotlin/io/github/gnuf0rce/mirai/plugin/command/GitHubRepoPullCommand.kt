@@ -1,3 +1,13 @@
+/*
+ * Copyright 2021-2022 dsstudio Technologies and contributors.
+ *
+ *  此源代码的使用受 GNU AFFERO GENERAL PUBLIC LICENSE version 3 许可证的约束, 可以在以下链接找到该许可证.
+ *  Use of this source code is governed by the GNU AGPLv3 license that can be found through the following link.
+ *
+ *  https://github.com/gnuf0rce/github-helper/blob/master/LICENSE
+ */
+
+
 package io.github.gnuf0rce.mirai.plugin.command
 
 import io.github.gnuf0rce.github.entry.*
@@ -6,7 +16,7 @@ import io.github.gnuf0rce.mirai.plugin.data.*
 import net.mamoe.mirai.console.command.*
 import net.mamoe.mirai.contact.*
 
-object GitHubRepoPullCommand : CompositeCommand(
+public object GitHubRepoPullCommand : CompositeCommand(
     owner = GitHubHelperPlugin,
     "repo-pull",
     description = "Repo Pull Notice"
@@ -18,30 +28,30 @@ object GitHubRepoPullCommand : CompositeCommand(
     }
 
     @SubCommand
-    suspend fun CommandSender.add(repo: String, contact: Contact = Contact()) {
+    public suspend fun CommandSender.add(repo: String, contact: Contact = Contact()) {
         subscriber.add(repo, contact.id)
         sendMessage("$repo with pull 添加完成")
     }
 
     @SubCommand
-    suspend fun CommandSender.remove(repo: String, contact: Contact = Contact()) {
+    public suspend fun CommandSender.remove(repo: String, contact: Contact = Contact()) {
         subscriber.remove(repo, contact.id)
         sendMessage("$repo with pull 移除完成")
     }
 
     @SubCommand
-    suspend fun CommandSender.interval(repo: String, millis: Long) {
+    public suspend fun CommandSender.interval(repo: String, millis: Long) {
         subscriber.interval(repo, millis)
         sendMessage("$repo interval ${millis}ms with pull")
     }
 
     @SubCommand
-    suspend fun CommandSender.list(contact: Contact = Contact()) {
+    public suspend fun CommandSender.list(contact: Contact = Contact()) {
         sendMessage(subscriber.list(contact.id))
     }
 
     @SubCommand
-    suspend fun CommandSender.build(repo: String, contact: Contact = Contact()) {
+    public suspend fun CommandSender.build(repo: String, contact: Contact = Contact()) {
         sendMessage(subscriber.build(repo, contact.id))
     }
 }

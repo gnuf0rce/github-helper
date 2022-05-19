@@ -8,8 +8,15 @@
  */
 
 
-package io.github.gnuf0rce.mirai.plugin.command
+package io.github.gnuf0rce.github.entry
 
-import net.mamoe.mirai.console.command.*
+import kotlinx.serialization.*
 
-internal fun CommandSender.Contact() = requireNotNull(subject) { "无法从当前环境获取联系人" }
+@Serializable
+public data class IssueBody(
+    var title: String? = null,
+    var body: String? = null,
+    var milestone: String? = null,
+    var labels: List<String>? = null,
+    var assignees: List<String>? = null,
+)

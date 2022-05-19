@@ -14,50 +14,48 @@ import kotlinx.serialization.*
 import java.time.*
 
 @Serializable
-@SerialName("Milestone")
-public data class Milestone(
-    @Contextual
-    @SerialName("closed_at")
-    override val closedAt: OffsetDateTime?,
-    @SerialName("closed_issues")
-    val closedIssues: Int,
+@SerialName("Comment")
+public data class Comment(
+    @SerialName("author_association")
+    val authorAssociation: String,
+    @SerialName("body")
+    override val body: String?,
+    @SerialName("body_text")
+    override val text: String?,
+    @SerialName("body_html")
+    override val html: String?,
     @Contextual
     @SerialName("created_at")
     override val createdAt: OffsetDateTime,
-    @SerialName("creator")
-    val creator: User,
-    @SerialName("description")
-    val description: String?,
-    @Contextual
-    @SerialName("due_on")
-    val dueOn: OffsetDateTime?,
     @SerialName("html_url")
     override val htmlUrl: String,
     @SerialName("id")
-    val id: Long,
-    @SerialName("labels_url")
-    val labelsUrl: String,
+    val id: Int,
+    @SerialName("issue_url")
+    val issueUrl: String,
     @SerialName("node_id")
     override val nodeId: String,
-    @SerialName("number")
-    val number: Int,
-    @SerialName("open_issues")
-    val openIssues: Int,
-    @SerialName("state")
-    val state: State,
-    @SerialName("title")
-    val title: String,
     @Contextual
     @SerialName("updated_at")
     override val updatedAt: OffsetDateTime,
     @SerialName("url")
     override val url: String,
-) : Entry, LifeCycle, WebPage, Owner.Product {
+    @SerialName("user")
+    val user: User,
+    @SerialName("reactions")
+    override val reactions: Reactions?,
+    @SerialName("performed_via_github_app")
+    val performedViaGithubApp: String? = null,
+): Entry, LifeCycle, WebPage, Content, Owner.Product {
 
     override val owner: User
-        get() = creator
+        get() = user
 
-    @Deprecated("Milestone No Merge", ReplaceWith("null"))
+    @Deprecated("Commit No Close", ReplaceWith("null"))
+    override val closedAt: OffsetDateTime?
+        get() = null
+
+    @Deprecated("Commit No Merge", ReplaceWith("null"))
     override val mergedAt: OffsetDateTime?
         get() = null
 }

@@ -1,3 +1,13 @@
+/*
+ * Copyright 2021-2022 dsstudio Technologies and contributors.
+ *
+ *  此源代码的使用受 GNU AFFERO GENERAL PUBLIC LICENSE version 3 许可证的约束, 可以在以下链接找到该许可证.
+ *  Use of this source code is governed by the GNU AGPLv3 license that can be found through the following link.
+ *
+ *  https://github.com/gnuf0rce/github-helper/blob/master/LICENSE
+ */
+
+
 @file:OptIn(ConsoleExperimentalApi::class)
 
 package io.github.gnuf0rce.mirai.plugin
@@ -14,7 +24,7 @@ import net.mamoe.mirai.console.util.ContactUtils.render
 import net.mamoe.mirai.event.events.*
 import net.mamoe.mirai.utils.*
 
-typealias MessageReplier = suspend MessageEvent.(MatchResult) -> Any?
+internal typealias MessageReplier = suspend MessageEvent.(MatchResult) -> Any?
 
 internal val ReplierPermission: Permission by lazy {
     PermissionService.INSTANCE.register(
@@ -38,8 +48,8 @@ internal val OwnerReplier: MessageReplier = replier@{ result ->
     if (hasReplierPermission().not()) return@replier null
     try {
         val (owner) = result.destructured
-        val entry = github.user(owner).get().takeIf { it.type == "User" }
-            ?: github.organization(owner).get()
+        val entry = github.user(owner).load().takeIf { it.type == "User" }
+            ?: github.organization(owner).load()
         entry.toMessage(subject)
     } catch (cause: Throwable) {
         logger.warning({ "构建Repo(${result.value})信息失败" }, cause)
@@ -57,7 +67,7 @@ internal val RepoReplier: MessageReplier = replier@{ result ->
     if (hasReplierPermission().not()) return@replier null
     try {
         val (owner, repo) = result.destructured
-        val entry = github.repo(owner, repo).get()
+        val entry = github.repo(owner, repo).load()
         entry.toMessage(subject, reply, REPLIER_NOTICE)
     } catch (cause: Throwable) {
         logger.warning({ "构建Repo(${result.value})信息失败" }, cause)
@@ -75,7 +85,7 @@ internal val CommitReplier: MessageReplier = replier@{ result ->
     if (hasReplierPermission().not()) return@replier null
     try {
         val (owner, repo, sha) = result.destructured
-        val entry = github.repo(owner, repo).commit(sha).get()
+        val entry = github.repo(owner, repo).commit(sha).load()
         entry.toMessage(subject, reply, REPLIER_NOTICE)
     } catch (cause: Throwable) {
         logger.warning({ "构建Repo(${result.value})信息失败" }, cause)

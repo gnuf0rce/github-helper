@@ -1,43 +1,45 @@
+/*
+ * Copyright 2021-2022 dsstudio Technologies and contributors.
+ *
+ *  此源代码的使用受 GNU AFFERO GENERAL PUBLIC LICENSE version 3 许可证的约束, 可以在以下链接找到该许可证.
+ *  Use of this source code is governed by the GNU AGPLv3 license that can be found through the following link.
+ *
+ *  https://github.com/gnuf0rce/github-helper/blob/master/LICENSE
+ */
+
+
 package io.github.gnuf0rce.github.model
 
 import io.github.gnuf0rce.github.*
 import io.github.gnuf0rce.github.entry.*
 import io.ktor.http.*
-import kotlinx.serialization.*
-import kotlinx.serialization.json.*
-import java.time.OffsetDateTime
 
 /**
  * 1. [https://api.github.com/repos/{owner}/{repo}/issues]
  */
-open class IssuesMapper(parent: Url, override val github: GitHubClient) :
-    GitHubMapper(parent, "issues") {
+public open class IssuesMapper(parent: Url, override val github: GitHubClient) :
+    GitHubMapper(parent = parent, path = "issues") {
 
-    @Serializable
-    data class Context(
-        @SerialName("filter")
-        val filter: IssueFilter = IssueFilter.assigned,
-        @SerialName("state")
-        val state: State = State.open,
-        @SerialName("sort")
-        val sort: IssueSort = IssueSort.created,
-        @SerialName("direction")
-        val direction: Direction = Direction.desc,
-        @Contextual
-        @SerialName("since")
-        val since: OffsetDateTime? = null
-    )
+    public open suspend fun list(page: Int, per: Int = 30, block: IssueQuery.() -> Unit = {}): List<Issue> =
+        page(page = page, per = per, context = IssueQuery().apply(block).toJsonObject())
 
-    open suspend fun list(page: Int, per: Int = 30, context: Context? = null) = page<Context, Issue>(page, per, context)
+    public open suspend fun new(title: String, block: IssueBody.() -> Unit = {}): Issue =
+        post(context = IssueBody(title = title).apply(block))
 
-    // TODO context
-    open suspend fun new(context: JsonObject) = post<JsonObject, Issue>(context)
+    public open suspend fun get(index: Int): Issue = get(path = "$index")
 
-    open suspend fun get(index: Int) = get<Issue>("$index")
+    public open suspend fun update(index: Int, block: IssueBody.() -> Unit): Issue =
+        patch(context = IssueBody().apply(block), path = "$index")
 
-    open suspend fun patch(index: Int, context: JsonObject) = patch<JsonObject, Issue>(context, "$index")
+    public open suspend fun lock(index: Int, reason: String? = null): Unit =
+        put(context = mapOf("lock_reason" to reason), path = "$index/lock")
 
-    open suspend fun lock(index: Int, context: JsonObject) = put<JsonObject, Issue>(context, "$index/lock")
+    public open suspend fun unlock(index: Int): Unit = delete(path = "$index/lock")
 
-    open suspend fun unlock(index: Int): Issue = delete("$index/lock")
+    public open suspend fun comments(index: Int, page: Int, per: Int = 30, block: CommentQuery.() -> Unit = {})
+        : List<Comment> =
+        page(page = page, per = per, context = CommentQuery().apply(block).toJsonObject(), path = "$index/comments")
+
+    public open suspend fun comment(index: Int, block: CommentQuery.() -> Unit = {}): Comment =
+        post(context = CommentQuery().apply(block).toJsonObject(), path = "$index/comments")
 }

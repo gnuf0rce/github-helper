@@ -1,19 +1,32 @@
+/*
+ * Copyright 2021-2022 dsstudio Technologies and contributors.
+ *
+ *  此源代码的使用受 GNU AFFERO GENERAL PUBLIC LICENSE version 3 许可证的约束, 可以在以下链接找到该许可证.
+ *  Use of this source code is governed by the GNU AGPLv3 license that can be found through the following link.
+ *
+ *  https://github.com/gnuf0rce/github-helper/blob/master/LICENSE
+ */
+
+
 package io.github.gnuf0rce.github.model
 
 import io.github.gnuf0rce.github.*
 import io.ktor.http.*
-import kotlinx.serialization.json.*
+import java.util.*
 
 /**
  * 1. [https://api.github.com/repos/{owner}/{repo}/branches]
  */
-open class BranchesMapper(parent: Url, override val github: GitHubClient) :
-    GitHubMapper(parent, "branches") {
+public open class BranchesMapper(parent: Url, override val github: GitHubClient) :
+    GitHubMapper(parent = parent, path = "branches") {
 
-    open suspend fun list(protected: Boolean, page: Int, per: Int = 30) =
-        page<Map<String, Boolean>, JsonObject>(page, per, mapOf("protected" to protected))
+    public open suspend fun list(protected: Boolean, page: Int, per: Int = 30): List<Temp> =
+        page(page = page, per = per, context = mapOf("protected" to protected))
 
-    open suspend fun get(name: String) = get<JsonObject>(name)
+    public open suspend fun get(name: String): Temp = get<Temp>(name)
 
-    open suspend fun protection(branch: String) = BranchProtectionMapper(base, branch, github)
+    protected open val protections: MutableMap<String, BranchProtectionMapper> = WeakHashMap()
+
+    public open suspend fun protection(branch: String): BranchProtectionMapper =
+        protections.getOrPut(branch) { BranchProtectionMapper(parent = base, branch = branch, github = github) }
 }

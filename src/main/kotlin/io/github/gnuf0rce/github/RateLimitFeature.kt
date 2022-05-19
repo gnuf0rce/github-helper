@@ -1,3 +1,13 @@
+/*
+ * Copyright 2021-2022 dsstudio Technologies and contributors.
+ *
+ *  此源代码的使用受 GNU AFFERO GENERAL PUBLIC LICENSE version 3 许可证的约束, 可以在以下链接找到该许可证.
+ *  Use of this source code is governed by the GNU AGPLv3 license that can be found through the following link.
+ *
+ *  https://github.com/gnuf0rce/github-helper/blob/master/LICENSE
+ */
+
+
 package io.github.gnuf0rce.github
 
 import io.ktor.client.*
@@ -10,12 +20,12 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.sync.*
 import java.time.*
 
-class RateLimitFeature internal constructor(val send: suspend (Status, String) -> Unit) {
-    data class Status(val limit: Int, val remaining: Int, val reset: Long)
+public class RateLimitFeature internal constructor(public val send: suspend (Status, String) -> Unit) {
+    public data class Status(val limit: Int, val remaining: Int, val reset: Long)
 
-    data class Config(var notice: suspend (rate: Status, resource: String) -> Unit = { _, _ -> })
+    public data class Config(var notice: suspend (rate: Status, resource: String) -> Unit = { _, _ -> })
 
-    constructor(config: Config) : this(config.notice)
+    public constructor(config: Config) : this(config.notice)
 
     private val rates: MutableMap<String, Status> = HashMap<String, Status>()
         .withDefault { Status(limit = 1, remaining = 1, reset = OffsetDateTime.now().toEpochSecond()) }
@@ -34,8 +44,8 @@ class RateLimitFeature internal constructor(val send: suspend (Status, String) -
         delay((reset - OffsetDateTime.now().toEpochSecond()) * 1_000)
     }
 
-    companion object Feature : HttpClientFeature<Config, RateLimitFeature> {
-        val resource: AttributeKey<String> = AttributeKey("RateLimitResource")
+    public companion object Feature : HttpClientFeature<Config, RateLimitFeature> {
+        private val resource: AttributeKey<String> = AttributeKey("RateLimitResource")
 
         override val key: AttributeKey<RateLimitFeature> = AttributeKey("RateLimit")
 
@@ -69,6 +79,6 @@ class RateLimitFeature internal constructor(val send: suspend (Status, String) -
 }
 
 @Suppress("FunctionName")
-fun HttpClientConfig<*>.RateLimit(block: RateLimitFeature.Config.() -> Unit) {
+public fun HttpClientConfig<*>.RateLimit(block: RateLimitFeature.Config.() -> Unit) {
     install(RateLimitFeature, block)
 }

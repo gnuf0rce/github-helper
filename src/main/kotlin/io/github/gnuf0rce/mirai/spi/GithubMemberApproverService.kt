@@ -1,8 +1,19 @@
-package io.github.gnuf0rce.mirai.plugin
+/*
+ * Copyright 2021-2022 dsstudio Technologies and contributors.
+ *
+ *  此源代码的使用受 GNU AFFERO GENERAL PUBLIC LICENSE version 3 许可证的约束, 可以在以下链接找到该许可证.
+ *  Use of this source code is governed by the GNU AGPLv3 license that can be found through the following link.
+ *
+ *  https://github.com/gnuf0rce/github-helper/blob/master/LICENSE
+ */
+
+
+package io.github.gnuf0rce.mirai.spi
 
 import io.github.gnuf0rce.github.exception.*
 import io.github.gnuf0rce.github.*
 import io.github.gnuf0rce.mirai.plugin.data.*
+import io.github.gnuf0rce.mirai.plugin.*
 import net.mamoe.mirai.console.util.ContactUtils.render
 import net.mamoe.mirai.event.*
 import net.mamoe.mirai.event.events.*
@@ -11,7 +22,7 @@ import net.mamoe.mirai.utils.*
 import xyz.cssxsh.mirai.spi.*
 import kotlin.collections.*
 
-class GithubMemberApproverService : MemberApprover {
+public class GithubMemberApproverService : MemberApprover {
     override val id: String = "github-approver"
     override val level: Int by lazy { System.getProperty("io.github.gnuf0rce.mirai.github.approver", "5").toInt() }
 
@@ -28,7 +39,7 @@ class GithubMemberApproverService : MemberApprover {
                 return ApproveResult.Reject(message = "<${login}> 已存在于 ${group.render()}")
             }
 
-            val user = github.user(login = login).get()
+            val user = github.user(login = login).load()
             val stats = user.stats()
             if (stats.percentage >= percentage) {
                 logger.info { "同意 $comer - $login - ${stats.rank}/${stats.percentage}" }

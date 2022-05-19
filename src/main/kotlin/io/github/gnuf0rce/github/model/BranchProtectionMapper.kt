@@ -1,31 +1,38 @@
+/*
+ * Copyright 2021-2022 dsstudio Technologies and contributors.
+ *
+ *  此源代码的使用受 GNU AFFERO GENERAL PUBLIC LICENSE version 3 许可证的约束, 可以在以下链接找到该许可证.
+ *  Use of this source code is governed by the GNU AGPLv3 license that can be found through the following link.
+ *
+ *  https://github.com/gnuf0rce/github-helper/blob/master/LICENSE
+ */
+
+
 package io.github.gnuf0rce.github.model
 
 import io.github.gnuf0rce.github.*
 import io.ktor.http.*
-import kotlinx.serialization.json.*
 
 /**
  * 1. [https://api.github.com/repos/{owner}/{repo}/branches/{branch}/protection]
  */
-open class BranchProtectionMapper(parent: Url, branch: String, override val github: GitHubClient) :
-    GitHubMapper(parent, "${branch}/protection") {
+public open class BranchProtectionMapper(parent: Url, branch: String, override val github: GitHubClient) :
+    GitHubMapper(parent = parent, path = "${branch}/protection") {
 
-    open suspend fun get() = get<JsonObject>()
+    public open suspend fun get(): Temp = get(path = "")
 
-    open suspend fun put(context: JsonObject) = put<JsonObject, JsonObject>(context)
+    public open suspend fun put(context: Temp): Temp = put(context = context, path = "")
 
-    open suspend fun delete() = delete<Unit>()
+    public open suspend fun delete(): Unit = delete(path = "")
 
-    open suspend fun admin() = get<JsonObject>("enforce_admins")
+    public open suspend fun admin(): Temp = get(path = "enforce_admins")
 
-    open suspend fun admin(open: Boolean) = open<Unit>(open, "enforce_admins")
+    public open suspend fun admin(open: Boolean): Unit = open(open, "enforce_admins")
 
-    open suspend fun reviews() = get<JsonObject>("required_pull_request_reviews")
+    public open suspend fun reviews(): Temp = get(path = "required_pull_request_reviews")
 
-    open suspend fun reviews(context: JsonObject) =
-        patch<JsonObject, JsonObject>(context, "required_pull_request_reviews")
+    public open suspend fun reviews(context: Temp): Temp =
+        patch(context = context, path = "required_pull_request_reviews")
 
-    open suspend fun reviewsDelete() = delete<Unit>("required_pull_request_reviews")
-
-    // open suspend fun signatures():
+    public open suspend fun reviewsDelete(): Unit = delete(path = "required_pull_request_reviews")
 }

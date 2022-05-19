@@ -1,10 +1,21 @@
+/*
+ * Copyright 2021-2022 dsstudio Technologies and contributors.
+ *
+ *  此源代码的使用受 GNU AFFERO GENERAL PUBLIC LICENSE version 3 许可证的约束, 可以在以下链接找到该许可证.
+ *  Use of this source code is governed by the GNU AGPLv3 license that can be found through the following link.
+ *
+ *  https://github.com/gnuf0rce/github-helper/blob/master/LICENSE
+ */
+
+
 package io.github.gnuf0rce.github.entry
 
 import kotlinx.serialization.*
 import java.time.*
 
 @Serializable
-data class Commit(
+@SerialName("Commit")
+public data class Commit(
     @SerialName("author")
     val author: User?,
     @SerialName("comments_url")
@@ -30,7 +41,7 @@ data class Commit(
     val stats: Stats = Stats(),
     @SerialName("files")
     val files: List<File> = emptyList()
-) : Entry, Record, LifeCycle, HtmlPage, Owner.Product {
+) : Entry, Record, LifeCycle, WebPage, Owner.Product {
 
     override val owner: User
         get() = author ?: committer ?: throw NoSuchElementException("No owner for the commit")
@@ -50,17 +61,17 @@ data class Commit(
         get() = detail.author.date
 
     @Serializable
-    data class Tree(
+    public data class Tree(
         @SerialName("sha")
         override val sha: String,
         @SerialName("html_url")
         override val htmlUrl: String? = null,
         @SerialName("url")
         override val url: String
-    ) : Record, HtmlPage
+    ) : Record, WebPage
 
     @Serializable
-    data class Detail(
+    public data class Detail(
         @SerialName("author")
         val author: Author,
         @SerialName("comment_count")
@@ -78,7 +89,7 @@ data class Commit(
     )
 
     @Serializable
-    data class Author(
+    public data class Author(
         @Contextual
         @SerialName("date")
         val date: OffsetDateTime,
@@ -89,7 +100,7 @@ data class Commit(
     )
 
     @Serializable
-    data class Verification(
+    public data class Verification(
         @SerialName("payload")
         val payload: String?,
         @SerialName("reason")
@@ -101,7 +112,7 @@ data class Commit(
     )
 
     @Serializable
-    data class Stats(
+    public data class Stats(
         @SerialName("additions")
         val additions: Int = 0,
         @SerialName("deletions")
@@ -111,7 +122,7 @@ data class Commit(
     )
 
     @Serializable
-    data class File(
+    public data class File(
         @SerialName("additions")
         val additions: Int,
         @SerialName("blob_url")

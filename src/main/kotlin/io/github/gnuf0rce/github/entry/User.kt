@@ -5,7 +5,7 @@ import java.time.*
 
 @Serializable
 @SerialName("User")
-data class User(
+public data class User(
     @SerialName("avatar_url")
     override val avatarUrl: String,
     @SerialName("events_url")

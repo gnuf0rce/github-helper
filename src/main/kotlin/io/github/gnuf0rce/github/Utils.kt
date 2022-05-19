@@ -1,3 +1,13 @@
+/*
+ * Copyright 2021-2022 dsstudio Technologies and contributors.
+ *
+ *  此源代码的使用受 GNU AFFERO GENERAL PUBLIC LICENSE version 3 许可证的约束, 可以在以下链接找到该许可证.
+ *  Use of this source code is governed by the GNU AGPLv3 license that can be found through the following link.
+ *
+ *  https://github.com/gnuf0rce/github-helper/blob/master/LICENSE
+ */
+
+
 package io.github.gnuf0rce.github
 
 import io.ktor.http.*
@@ -9,7 +19,7 @@ import kotlinx.serialization.modules.*
 import java.time.*
 import java.time.format.*
 
-const val IGNORE_UNKNOWN_KEYS = "io.github.gnuf0rce.github.ignore"
+internal const val IGNORE_UNKNOWN_KEYS = "io.github.gnuf0rce.github.ignore"
 
 internal fun GitHubClient() = GitHubClient(token = System.getenv("GITHUB_TOKEN"))
 
@@ -27,11 +37,9 @@ internal val GitHubJson = Json {
 
 @Suppress("unused")
 internal val ContentType.Application.GitHubJson
-    get() = ContentType.parse("application/vnd.github.v3+json")
+    get() = ContentType.parse("application/vnd.github.v3.full+json")
 
-@OptIn(ExperimentalSerializationApi::class)
-@Serializer(OffsetDateTime::class)
-object OffsetDateTimeSerializer : KSerializer<OffsetDateTime> {
+internal object OffsetDateTimeSerializer : KSerializer<OffsetDateTime> {
     override val descriptor: SerialDescriptor =
         PrimitiveSerialDescriptor(OffsetDateTime::class.qualifiedName!!, PrimitiveKind.STRING)
 
@@ -48,9 +56,7 @@ object OffsetDateTimeSerializer : KSerializer<OffsetDateTime> {
     }
 }
 
-@OptIn(ExperimentalSerializationApi::class)
-@Serializer(ContentType::class)
-object ContentTypeSerializer : KSerializer<ContentType> {
+internal object ContentTypeSerializer : KSerializer<ContentType> {
     override val descriptor: SerialDescriptor =
         PrimitiveSerialDescriptor(ContentType::class.qualifiedName!!, PrimitiveKind.STRING)
 

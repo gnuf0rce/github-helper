@@ -1,3 +1,13 @@
+/*
+ * Copyright 2021-2022 dsstudio Technologies and contributors.
+ *
+ *  此源代码的使用受 GNU AFFERO GENERAL PUBLIC LICENSE version 3 许可证的约束, 可以在以下链接找到该许可证.
+ *  Use of this source code is governed by the GNU AGPLv3 license that can be found through the following link.
+ *
+ *  https://github.com/gnuf0rce/github-helper/blob/master/LICENSE
+ */
+
+
 package io.github.gnuf0rce.github.entry
 
 import io.ktor.http.*
@@ -5,7 +15,8 @@ import kotlinx.serialization.*
 import java.time.*
 
 @Serializable
-data class Release(
+@SerialName("Release")
+public data class Release(
     @SerialName("assets")
     val assets: List<Asset>,
     @SerialName("assets_url")
@@ -14,6 +25,10 @@ data class Release(
     val author: User,
     @SerialName("body")
     override val body: String?,
+    @SerialName("body_text")
+    override val text: String?,
+    @SerialName("body_html")
+    override val html: String?,
     @Contextual
     @SerialName("created_at")
     override val createdAt: OffsetDateTime,
@@ -50,13 +65,13 @@ data class Release(
     override val url: String,
     @SerialName("zipball_url")
     val zipballUrl: String
-) : Entry, LifeCycle, HtmlPage, Content, Owner.Product {
+) : Entry, LifeCycle, WebPage, Content, Owner.Product {
 
     override val owner: User
         get() = author
 
     /**
-     * 1. [publishedAt]
+     * @see publishedAt
      */
     override val closedAt: OffsetDateTime?
         get() = publishedAt
@@ -65,11 +80,15 @@ data class Release(
     override val mergedAt: OffsetDateTime?
         get() = null
 
+    /**
+     * @see assets
+     * @see createdAt
+     */
     override val updatedAt: OffsetDateTime
         get() = assets.maxOfOrNull { it.updatedAt } ?: createdAt
 
     @Serializable
-    data class Asset(
+    public data class Asset(
         @SerialName("browser_download_url")
         val browserDownloadUrl: String,
         @Contextual
@@ -91,7 +110,7 @@ data class Release(
         @SerialName("size")
         val size: Int,
         @SerialName("state")
-        val state: State,
+        val state: ReleaseState,
         @Contextual
         @SerialName("updated_at")
         override val updatedAt: OffsetDateTime,
@@ -100,10 +119,6 @@ data class Release(
         @SerialName("url")
         override val url: String
     ) : Entry, LifeCycle {
-
-        @Serializable
-        @Suppress("EnumEntryName", "unused")
-        enum class State { uploaded }
 
         @Deprecated("Asset No Close", ReplaceWith("null"))
         override val closedAt: OffsetDateTime?

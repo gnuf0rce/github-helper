@@ -1,3 +1,13 @@
+/*
+ * Copyright 2021-2022 dsstudio Technologies and contributors.
+ *
+ *  此源代码的使用受 GNU AFFERO GENERAL PUBLIC LICENSE version 3 许可证的约束, 可以在以下链接找到该许可证.
+ *  Use of this source code is governed by the GNU AGPLv3 license that can be found through the following link.
+ *
+ *  https://github.com/gnuf0rce/github-helper/blob/master/LICENSE
+ */
+
+
 package io.github.gnuf0rce.github
 
 import io.github.gnuf0rce.github.entry.*
@@ -14,14 +24,15 @@ import io.ktor.http.*
 import kotlinx.coroutines.*
 import java.io.*
 import java.net.*
+import kotlin.coroutines.*
 
-open class GitHubClient(open val token: String?) : CoroutineScope, Closeable {
+public open class GitHubClient(public open val token: String?) : CoroutineScope, Closeable {
 
     protected var proxy: Proxy? = null
 
     protected var timeout: Long = 30 * 1000L
 
-    protected open val client = HttpClient(OkHttp) {
+    protected open val client: HttpClient = HttpClient(OkHttp) {
         BrowserUserAgent()
         ContentEncoding()
         install(HttpTimeout) {
@@ -65,15 +76,15 @@ open class GitHubClient(open val token: String?) : CoroutineScope, Closeable {
         }
     }
 
-    override val coroutineContext get() = client.coroutineContext
+    override val coroutineContext: CoroutineContext get() = client.coroutineContext
 
-    override fun close() = client.close()
+    override fun close(): Unit = client.close()
 
-    protected open val ignore: (Throwable) -> Boolean = { it is IOException || it is HttpRequestTimeoutException }
+    protected open val ignore: (Throwable) -> Boolean = { it is IOException }
 
-    protected open val maxIgnoreCount = 20
+    protected open val maxIgnoreCount: Int = 20
 
-    suspend fun <T> useHttpClient(block: suspend (HttpClient) -> T): T = supervisorScope {
+    public suspend fun <T> useHttpClient(block: suspend (HttpClient) -> T): T = supervisorScope {
         var count = 0
         while (isActive) {
             try {

@@ -1,28 +1,35 @@
+/*
+ * Copyright 2021-2022 dsstudio Technologies and contributors.
+ *
+ *  此源代码的使用受 GNU AFFERO GENERAL PUBLIC LICENSE version 3 许可证的约束, 可以在以下链接找到该许可证.
+ *  Use of this source code is governed by the GNU AGPLv3 license that can be found through the following link.
+ *
+ *  https://github.com/gnuf0rce/github-helper/blob/master/LICENSE
+ */
+
+
 package io.github.gnuf0rce.github.model
 
 import io.github.gnuf0rce.github.*
-import io.github.gnuf0rce.github.entry.Commit
+import io.github.gnuf0rce.github.entry.*
 import io.ktor.http.*
-import kotlinx.serialization.json.JsonArray
-import kotlinx.serialization.json.JsonObject
 
-open class CommitMapper(parent: Url, sha: String, override val github: GitHubClient) :
-    GitHubMapper(parent, "commits/$sha") {
+public open class CommitMapper(parent: Url, sha: String, override val github: GitHubClient) :
+    GitHubMapper(parent = parent, path = "commits/$sha") {
 
-    open suspend fun get() = get<Commit>()
+    public open suspend fun load(): Commit = get()
 
-    open suspend fun comments(page: Int, per: Int = 30) = page<JsonObject>(page, per, "comments")
+    public open suspend fun comments(page: Int, per: Int = 30): List<Temp> = page(page = page, per = per, path = "comments")
 
-    open suspend fun comment(context: JsonObject) = post<JsonObject, JsonObject>(context, "comments")
+    public open suspend fun comment(context: Temp): Temp = post(context = context, path = "comments")
 
-    open suspend fun heads() = get<JsonArray>("branches-where-head")
+    public open suspend fun heads(): List<Temp> = get(path = "branches-where-head")
 
-    open suspend fun pulls() = get<JsonArray>("pulls")
+    public open suspend fun pulls(): List<Temp> = get(path = "pulls")
 
-    // XXX
-    open suspend fun ref() = get<JsonObject>("ref")
+    public open suspend fun ref(): Temp = get(path = "ref")
 
-    open suspend fun compare(base: String, head: String) = get<JsonObject>("compare/${base}...${head}")
+    public open suspend fun compare(base: String, head: String): Temp = get(path = "compare/${base}...${head}")
 
-    open suspend fun community() = get<JsonObject>("community/profile")
+    public open suspend fun community(): Temp = get(path = "community/profile")
 }

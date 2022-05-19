@@ -8,21 +8,25 @@
  */
 
 
-package io.github.gnuf0rce.mirai.plugin.data
+package io.github.gnuf0rce.github.entry
 
 import io.github.gnuf0rce.github.*
 import kotlinx.serialization.*
+import kotlinx.serialization.json.*
 import java.time.*
 
 @Serializable
-public data class GitHubTask(
-    @SerialName("id")
-    val id: String,
-    @SerialName("contacts")
-    val contacts: MutableSet<Long> = HashSet(),
-    @SerialName("last")
-    @Serializable(OffsetDateTimeSerializer::class)
-    var last: OffsetDateTime = OffsetDateTime.now(),
-    @SerialName("interval")
-    var interval: Long = 600_000L
-)
+public data class CommentQuery(
+    @SerialName("sort")
+    var sort: ElementSort = ElementSort.created,
+    @SerialName("direction")
+    var direction: Direction = Direction.desc,
+    @Contextual
+    @SerialName("since")
+    var since: OffsetDateTime? = null
+) : Query {
+
+    override fun toJsonObject(): JsonObject {
+        return GitHubJson.encodeToJsonElement(serializer(), this) as JsonObject
+    }
+}

@@ -1,3 +1,13 @@
+/*
+ * Copyright 2021-2022 dsstudio Technologies and contributors.
+ *
+ *  此源代码的使用受 GNU AFFERO GENERAL PUBLIC LICENSE version 3 许可证的约束, 可以在以下链接找到该许可证.
+ *  Use of this source code is governed by the GNU AGPLv3 license that can be found through the following link.
+ *
+ *  https://github.com/gnuf0rce/github-helper/blob/master/LICENSE
+ */
+
+
 @file:OptIn(MiraiExperimentalApi::class, ConsoleExperimentalApi::class)
 
 package io.github.gnuf0rce.mirai.plugin
@@ -15,8 +25,8 @@ import net.mamoe.mirai.console.util.*
 import net.mamoe.mirai.console.util.ContactUtils.getContactOrNull
 import net.mamoe.mirai.console.util.ContactUtils.render
 import net.mamoe.mirai.contact.*
+import net.mamoe.mirai.message.*
 import net.mamoe.mirai.message.data.*
-import net.mamoe.mirai.message.data.Image.Key.queryUrl
 import net.mamoe.mirai.utils.ExternalResource.Companion.uploadAsImage
 import net.mamoe.mirai.utils.ExternalResource.Companion.toExternalResource
 import net.mamoe.mirai.utils.*
@@ -28,7 +38,7 @@ import java.time.*
 internal fun Contact(id: Long): Contact = Bot.instances.firstNotNullOf { it.getContactOrNull(id) }
 
 @Serializable
-enum class MessageType { TEXT, XML, JSON }
+public enum class MessageType { DEFAULT, SHORT, FORWARD }
 
 internal suspend fun Owner.avatar(flush: Boolean = false, client: GitHubClient = github): File {
     val url = Url(avatarUrl)
@@ -97,7 +107,7 @@ private fun Reactions.render(): String = buildString {
     if (eyes > 0) append("👀:$eyes")
 }
 
-data class UserStats(
+public data class UserStats(
     /**
      * B+, A+, A++, S, S+
      */
@@ -222,17 +232,14 @@ internal suspend fun User.trophy(contact: Contact): Message {
 /**
  * TODO: more info ...
  */
-suspend fun Owner.toMessage(contact: Contact): Message {
+public suspend fun Owner.toMessage(contact: Contact): Message {
     return when (this) {
         is User -> card(contact)
         is Organization -> avatar().uploadAsImage(contact)
     }
 }
 
-/**
- * TODO: License ...
- */
-suspend fun HtmlPage.toMessage(contact: Contact, type: MessageType, notice: String): Message {
+public suspend fun WebPage.toMessage(contact: Contact, type: MessageType, notice: String): Message {
     return when (this) {
         is Issue -> toMessage(contact, type, notice)
         is Pull -> toMessage(contact, type, notice)
@@ -246,16 +253,16 @@ suspend fun HtmlPage.toMessage(contact: Contact, type: MessageType, notice: Stri
         is Readme -> toMessage(contact)
         is Team -> htmlUrl.toPlainText()
         is Commit.Tree -> (htmlUrl ?: sha).toPlainText()
+        is Comment -> htmlUrl.toPlainText()
     }
 }
 
-suspend fun Contact.sendMessage(entry: HtmlPage, notice: String) = sendMessage(entry.toMessage(this, reply, notice))
+public suspend fun Contact.sendEntry(entry: WebPage, notice: String): MessageReceipt<Contact> =
+    sendMessage(entry.toMessage(this, reply, notice))
 
-suspend fun ControlRecord.toMessage(contact: Contact, type: MessageType, notice: String): Message {
-    val image = user.avatar().uploadAsImage(contact)
+public suspend fun Issue.toMessage(contact: Contact, type: MessageType, notice: String): Message {
     return when (type) {
-        MessageType.TEXT -> buildMessageChain {
-            appendLine(image)
+        MessageType.DEFAULT -> buildMessageChain {
             appendLine("$notice with issue by ${user.login} ")
             appendLine("URL: $htmlUrl ")
             appendLine("CREATED_AT: $createdAt ")
@@ -263,48 +270,96 @@ suspend fun ControlRecord.toMessage(contact: Contact, type: MessageType, notice:
             appendLine("TITLE: $title ")
             appendLine("STATE: $state ")
             if (labels.isNotEmpty()) appendLine("LABELS: ${labels.joinToString { it.name }} ")
-            if (reactions != null) appendLine(reactions!!.render())
-            if (body != null && body!!.length < 50) appendLine(body)
+            if (reactions != null) appendLine(reactions.render())
+            if (text != null && text.length < 50) appendLine(text)
         }
-        MessageType.XML -> buildXmlMessage(1) {
-            actionData = htmlUrl
-            templateId = -1
-            action = "web"
-            brief = notice
-            flag = 0
+        MessageType.SHORT -> TODO()
+        MessageType.FORWARD -> buildForwardMessage(contact) {
+            displayStrategy = object : ForwardMessage.DisplayStrategy {
+                override fun generateTitle(forward: RawForwardMessage): String = title
+                override fun generatePreview(forward: RawForwardMessage): List<String> = listOf(
+                    "$notice with issue by ${user.login}",
+                    "CREATED_AT: $createdAt ",
+                    "UPDATED_AT: $updatedAt ",
+                    "STATE: $state "
+                )
+            }
+            contact.bot named (owner.name ?: owner.login) at createdAt.toEpochSecond().toInt() says buildMessageChain {
+                appendLine("URL: $htmlUrl ")
+                if (labels.isNotEmpty()) appendLine("LABELS: ${labels.joinToString { it.name }} ")
+                if (reactions != null) appendLine(reactions.render())
+                if (body != null) appendLine(body)
+            }
+            if (comments > 0) {
+                val (owner, repo) = FULL_REGEX.find(Url(htmlUrl).encodedPath)!!.destructured
+                val per = 30
+                val comments = github.repo(owner = owner, repo = repo).issues
+                    .comments(index = number, page = ((comments - 1) / per) + 1, per = per)
 
-            item {
-                layout = 2
-                picture(coverUrl = image.queryUrl())
-                title(text = title)
-                for (label in labels) {
-                    summary(text = label.name, color = "#${label.color.uppercase()}")
+                for (comment in comments) {
+                    contact.bot named (comment.owner.name ?: comment.owner.login) at
+                        comment.createdAt.toEpochSecond().toInt() says buildMessageChain {
+                        if (comment.reactions != null) appendLine(comment.reactions.render())
+                        if (body != null) appendLine(comment.body)
+                    }
                 }
             }
-
-            source(name = notice)
-        }
-        MessageType.JSON -> buildStructMessage<StructNew> {
-            config.ctime = createdAt.toEpochSecond()
-            config.token = "239525e4c0fc9b6849624417086250df"
-            desc = "issue"
-            uin = contact.id
-            detail.appType = 1
-            detail.appid = 100951776
-            detail.desc = labels.joinToString { it.name }
-            detail.jumpUrl = htmlUrl
-            detail.preview = image.queryUrl()
-            detail.tag = "GitHub"
-            detail.title = title
-            prompt = "[分享]${title}"
         }
     }
 }
 
-suspend fun Release.toMessage(contact: Contact, type: MessageType, notice: String): Message {
+public suspend fun Pull.toMessage(contact: Contact, type: MessageType, notice: String): Message {
+    return when (type) {
+        MessageType.DEFAULT -> buildMessageChain {
+            appendLine("$notice with pull by ${user.login} ")
+            appendLine("URL: $htmlUrl ")
+            appendLine("CREATED_AT: $createdAt ")
+            appendLine("UPDATED_AT: $updatedAt ")
+            appendLine("TITLE: $title ")
+            appendLine("STATE: $state ")
+            if (labels.isNotEmpty()) appendLine("LABELS: ${labels.joinToString { it.name }} ")
+            if (reactions != null) appendLine(reactions.render())
+            if (text != null && text.length < 50) appendLine(text)
+        }
+        MessageType.SHORT -> TODO()
+        MessageType.FORWARD -> buildForwardMessage(contact) {
+            displayStrategy = object : ForwardMessage.DisplayStrategy {
+                override fun generateTitle(forward: RawForwardMessage): String = title
+                override fun generatePreview(forward: RawForwardMessage): List<String> = listOf(
+                    "$notice with issue by ${user.login}",
+                    "CREATED_AT: $createdAt ",
+                    "UPDATED_AT: $updatedAt ",
+                    "STATE: $state "
+                )
+            }
+            contact.bot named (owner.name ?: owner.login) at createdAt.toEpochSecond().toInt() says buildMessageChain {
+                appendLine("URL: $htmlUrl ")
+                if (labels.isNotEmpty()) appendLine("LABELS: ${labels.joinToString { it.name }} ")
+                if (reactions != null) appendLine(reactions.render())
+                if (body != null) appendLine(body)
+            }
+            if (comments > 0) {
+                val (owner, repo) = FULL_REGEX.find(Url(htmlUrl).encodedPath)!!.destructured
+                val per = 30
+                val comments = github.repo(owner = owner, repo = repo).issues
+                    .comments(index = number, page = ((comments - 1) / per) + 1, per = per)
+
+                for (comment in comments) {
+                    contact.bot named (comment.owner.name ?: comment.owner.login) at
+                        comment.createdAt.toEpochSecond().toInt() says buildMessageChain {
+                        if (comment.reactions != null) appendLine(comment.reactions.render())
+                        if (body != null) appendLine(comment.body)
+                    }
+                }
+            }
+        }
+    }
+}
+
+public suspend fun Release.toMessage(contact: Contact, type: MessageType, notice: String): Message {
     val image = author.avatar().uploadAsImage(contact)
     return when (type) {
-        MessageType.TEXT -> buildMessageChain {
+        MessageType.DEFAULT -> buildMessageChain {
             appendLine(image)
             appendLine("$notice with release by ${author.login} ")
             appendLine("CREATED_AT: $createdAt ")
@@ -314,63 +369,30 @@ suspend fun Release.toMessage(contact: Contact, type: MessageType, notice: Strin
             if (reactions != null) appendLine(reactions.render())
             if (body != null && body.length < 50) appendLine(body)
         }
-        MessageType.XML -> buildXmlMessage(1) {
-            actionData = htmlUrl
-            templateId = -1
-            action = "web"
-            brief = notice
-            flag = 0
-
-            item {
-                layout = 2
-                picture(coverUrl = image.queryUrl())
-                title(text = name)
-                for (asset in assets) {
-                    summary(text = asset.name)
-                }
-                summary(text = tagName)
-            }
-
-            source(name = notice)
-        }
-        MessageType.JSON -> TODO()
+        MessageType.SHORT -> TODO()
+        MessageType.FORWARD -> TODO()
     }
 }
 
-suspend fun Commit.toMessage(contact: Contact, type: MessageType, notice: String): Message {
+public suspend fun Commit.toMessage(contact: Contact, type: MessageType, notice: String): Message {
     val image = author?.avatar()?.uploadAsImage(contact)
     return when (type) {
-        MessageType.TEXT -> buildMessageChain {
+        MessageType.DEFAULT -> buildMessageChain {
             if (image != null) appendLine(image)
             appendLine("$notice with commit by ${author?.login ?: detail.author.email} ")
             appendLine("URL: $htmlUrl ")
             appendLine("CREATED_AT: $createdAt ")
             appendLine(detail.message)
         }
-        MessageType.XML -> buildXmlMessage(1) {
-            actionData = htmlUrl
-            templateId = -1
-            action = "web"
-            brief = notice
-            flag = 0
-
-            item {
-                layout = 2
-                if (image != null) picture(coverUrl = image.queryUrl())
-                title(text = sha)
-                summary(text = detail.message)
-            }
-
-            source(name = notice)
-        }
-        MessageType.JSON -> TODO()
+        MessageType.SHORT -> TODO()
+        MessageType.FORWARD -> TODO()
     }
 }
 
-suspend fun Repo.toMessage(contact: Contact, type: MessageType, notice: String): Message {
+public suspend fun Repo.toMessage(contact: Contact, type: MessageType, notice: String): Message {
     val image = owner.avatar().uploadAsImage(contact)
     return when (type) {
-        MessageType.TEXT -> buildMessageChain {
+        MessageType.DEFAULT -> buildMessageChain {
             appendLine(image)
             appendLine("$notice with repo by ${owner.login} ")
             appendLine("URL: $htmlUrl ")
@@ -379,32 +401,15 @@ suspend fun Repo.toMessage(contact: Contact, type: MessageType, notice: String):
             appendLine("LANGUAGE: $language ")
             appendLine("DESCRIPTION: $description ")
         }
-        MessageType.XML -> buildXmlMessage(1) {
-            actionData = htmlUrl
-            templateId = -1
-            action = "web"
-            brief = notice
-            flag = 0
-
-            item {
-                layout = 2
-                picture(coverUrl = image.queryUrl())
-                title(text = name)
-                for (topic in topics) {
-                    summary(text = topic)
-                }
-            }
-
-            source(name = notice)
-        }
-        MessageType.JSON -> TODO()
+        MessageType.SHORT -> TODO()
+        MessageType.FORWARD -> TODO()
     }
 }
 
-suspend fun Milestone.toMessage(contact: Contact, type: MessageType, notice: String): Message {
+public suspend fun Milestone.toMessage(contact: Contact, type: MessageType, notice: String): Message {
     val image = creator.avatar().uploadAsImage(contact)
     return when (type) {
-        MessageType.TEXT -> buildMessageChain {
+        MessageType.DEFAULT -> buildMessageChain {
             appendLine(image)
             appendLine("$notice with milestone by ${creator.login} ")
             appendLine("URL: $htmlUrl ")
@@ -414,27 +419,12 @@ suspend fun Milestone.toMessage(contact: Contact, type: MessageType, notice: Str
             appendLine("STATE: $state ")
             appendLine("DESCRIPTION: $description ")
         }
-        MessageType.XML -> buildXmlMessage(1) {
-            actionData = htmlUrl
-            templateId = -1
-            action = "web"
-            brief = notice
-            flag = 0
-
-            item {
-                layout = 2
-                picture(coverUrl = image.queryUrl())
-                title(text = title)
-                summary(text = description.orEmpty())
-            }
-
-            source(name = notice)
-        }
-        MessageType.JSON -> TODO()
+        MessageType.SHORT -> TODO()
+        MessageType.FORWARD -> TODO()
     }
 }
 
-suspend fun Readme.toMessage(contact: Contact): Message {
+public suspend fun Readme.toMessage(contact: Contact): Message {
     if (contact is FileSupported) {
         contact.launch(SupervisorJob()) {
             val file = if (selenium) {

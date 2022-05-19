@@ -1,1 +1,1 @@
-io.github.gnuf0rce.mirai.plugin.GithubMemberApproverService
+io.github.gnuf0rce.mirai.spi.GithubMemberApproverService

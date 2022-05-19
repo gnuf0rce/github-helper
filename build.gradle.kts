@@ -24,11 +24,7 @@ repositories {
 }
 
 kotlin {
-    sourceSets {
-        all {
-            languageSettings.optIn("kotlin.RequiresOptIn")
-        }
-    }
+    explicitApi()
 }
 
 dependencies {
