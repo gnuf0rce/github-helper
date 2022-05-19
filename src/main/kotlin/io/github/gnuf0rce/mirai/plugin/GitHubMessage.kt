@@ -16,7 +16,9 @@ import io.github.gnuf0rce.github.*
 import io.github.gnuf0rce.github.entry.*
 import io.github.gnuf0rce.github.entry.User
 import io.github.gnuf0rce.mirai.plugin.data.*
+import io.ktor.client.call.*
 import io.ktor.client.request.*
+import io.ktor.client.statement.*
 import io.ktor.http.*
 import kotlinx.coroutines.*
 import kotlinx.serialization.*
@@ -40,14 +42,21 @@ internal fun Contact(id: Long): Contact = Bot.instances.firstNotNullOf { it.getC
 @Serializable
 public enum class MessageType { DEFAULT, SHORT, FORWARD }
 
-internal suspend fun Owner.avatar(flush: Boolean = false, client: GitHubClient = github): File {
-    val url = Url(avatarUrl)
-    return ImageFolder.resolve("avatar").resolve(url.filename).apply {
-        if (exists().not() || flush) {
-            parentFile.mkdirs()
-            writeBytes(client.useHttpClient { client ->
-                client.get(url)
-            })
+internal suspend fun Owner.avatar(size: Int = 50, client: GitHubClient = github): File {
+    val folder = ImageFolder.resolve("avatar")
+    val cache = folder.listFiles()?.find { it.name.startsWith("${login}.${size}") }
+    if (cache != null && System.currentTimeMillis() - cache.lastModified() < 7 * 24 * 3600_000) {
+        return cache
+    }
+
+    return client.useHttpClient { http ->
+        http.get<HttpStatement>(avatarUrl) { url.parameters["s"] = size.toString() }.execute { response ->
+            val format = response.contentType()?.contentSubtype ?: "jpg"
+            val file = folder.resolve("${login}.${size}.${format}")
+
+            file.writeBytes(response.receive())
+
+            file
         }
     }
 }
