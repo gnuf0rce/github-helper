@@ -23,6 +23,7 @@ import net.mamoe.mirai.console.util.*
 import net.mamoe.mirai.console.util.ContactUtils.render
 import net.mamoe.mirai.event.events.*
 import net.mamoe.mirai.utils.*
+import java.time.OffsetDateTime
 
 internal typealias MessageReplier = suspend MessageEvent.(MatchResult) -> Any?
 
@@ -37,6 +38,9 @@ internal val ReplierPermission: Permission by lazy {
 private fun MessageEvent.hasReplierPermission() = toCommandSender().hasPermission(ReplierPermission)
 
 private const val REPLIER_NOTICE = "replier"
+
+// TODO: REPLIER_FORMAT
+private val REPLIER_FORMAT = Format.FORWARD
 
 /**
  * 1. [https://github.com/{owner}/]
@@ -68,7 +72,7 @@ internal val RepoReplier: MessageReplier = replier@{ result ->
     try {
         val (owner, repo) = result.destructured
         val entry = github.repo(owner, repo).load()
-        entry.toMessage(subject, reply, REPLIER_NOTICE)
+        entry.toMessage(subject, REPLIER_FORMAT, REPLIER_NOTICE)
     } catch (cause: Throwable) {
         logger.warning({ "构建Repo(${result.value})信息失败" }, cause)
         cause.message
@@ -104,7 +108,7 @@ internal val IssueReplier: MessageReplier = replier@{ result ->
     try {
         val (owner, repo, number) = result.destructured
         val entry = github.repo(owner, repo).issues.get(number.toInt())
-        entry.toMessage(subject, reply, REPLIER_NOTICE)
+        entry.toMessage(subject, REPLIER_FORMAT, "$owner/$repo", OffsetDateTime.now().minusMinutes(10))
     } catch (cause: Throwable) {
         logger.warning({ "构建Repo(${result.value})信息失败" }, cause)
         cause.message
@@ -122,7 +126,7 @@ internal val PullReplier: MessageReplier = replier@{ result ->
     try {
         val (owner, repo, number) = result.destructured
         val entry = github.repo(owner, repo).pulls.get(number.toInt())
-        entry.toMessage(subject, reply, REPLIER_NOTICE)
+        entry.toMessage(subject, REPLIER_FORMAT, "$owner/$repo", OffsetDateTime.now().minusMinutes(10))
     } catch (cause: Throwable) {
         logger.warning({ "构建Pull(${result.value})信息失败" }, cause)
         cause.message
@@ -158,7 +162,7 @@ internal val MilestoneReplier: MessageReplier = replier@{ result ->
     try {
         val (owner, repo, number) = result.destructured
         val entry = github.repo(owner, repo).milestones.get(number.toInt())
-        entry.toMessage(subject, reply, REPLIER_NOTICE)
+        entry.toMessage(subject, REPLIER_FORMAT, "$owner/$repo")
     } catch (cause: Throwable) {
         logger.warning({ "构建Milestone(${result.value})信息失败" }, cause)
         cause.message

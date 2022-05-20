@@ -11,6 +11,7 @@
 package io.github.gnuf0rce.mirai.plugin.data
 
 import io.github.gnuf0rce.github.*
+import io.github.gnuf0rce.mirai.plugin.*
 import kotlinx.serialization.*
 import java.time.*
 
@@ -24,5 +25,7 @@ public data class GitHubTask(
     @Serializable(OffsetDateTimeSerializer::class)
     var last: OffsetDateTime = OffsetDateTime.now(),
     @SerialName("interval")
-    var interval: Long = 600_000L
+    var interval: Long = 600_000L,
+    @SerialName("format")
+    var format: Format = Format.TEXT
 )

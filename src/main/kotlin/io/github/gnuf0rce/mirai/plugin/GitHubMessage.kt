@@ -14,7 +14,6 @@ package io.github.gnuf0rce.mirai.plugin
 
 import io.github.gnuf0rce.github.*
 import io.github.gnuf0rce.github.entry.*
-import io.github.gnuf0rce.github.entry.User
 import io.github.gnuf0rce.mirai.plugin.data.*
 import io.ktor.client.call.*
 import io.ktor.client.request.*
@@ -26,7 +25,8 @@ import net.mamoe.mirai.*
 import net.mamoe.mirai.console.util.*
 import net.mamoe.mirai.console.util.ContactUtils.getContactOrNull
 import net.mamoe.mirai.console.util.ContactUtils.render
-import net.mamoe.mirai.contact.*
+import net.mamoe.mirai.contact.Contact
+import net.mamoe.mirai.contact.FileSupported
 import net.mamoe.mirai.message.*
 import net.mamoe.mirai.message.data.*
 import net.mamoe.mirai.utils.ExternalResource.Companion.uploadAsImage
@@ -40,16 +40,19 @@ import java.time.*
 internal fun Contact(id: Long): Contact = Bot.instances.firstNotNullOf { it.getContactOrNull(id) }
 
 @Serializable
-public enum class MessageType { DEFAULT, SHORT, FORWARD }
+public enum class Format { OLD, TEXT, FORWARD }
 
-internal suspend fun Owner.avatar(size: Int = 50, client: GitHubClient = github): File {
+internal suspend fun Owner?.avatar(contact: Contact, size: Int, client: GitHubClient = github): Image {
+    val avatarUrl = this?.avatarUrl ?: "https://avatars.githubusercontent.com/u/0"
+    val login = this?.login.orEmpty()
+
     val folder = ImageFolder.resolve("avatar")
     val cache = folder.listFiles()?.find { it.name.startsWith("${login}.${size}") }
     if (cache != null && System.currentTimeMillis() - cache.lastModified() < 7 * 24 * 3600_000) {
-        return cache
+        return cache.uploadAsImage(contact)
     }
 
-    return client.useHttpClient { http ->
+    val file = client.useHttpClient { http ->
         http.get<HttpStatement>(avatarUrl) { url.parameters["s"] = size.toString() }.execute { response ->
             val format = response.contentType()?.contentSubtype ?: "jpg"
             val file = folder.resolve("${login}.${size}.${format}")
@@ -59,6 +62,8 @@ internal suspend fun Owner.avatar(size: Int = 50, client: GitHubClient = github)
             file
         }
     }
+
+    return file.uploadAsImage(contact)
 }
 
 internal fun Readme.pdf(flush: Boolean = false): File {
@@ -179,7 +184,7 @@ internal suspend fun User.stats(flush: Long = 86400_000, client: GitHubClient = 
 internal fun MessageChainBuilder.appendLine(image: Image) = append(image).appendLine()
 
 internal suspend fun User.card(contact: Contact): Message {
-    val image = avatar().uploadAsImage(contact)
+    val image = avatar(contact, 50)
     val stats = stats()
     return if (selenium) {
         buildMessageChain {
@@ -244,35 +249,43 @@ internal suspend fun User.trophy(contact: Contact): Message {
 public suspend fun Owner.toMessage(contact: Contact): Message {
     return when (this) {
         is User -> card(contact)
-        is Organization -> avatar().uploadAsImage(contact)
+        is Organization -> avatar(contact, 50)
     }
 }
 
-public suspend fun WebPage.toMessage(contact: Contact, type: MessageType, notice: String): Message {
+public suspend fun WebPage.toMessage(contact: Contact, format: Format, notice: String, since: OffsetDateTime): Message {
     return when (this) {
-        is Issue -> toMessage(contact, type, notice)
-        is Pull -> toMessage(contact, type, notice)
-        is Release -> toMessage(contact, type, notice)
-        is Commit -> toMessage(contact, type, notice)
-        is Repo -> toMessage(contact, type, notice)
-        is Milestone -> toMessage(contact, type, notice)
+        is Issue -> toMessage(contact, format, notice, since)
+        is Pull -> toMessage(contact, format, notice, since)
+        is Release -> toMessage(contact, format, notice)
+        is Commit -> toMessage(contact, format, notice)
+        is Repo -> toMessage(contact, format, notice)
+        is Milestone -> toMessage(contact, format, notice)
         is Owner -> toMessage(contact)
         is License -> (htmlUrl ?: name).toPlainText()
         is Issue.PullRequest -> htmlUrl.toPlainText()
         is Readme -> toMessage(contact)
         is Team -> htmlUrl.toPlainText()
         is Commit.Tree -> (htmlUrl ?: sha).toPlainText()
-        is Comment -> htmlUrl.toPlainText()
+        is IssueComment -> htmlUrl.toPlainText()
+        is PullRequestReviewComment -> htmlUrl.toPlainText()
+        is GithubAppInfo -> htmlUrl.toPlainText()
     }
 }
 
-public suspend fun Contact.sendEntry(entry: WebPage, notice: String): MessageReceipt<Contact> =
-    sendMessage(entry.toMessage(this, reply, notice))
+public suspend fun Contact.sendEntry(entry: WebPage, notice: String, format: Format, since: OffsetDateTime)
+    : MessageReceipt<Contact> = sendMessage(entry.toMessage(this, format, notice, since))
 
-public suspend fun Issue.toMessage(contact: Contact, type: MessageType, notice: String): Message {
-    return when (type) {
-        MessageType.DEFAULT -> buildMessageChain {
-            appendLine("$notice with issue by ${user.login} ")
+@ForwardMessageDsl
+private infix fun ForwardMessageBuilder.BuilderNode.at(offsetDateTime: OffsetDateTime) = apply {
+    time = offsetDateTime.toEpochSecond().toInt()
+}
+
+public suspend fun Issue.toMessage(contact: Contact, format: Format, notice: String, since: OffsetDateTime): Message {
+    return when (format) {
+        Format.OLD -> buildMessageChain {
+            appendLine(user.avatar(contact, 30))
+            appendLine("$notice with issue by ${owner?.nameOrLogin} ")
             appendLine("URL: $htmlUrl ")
             appendLine("CREATED_AT: $createdAt ")
             appendLine("UPDATED_AT: $updatedAt ")
@@ -282,34 +295,117 @@ public suspend fun Issue.toMessage(contact: Contact, type: MessageType, notice: 
             if (reactions != null) appendLine(reactions.render())
             if (text != null && text.length < 50) appendLine(text)
         }
-        MessageType.SHORT -> TODO()
-        MessageType.FORWARD -> buildForwardMessage(contact) {
+        Format.TEXT -> when {
+            // case 1 new open issue
+            createdAt == updatedAt -> buildMessageChain {
+                appendLine(htmlUrl)
+                appendLine(user.avatar(contact, 30))
+                appendLine("[$notice] New issue <$title> open by ${user?.nameOrLogin}")
+                if (text != null && text.length < 100) {
+                    appendLine(text)
+                }
+            }
+            // case 2 merged issue
+            mergedAt == updatedAt -> buildMessageChain {
+                appendLine(htmlUrl)
+                appendLine(mergedBy.avatar(contact, 30))
+                appendLine("[$notice] Issue <$title> merged by ${pullRequest?.htmlUrl ?: mergedBy?.nameOrLogin}")
+                appendLine(stateReason)
+            }
+            // case 3 closed issue
+            closedAt == updatedAt -> buildMessageChain {
+                appendLine(htmlUrl)
+                appendLine(closedBy.avatar(contact, 30))
+                appendLine("[$notice] Issue <$title> closed by ${closedBy?.nameOrLogin}")
+                appendLine(stateReason)
+            }
+            // case 4 locked issue
+            locked -> buildMessageChain {
+                appendLine(htmlUrl)
+                appendLine("[$notice] Issue <$title> locked by ${activeLockReason ?: stateReason}")
+            }
+            // case 6 new comment or other update for issue
+            else -> buildMessageChain {
+                appendLine(htmlUrl)
+                val (owner, repo) = FULL_REGEX.find(Url(htmlUrl).encodedPath)!!.destructured
+                val comments = github.repo(owner = owner, repo = repo).issues
+                    .comments(number = number) {
+                        this.sort = ElementSort.updated
+                        this.since = since
+                    }
+
+                if (comments.isEmpty()) {
+                    appendLine("[$notice] Issue <$title> has change")
+                    appendLine(reactions?.render())
+                    if (assignees.isNotEmpty()) {
+                        appendLine("assignees: ")
+                        assignees.forEach { assignee ->
+                            append(assignee.avatar(contact, 30)).append(assignee.nameOrLogin).append(" ")
+                        }
+                        appendLine()
+                    }
+                    if (milestone != null) {
+                        appendLine("milestone with ${milestone.title}")
+                    }
+                } else {
+                    appendLine("[$notice] Issue <$title> new ${comments.size} comments")
+                    val comment = comments.first()
+                    appendLine("last at ${comment.updatedAt}")
+                    append(comment.user.avatar(contact, 30)).append(association.name)
+                    appendLine(comment.reactions?.render())
+                    append(comment.text)
+                }
+            }
+        }
+        Format.FORWARD -> buildForwardMessage(contact) {
             displayStrategy = object : ForwardMessage.DisplayStrategy {
                 override fun generateTitle(forward: RawForwardMessage): String = title
                 override fun generatePreview(forward: RawForwardMessage): List<String> = listOf(
-                    "$notice with issue by ${user.login}",
-                    "CREATED_AT: $createdAt ",
-                    "UPDATED_AT: $updatedAt ",
-                    "STATE: $state "
+                    "$notice with #${number} issue by $ownerNameOrLogin",
+                    "$state, $comments comments",
+                    "update at $updatedAt",
+                    stateReason ?: activeLockReason ?: labels.joinToString { it.name }
                 )
+
+                override fun generateSummary(forward: RawForwardMessage): String {
+                    return stateReason ?: activeLockReason ?: labels.joinToString { it.name }
+                }
             }
-            contact.bot named (owner.name ?: owner.login) at createdAt.toEpochSecond().toInt() says buildMessageChain {
-                appendLine("URL: $htmlUrl ")
-                if (labels.isNotEmpty()) appendLine("LABELS: ${labels.joinToString { it.name }} ")
-                if (reactions != null) appendLine(reactions.render())
-                if (body != null) appendLine(body)
+            contact.bot named association.name at createdAt says buildMessageChain {
+                append(user.avatar(contact, 30)).appendLine(ownerNameOrLogin)
+                appendLine(htmlUrl)
+                appendLine(labels.joinToString { it.description ?: it.name })
+                appendLine(reactions?.render())
+                append(body)
+            }
+            contact.bot named "status" at createdAt says buildMessageChain {
+                if (closedBy != null) {
+                    append(closedBy.avatar(contact, 30)).appendLine("closed at $closedAt by ${closedBy.nameOrLogin}")
+                }
+                if (assignees.isNotEmpty()) {
+                    appendLine("assigned to ")
+                    assignees.forEach { assignee ->
+                        append(assignee.avatar(contact, 30)).append(assignee.nameOrLogin).append(" ")
+                    }
+                    appendLine()
+                }
+                if (milestone != null) {
+                    appendLine("milestone with ${milestone.title}")
+                }
             }
             if (comments > 0) {
                 val (owner, repo) = FULL_REGEX.find(Url(htmlUrl).encodedPath)!!.destructured
-                val per = 30
                 val comments = github.repo(owner = owner, repo = repo).issues
-                    .comments(index = number, page = ((comments - 1) / per) + 1, per = per)
+                    .comments(number = number) {
+                        sort = ElementSort.created
+                        direction = Direction.asc
+                    }
 
                 for (comment in comments) {
-                    contact.bot named (comment.owner.name ?: comment.owner.login) at
-                        comment.createdAt.toEpochSecond().toInt() says buildMessageChain {
-                        if (comment.reactions != null) appendLine(comment.reactions.render())
-                        if (body != null) appendLine(comment.body)
+                    contact.bot named comment.association.name at comment.createdAt says buildMessageChain {
+                        append(comment.user.avatar(contact, 30)).appendLine(comment.user?.nameOrLogin)
+                        appendLine(comment.reactions?.render())
+                        append(comment.body)
                     }
                 }
             }
@@ -317,10 +413,11 @@ public suspend fun Issue.toMessage(contact: Contact, type: MessageType, notice: 
     }
 }
 
-public suspend fun Pull.toMessage(contact: Contact, type: MessageType, notice: String): Message {
-    return when (type) {
-        MessageType.DEFAULT -> buildMessageChain {
-            appendLine("$notice with pull by ${user.login} ")
+public suspend fun Pull.toMessage(contact: Contact, format: Format, notice: String, since: OffsetDateTime): Message {
+    return when (format) {
+        Format.OLD -> buildMessageChain {
+            appendLine(user.avatar(contact, 30))
+            appendLine("$notice with pull by $ownerNameOrLogin ")
             appendLine("URL: $htmlUrl ")
             appendLine("CREATED_AT: $createdAt ")
             appendLine("UPDATED_AT: $updatedAt ")
@@ -330,34 +427,132 @@ public suspend fun Pull.toMessage(contact: Contact, type: MessageType, notice: S
             if (reactions != null) appendLine(reactions.render())
             if (text != null && text.length < 50) appendLine(text)
         }
-        MessageType.SHORT -> TODO()
-        MessageType.FORWARD -> buildForwardMessage(contact) {
+        Format.TEXT -> when {
+            // case 1 new open pull
+            createdAt == updatedAt -> buildMessageChain {
+                appendLine(htmlUrl)
+                appendLine(user.avatar(contact, 30))
+                appendLine("[$notice] New pull request <$title> open by ${user?.nameOrLogin}")
+                if (body != null && body.length < 100) {
+                    appendLine(body)
+                }
+            }
+            // case 2 merged pull
+            mergedAt == updatedAt -> buildMessageChain {
+                appendLine(htmlUrl)
+                appendLine(mergedBy.avatar(contact, 30))
+                appendLine("[$notice] Pull Request <$title> merged by ${mergedBy?.nameOrLogin}")
+                appendLine(autoMerge)
+            }
+            // case 3 closed pull
+            closedAt == updatedAt -> buildMessageChain {
+                appendLine(htmlUrl)
+                appendLine(closedBy.avatar(contact, 30))
+                appendLine("[$notice] Pull Request <$title> closed by ${closedBy?.nameOrLogin}")
+            }
+            // case 4 locked pull
+            locked -> buildMessageChain {
+                appendLine(htmlUrl)
+                appendLine("[$notice] Pull Request <$title> locked by $activeLockReason")
+            }
+            // case 6 new comment or other update for issue
+            else -> buildMessageChain {
+                appendLine(htmlUrl)
+                val (owner, repo) = FULL_REGEX.find(Url(htmlUrl).encodedPath)!!.destructured
+                val comments = github.repo(owner = owner, repo = repo).issues
+                    .comments(number = number) {
+                        this.sort = ElementSort.updated
+                        this.since = since
+                    }
+
+                if (comments.isEmpty()) {
+                    appendLine("[$notice] Pull Request <$title> has change")
+                    appendLine(reactions?.render())
+                    if (requestedReviewers.isNotEmpty()) {
+                        appendLine("assignees: ")
+                        assignees.forEach { assignee ->
+                            append(assignee.avatar(contact, 30)).append(assignee.nameOrLogin).append(" ")
+                        }
+                        appendLine()
+                    }
+                    if (assignees.isNotEmpty()) {
+                        appendLine("assignees: ")
+                        assignees.forEach { assignee ->
+                            append(assignee.avatar(contact, 30)).append(assignee.nameOrLogin).append(" ")
+                        }
+                        appendLine()
+                    }
+                    if (milestone != null) {
+                        appendLine("milestone with ${milestone.title}")
+                    }
+                } else {
+                    appendLine("[$notice] Pull Request <$title> new ${comments.size} comments")
+                    val comment = comments.first()
+                    appendLine("last at ${comment.updatedAt}")
+                    append(comment.user.avatar(contact, 30)).appendLine(comment.user?.nameOrLogin)
+                    appendLine(comment.reactions?.render())
+                    append(comment.text)
+                }
+            }
+        }
+        Format.FORWARD -> buildForwardMessage(contact) {
             displayStrategy = object : ForwardMessage.DisplayStrategy {
                 override fun generateTitle(forward: RawForwardMessage): String = title
                 override fun generatePreview(forward: RawForwardMessage): List<String> = listOf(
-                    "$notice with issue by ${user.login}",
-                    "CREATED_AT: $createdAt ",
-                    "UPDATED_AT: $updatedAt ",
-                    "STATE: $state "
+                    "$notice with #${number} pull by $ownerNameOrLogin",
+                    "$state, $comments comments, $commits commits, $changedFiles files",
+                    "update at $updatedAt, $mergeableState",
+                    autoMerge ?: activeLockReason ?: labels.joinToString { it.name }
                 )
+
+                override fun generateSummary(forward: RawForwardMessage): String {
+                    return autoMerge ?: activeLockReason ?: labels.joinToString { it.name }
+                }
             }
-            contact.bot named (owner.name ?: owner.login) at createdAt.toEpochSecond().toInt() says buildMessageChain {
-                appendLine("URL: $htmlUrl ")
-                if (labels.isNotEmpty()) appendLine("LABELS: ${labels.joinToString { it.name }} ")
-                if (reactions != null) appendLine(reactions.render())
-                if (body != null) appendLine(body)
+            contact.bot named association.name at createdAt says buildMessageChain {
+                append(user.avatar(contact, 30)).appendLine(user?.nameOrLogin)
+                appendLine(htmlUrl)
+                appendLine(labels.joinToString { it.description ?: it.name })
+                appendLine(reactions?.render())
+                append(body)
+            }
+            contact.bot named "status" at createdAt says buildMessageChain {
+                if (mergedBy != null) {
+                    append(mergedBy.avatar(contact, 30)).appendLine("merged at $closedAt by ${mergedBy.nameOrLogin}")
+                } else if (closedBy != null) {
+                    append(closedBy.avatar(contact, 30)).appendLine("closed at $closedAt by ${closedBy.nameOrLogin}")
+                }
+                if (assignees.isNotEmpty()) {
+                    appendLine("assigned to ")
+                    assignees.forEach { assignee ->
+                        append(assignee.avatar(contact, 30)).append(assignee.nameOrLogin).append(" ")
+                    }
+                    appendLine()
+                }
+                if (requestedReviewers.isNotEmpty()) {
+                    appendLine("review by ")
+                    requestedReviewers.forEach { reviewer ->
+                        append(reviewer.avatar(contact, 30)).append(reviewer.nameOrLogin).append(" ")
+                    }
+                    appendLine()
+                }
+                if (milestone != null) {
+                    appendLine("milestone with ${milestone.title}")
+                }
             }
             if (comments > 0) {
                 val (owner, repo) = FULL_REGEX.find(Url(htmlUrl).encodedPath)!!.destructured
-                val per = 30
-                val comments = github.repo(owner = owner, repo = repo).issues
-                    .comments(index = number, page = ((comments - 1) / per) + 1, per = per)
+                val comments = github.repo(owner = owner, repo = repo).pulls
+                    .comments(number = number) {
+                        sort = ElementSort.created
+                        direction = Direction.asc
+                    }
 
                 for (comment in comments) {
-                    contact.bot named (comment.owner.name ?: comment.owner.login) at
-                        comment.createdAt.toEpochSecond().toInt() says buildMessageChain {
-                        if (comment.reactions != null) appendLine(comment.reactions.render())
-                        if (body != null) appendLine(comment.body)
+                    contact.bot named comment.association.name at comment.createdAt says buildMessageChain {
+                        append(comment.user.avatar(contact, 30)).appendLine(comment.user?.nameOrLogin)
+                        appendLine(comment.reactions?.render())
+                        append(comment.body)
                     }
                 }
             }
@@ -365,12 +560,11 @@ public suspend fun Pull.toMessage(contact: Contact, type: MessageType, notice: S
     }
 }
 
-public suspend fun Release.toMessage(contact: Contact, type: MessageType, notice: String): Message {
-    val image = author.avatar().uploadAsImage(contact)
-    return when (type) {
-        MessageType.DEFAULT -> buildMessageChain {
-            appendLine(image)
-            appendLine("$notice with release by ${author.login} ")
+public suspend fun Release.toMessage(contact: Contact, format: Format, notice: String): Message {
+    return when (format) {
+        Format.OLD -> buildMessageChain {
+            appendLine(author.avatar(contact, 50))
+            appendLine("$notice with release by $ownerNameOrLogin ")
             appendLine("CREATED_AT: $createdAt ")
             appendLine("PUBLISHED_AT: $publishedAt ")
             appendLine("URL: $htmlUrl ")
@@ -378,49 +572,46 @@ public suspend fun Release.toMessage(contact: Contact, type: MessageType, notice
             if (reactions != null) appendLine(reactions.render())
             if (body != null && body.length < 50) appendLine(body)
         }
-        MessageType.SHORT -> TODO()
-        MessageType.FORWARD -> TODO()
+        Format.TEXT -> TODO("Release TEXT")
+        Format.FORWARD -> TODO("Release FORWARD")
     }
 }
 
-public suspend fun Commit.toMessage(contact: Contact, type: MessageType, notice: String): Message {
-    val image = author?.avatar()?.uploadAsImage(contact)
+public suspend fun Commit.toMessage(contact: Contact, type: Format, notice: String): Message {
     return when (type) {
-        MessageType.DEFAULT -> buildMessageChain {
-            if (image != null) appendLine(image)
-            appendLine("$notice with commit by ${author?.login ?: detail.author.email} ")
+        Format.OLD -> buildMessageChain {
+            appendLine(author.avatar(contact, 50))
+            appendLine("$notice with commit by $ownerNameOrLogin ")
             appendLine("URL: $htmlUrl ")
             appendLine("CREATED_AT: $createdAt ")
             appendLine(detail.message)
         }
-        MessageType.SHORT -> TODO()
-        MessageType.FORWARD -> TODO()
+        Format.TEXT -> TODO("Commit TEXT")
+        Format.FORWARD -> TODO("Commit FORWARD")
     }
 }
 
-public suspend fun Repo.toMessage(contact: Contact, type: MessageType, notice: String): Message {
-    val image = owner.avatar().uploadAsImage(contact)
+public suspend fun Repo.toMessage(contact: Contact, type: Format, notice: String): Message {
     return when (type) {
-        MessageType.DEFAULT -> buildMessageChain {
-            appendLine(image)
-            appendLine("$notice with repo by ${owner.login} ")
+        Format.OLD -> buildMessageChain {
+            appendLine(owner.avatar(contact, 50))
+            appendLine("$notice with repo by $ownerNameOrLogin ")
             appendLine("URL: $htmlUrl ")
             appendLine("CREATED_AT: $createdAt ")
             appendLine("STARGAZERS_COUNT: $stargazersCount")
             appendLine("LANGUAGE: $language ")
             appendLine("DESCRIPTION: $description ")
         }
-        MessageType.SHORT -> TODO()
-        MessageType.FORWARD -> TODO()
+        Format.TEXT -> TODO("Repo TEXT")
+        Format.FORWARD -> TODO("Repo FORWARD")
     }
 }
 
-public suspend fun Milestone.toMessage(contact: Contact, type: MessageType, notice: String): Message {
-    val image = creator.avatar().uploadAsImage(contact)
+public suspend fun Milestone.toMessage(contact: Contact, type: Format, notice: String): Message {
     return when (type) {
-        MessageType.DEFAULT -> buildMessageChain {
-            appendLine(image)
-            appendLine("$notice with milestone by ${creator.login} ")
+        Format.OLD -> buildMessageChain {
+            appendLine(creator.avatar(contact, 50))
+            appendLine("$notice with milestone by $ownerNameOrLogin ")
             appendLine("URL: $htmlUrl ")
             appendLine("CREATED_AT: $createdAt ")
             appendLine("CREATED_AT: $updatedAt ")
@@ -428,8 +619,8 @@ public suspend fun Milestone.toMessage(contact: Contact, type: MessageType, noti
             appendLine("STATE: $state ")
             appendLine("DESCRIPTION: $description ")
         }
-        MessageType.SHORT -> TODO()
-        MessageType.FORWARD -> TODO()
+        Format.TEXT -> TODO("Milestone TEXT")
+        Format.FORWARD -> TODO("Milestone FORWARD")
     }
 }
 
