@@ -35,7 +35,7 @@ public sealed interface WebPage {
 
 public sealed interface Content {
     public val body: String?
-    public val text: String
-    public val html: String
+    public val text: String?
+    public val html: String?
     public val reactions: Reactions?
 }

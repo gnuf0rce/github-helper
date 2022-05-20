@@ -140,7 +140,7 @@ public data class Repo(
     @SerialName("open_issues_count")
     val openIssuesCount: Int,
     @SerialName("owner")
-    override val owner: Owner,
+    override val owner: Owner?,
     @SerialName("permissions")
     val permissions: Map<String, Boolean> = emptyMap(),
     @SerialName("private")
@@ -194,7 +194,7 @@ public data class Repo(
     @SerialName("watchers_count")
     val watchersCount: Int,
     @SerialName("organization")
-    val organization: Organization? = null,
+    val organization: Organization? = null
 ) : Entry, LifeCycle, WebPage, Owner.Product {
 
     @Deprecated("Repo No Close", ReplaceWith("null"))

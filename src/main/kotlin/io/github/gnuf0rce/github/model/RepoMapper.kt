@@ -71,7 +71,7 @@ public open class RepoMapper(parent: Url, override val github: GitHubClient) :
 
     public open val milestones: MilestonesMapper by lazy { MilestonesMapper(parent = base, github = github) }
 
-    public open suspend fun commits(page: Int, per: Int = 30): List<Commit> =
+    public open suspend fun commits(page: Int = 1, per: Int = 30): List<Commit> =
         page(page = page, per = per, path = "commits")
 
     protected open val commits: MutableMap<String, CommitMapper> = WeakHashMap()

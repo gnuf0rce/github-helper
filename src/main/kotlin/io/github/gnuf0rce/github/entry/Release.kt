@@ -22,7 +22,7 @@ public data class Release(
     @SerialName("assets_url")
     val assetsUrl: String,
     @SerialName("author")
-    val author: User,
+    val author: User?,
     @SerialName("body")
     override val body: String?,
     @SerialName("body_text")
@@ -67,7 +67,7 @@ public data class Release(
     val zipballUrl: String
 ) : Entry, LifeCycle, WebPage, Content, Owner.Product {
 
-    override val owner: User
+    override val owner: User?
         get() = author
 
     /**

@@ -10,13 +10,10 @@
 
 package io.github.gnuf0rce.github.entry
 
-import kotlinx.serialization.*
 
-@Serializable
-public data class IssueBody(
-    var title: String? = null,
-    var body: String? = null,
-    var milestone: String? = null,
-    var labels: List<String>? = null,
-    var assignees: List<String>? = null
-)
+public sealed interface Event : Entry, LifeCycle, Owner.Product {
+    public val actor: User?
+
+    override val owner: Owner?
+        get() = actor
+}

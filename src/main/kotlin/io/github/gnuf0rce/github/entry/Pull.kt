@@ -25,7 +25,7 @@ public data class Pull(
     @SerialName("assignees")
     override val assignees: List<User> = emptyList(),
     @SerialName("author_association")
-    override val authorAssociation: Association,
+    override val association: Association,
     @SerialName("auto_merge")
     val autoMerge: String?,
     @SerialName("base")
@@ -33,9 +33,9 @@ public data class Pull(
     @SerialName("body")
     override val body: String?,
     @SerialName("body_text")
-    override val text: String,
+    override val text: String?,
     @SerialName("body_html")
-    override val html: String,
+    override val html: String?,
     @SerialName("changed_files")
     val changedFiles: Int = 0,
     @Contextual
@@ -83,7 +83,7 @@ public data class Pull(
     @SerialName("merged")
     val merged: Boolean = false,
     @SerialName("merged_by")
-    val mergedBy: User? = null,
+    override val mergedBy: User? = null,
     @SerialName("merge_commit_sha")
     val mergeCommitSha: String,
     @Contextual
@@ -123,12 +123,12 @@ public data class Pull(
     @SerialName("url")
     override val url: String,
     @SerialName("user")
-    override val user: User,
+    override val user: User?,
     @SerialName("repository")
     override val repository: Repo? = null,
     @SerialName("performed_via_github_app")
-    val performedViaGithubApp: GithubAppInfo? = null,
-) : Entry, LifeCycle, WebPage, ControlRecord {
+    val performedViaGithubApp: GithubAppInfo? = null
+) : Entry, ControlRecord {
 
     @Serializable
     public data class About(
@@ -141,10 +141,10 @@ public data class Pull(
         @SerialName("sha")
         val sha: String,
         @SerialName("user")
-        val user: Owner
+        val user: Owner?
     ) : Owner.Product {
 
-        override val owner: Owner
+        override val owner: Owner?
             get() = user
     }
 

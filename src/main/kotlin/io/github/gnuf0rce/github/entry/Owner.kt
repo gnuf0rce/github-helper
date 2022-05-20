@@ -22,6 +22,7 @@ public sealed class Owner : Entry, LifeCycle, WebPage {
     public abstract val login: String
     public abstract val name: String?
     public abstract val type: String
+    public open val nameOrLogin: String get() = name ?: login
 
     @Deprecated("Owner No Merge", ReplaceWith("null"))
     override val mergedAt: OffsetDateTime?
@@ -32,6 +33,7 @@ public sealed class Owner : Entry, LifeCycle, WebPage {
         get() = null
 
     public sealed interface Product {
-        public val owner: Owner
+        public val owner: Owner?
+        public val ownerNameOrLogin: String get() = owner?.name ?: owner?.login ?: "null"
     }
 }

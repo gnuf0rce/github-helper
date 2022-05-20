@@ -19,14 +19,15 @@ import kotlinx.serialization.*
 public sealed interface ControlRecord : Entry, LifeCycle, WebPage, Content, Owner.Product {
     override val htmlUrl: String
     public val title: String
-    public val user: User
+    public val user: User?
     public val assignee: User?
     public val assignees: List<User>
     public val closedBy: User?
+    public val mergedBy: User?
     public val state: State
     public val number: Int
     public val labels: List<Label>
-    public val authorAssociation: Association
+    public val association: Association
     public val comments: Int
     public val commentsUrl: String
     public val milestone: Milestone?
@@ -34,10 +35,10 @@ public sealed interface ControlRecord : Entry, LifeCycle, WebPage, Content, Owne
     public val locked: Boolean
     public val repository: Repo?
 
-    override val owner: User
+    override val owner: User?
         get() = user
 
-    // XXX: 可能是字符串
+    // TODO: 可能是字符串
     @Serializable
     public data class Label(
         @SerialName("color")

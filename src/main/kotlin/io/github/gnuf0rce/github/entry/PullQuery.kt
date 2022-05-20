@@ -13,21 +13,19 @@ package io.github.gnuf0rce.github.entry
 import io.github.gnuf0rce.github.*
 import kotlinx.serialization.*
 import kotlinx.serialization.json.*
-import java.time.*
 
 @Serializable
-public data class IssueQuery(
-    @SerialName("filter")
-    var filter: IssueFilter = IssueFilter.assigned,
+public data class PullQuery(
     @SerialName("state")
     var state: StateFilter = StateFilter.open,
+    @SerialName("head")
+    var head: String = "",
+    @SerialName("base")
+    var base: String = "",
     @SerialName("sort")
     var sort: ElementSort = ElementSort.created,
     @SerialName("direction")
-    var direction: Direction = Direction.desc,
-    @Contextual
-    @SerialName("since")
-    var since: OffsetDateTime? = null
+    var direction: Direction = Direction.desc
 ) : Query {
     override fun toJsonObject(): JsonObject {
         return GitHubJson.encodeToJsonElement(serializer(), this) as JsonObject

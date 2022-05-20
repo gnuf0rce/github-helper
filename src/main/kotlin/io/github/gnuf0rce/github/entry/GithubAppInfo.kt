@@ -16,13 +16,13 @@ import java.time.*
 @Serializable
 public data class GithubAppInfo(
     @SerialName("id")
-    val id: Int,
+    val id: Long,
     @SerialName("slug")
     val slug: String? = null,
     @SerialName("node_id")
     override val nodeId: String,
     @SerialName("owner")
-    override val owner: User,
+    override val owner: User?,
     @SerialName("name")
     val name: String,
     @SerialName("description")

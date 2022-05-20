@@ -14,23 +14,38 @@ import io.github.gnuf0rce.github.*
 import io.github.gnuf0rce.github.entry.*
 import io.ktor.http.*
 
+/**
+ * [Commits](https://docs.github.com/en/rest/commits)
+ */
 public open class CommitMapper(parent: Url, sha: String, override val github: GitHubClient) :
     GitHubMapper(parent = parent, path = "commits/$sha") {
 
-    public open suspend fun load(): Commit = get()
+    // region Commits
 
+    /**
+     * [get-a-commit](https://docs.github.com/en/rest/commits/commits#get-a-commit)
+     */
+    public open suspend fun get(): Commit = get(path = "")
+
+    /**
+     * [list-branches-for-head-commit](https://docs.github.com/en/rest/commits/commits#list-branches-for-head-commit)
+     */
+    public open suspend fun branches(): List<Temp> = get(path = "branches-where-head")
+
+    /**
+     * [list-pull-requests-associated-with-a-commit](https://docs.github.com/en/rest/commits/commits#list-pull-requests-associated-with-a-commit)
+     */
+    public open suspend fun pulls(): List<Temp> = get(path = "pulls")
+
+    // endregion
+
+    // region Commit comments
+
+    /**
+     * [list-commit-comments](https://docs.github.com/en/rest/commits/comments#list-commit-comments)
+     */
     public open suspend fun comments(page: Int, per: Int = 30): List<Temp> =
         page(page = page, per = per, path = "comments")
 
-    public open suspend fun comment(context: Temp): Temp = post(context = context, path = "comments")
-
-    public open suspend fun heads(): List<Temp> = get(path = "branches-where-head")
-
-    public open suspend fun pulls(): List<Temp> = get(path = "pulls")
-
-    public open suspend fun ref(): Temp = get(path = "ref")
-
-    public open suspend fun compare(base: String, head: String): Temp = get(path = "compare/${base}...${head}")
-
-    public open suspend fun community(): Temp = get(path = "community/profile")
+    // endregion
 }

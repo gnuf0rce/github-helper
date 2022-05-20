@@ -15,15 +15,16 @@ import io.github.gnuf0rce.github.entry.*
 import io.ktor.http.*
 
 /**
- * 1. [https://api.github.com/issues]
- * 2. [https://api.github.com/user]
- * 3. [https://api.github.com/rate_limit]
+ * [REST API](https://docs.github.com/en/rest)
  */
 public open class CurrentMapper(parent: Url, override val github: GitHubClient) :
     GitHubMapper(parent = parent, path = "") {
 
-    public suspend fun issues(page: Int, per: Int = 30, context: Temp? = null): List<Issue> =
-        page(page = page, per = per, context = context, path = "issues")
+    /**
+     * [list-issues-assigned-to-the-authenticated-user](https://docs.github.com/en/rest/issues/issues#list-issues-assigned-to-the-authenticated-user)
+     */
+    public suspend fun issues(page: Int = 1, per: Int = 30, block: IssueQuery.() -> Unit = {}): List<Issue> =
+        page(page = page, per = per, context = IssueQuery().apply(block).toJsonObject(), path = "issues")
 
     public suspend fun user(): User = get(path = "user")
 

@@ -15,17 +15,32 @@ import io.github.gnuf0rce.github.entry.*
 import io.ktor.http.*
 
 /**
- * 1. [https://api.github.com/repos/{owner}/{repo}/releases]
+ * [Releases](https://docs.github.com/en/rest/releases)
  */
 public open class ReleasesMapper(parent: Url, override val github: GitHubClient) :
     GitHubMapper(parent = parent, path = "releases") {
 
-    public open suspend fun list(page: Int, per: Int = 30, context: Temp? = null): List<Release> =
-        page(page = page, per = per, context = context)
+    // region Releases
 
+    /**
+     * [list-releases](https://docs.github.com/en/rest/releases/releases#list-releases)
+     */
+    public open suspend fun list(page: Int = 1, per: Int = 30): List<Release> = page(page = page, per = per)
+
+    /**
+     * [get-the-latest-release](https://docs.github.com/en/rest/releases/releases#get-the-latest-release)
+     */
     public open suspend fun latest(): Release = get(path = "latest")
 
-    public open suspend fun new(context: Temp): Release = post(context = context)
+    /**
+     * [get-a-release-by-tag-name](https://docs.github.com/en/rest/releases/releases#get-a-release-by-tag-name)
+     */
+    public open suspend fun get(tag: String): Release = get(path = "tag/$tag")
 
+    /**
+     * [get-a-release](https://docs.github.com/en/rest/releases/releases#get-a-release)
+     */
     public open suspend fun get(id: Int): Release = get(path = "$id")
+
+    // endregion
 }

@@ -13,24 +13,54 @@ package io.github.gnuf0rce.github.model
 import io.github.gnuf0rce.github.*
 import io.github.gnuf0rce.github.entry.*
 import io.ktor.http.*
+import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.*
 
 /**
- * 1. [https://api.github.com/repos/{owner}/{repo}/pulls]
+ * [Pulls](https://docs.github.com/en/rest/pulls/pulls)
  */
 public open class PullsMapper(parent: Url, override val github: GitHubClient) :
     GitHubMapper(parent = parent, path = "pulls") {
 
-    public open suspend fun list(page: Int, per: Int = 30, context: Temp? = null): List<Pull> =
+    // region Pulls
+
+    /**
+     * [list-pull-requests](https://docs.github.com/en/rest/pulls/pulls#list-pull-requests)
+     */
+    public open suspend fun list(page: Int = 1, per: Int = 30, context: Temp? = null): List<Pull> =
         page(page = page, per = per, context = context)
 
-    public open suspend fun new(context: Temp): Pull = post(context = context)
+    /**
+     * [create-a-pull-request](https://docs.github.com/en/rest/pulls/pulls#create-a-pull-request)
+     */
+    public open suspend fun create(context: Temp): Pull = post(context = context)
 
-    public open suspend fun get(index: Int): Pull = get(path = "$index")
+    /**
+     * [get-a-pull-request](https://docs.github.com/en/rest/pulls/pulls#get-a-pull-request)
+     */
+    public open suspend fun get(number: Int): Pull = get(path = "$number")
 
-    public open suspend fun comments(index: Int, page: Int, per: Int = 30, block: CommentQuery.() -> Unit = {})
+    // endregion
+
+    // region Review comments
+
+    /**
+     * [get-a-pull-request](https://docs.github.com/en/rest/pulls/pulls#get-a-pull-request)
+     */
+    public open suspend fun comments(number: Int, page: Int = 1, per: Int = 30, block: CommentQuery.() -> Unit = {})
         : List<PullRequestReviewComment> =
-        page(page = page, per = per, context = CommentQuery().apply(block).toJsonObject(), path = "$index/comments")
+        page(page = page, per = per, context = CommentQuery().apply(block).toJsonObject(), path = "$number/comments")
 
-    public open suspend fun comment(index: Int, block: CommentQuery.() -> Unit = {}): PullRequestReviewComment =
-        post(context = CommentQuery().apply(block).toJsonObject(), path = "$index/comments")
+    /**
+     * [list-review-comments-in-a-repository](https://docs.github.com/en/rest/pulls/comments#list-review-comments-in-a-repository)
+     */
+    public open val comments: Flow<List<PullRequestReviewComment>> by lazy {
+        callbackFlow {
+            while (github.isActive) {
+                send(element = page(page = 1, per = 100, path = "comments"))
+            }
+        }
+    }
+
+    // endregion
 }

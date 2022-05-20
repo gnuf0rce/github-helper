@@ -18,18 +18,20 @@ import java.time.*
 public data class Issue(
     @SerialName("active_lock_reason")
     val activeLockReason: String?,
+    @SerialName("state_reason")
+    val stateReason: String?,
     @SerialName("assignee")
     override val assignee: User? = null,
     @SerialName("assignees")
     override val assignees: List<User> = emptyList(),
     @SerialName("author_association")
-    override val authorAssociation: Association,
+    override val association: Association,
     @SerialName("body")
     override val body: String?,
     @SerialName("body_text")
-    override val text: String,
+    override val text: String?,
     @SerialName("body_html")
-    override val html: String,
+    override val html: String?,
     @Contextual
     @SerialName("closed_at")
     override val closedAt: OffsetDateTime?,
@@ -83,12 +85,12 @@ public data class Issue(
     @SerialName("url")
     override val url: String,
     @SerialName("user")
-    override val user: User,
+    override val user: User?,
     @SerialName("repository")
     override val repository: Repo? = null,
     @SerialName("performed_via_github_app")
-    val performedViaGithubApp: GithubAppInfo? = null,
-) : Entry, LifeCycle, WebPage, ControlRecord {
+    val performedViaGithubApp: GithubAppInfo? = null
+) : Entry, ControlRecord {
 
     @Serializable
     public data class PullRequest(
@@ -104,4 +106,7 @@ public data class Issue(
         @SerialName("url")
         val url: String,
     ) : WebPage
+
+    override val mergedBy: User?
+        get() = closedBy
 }

@@ -85,8 +85,8 @@ internal val CommitReplier: MessageReplier = replier@{ result ->
     if (hasReplierPermission().not()) return@replier null
     try {
         val (owner, repo, sha) = result.destructured
-        val entry = github.repo(owner, repo).commit(sha).load()
-        entry.toMessage(subject, reply, REPLIER_NOTICE)
+        val entry = github.repo(owner, repo).commit(sha).get()
+        entry.toMessage(subject, REPLIER_FORMAT, "$owner/$repo")
     } catch (cause: Throwable) {
         logger.warning({ "构建Repo(${result.value})信息失败" }, cause)
         cause.message
@@ -139,15 +139,8 @@ internal val ReleaseReplier: MessageReplier = replier@{ result ->
     if (hasReplierPermission().not()) return@replier null
     try {
         val (owner, repo, name) = result.destructured
-        var page = 1
-        val entry: Release
-        while (true) {
-            val list = github.repo(owner, repo).releases.list(page++)
-            if (list.isEmpty()) throw NotImplementedError("no release $name with ${owner}/${repo}")
-            entry = list.find { it.tagName == name } ?: continue
-            break
-        }
-        entry.toMessage(subject, reply, REPLIER_NOTICE)
+        val entry: Release = github.repo(owner, repo).releases.get(tag = name)
+        entry.toMessage(subject, REPLIER_FORMAT, "$owner/$repo")
     } catch (cause: Throwable) {
         logger.warning({ "构建Release(${result.value})信息失败" }, cause)
         cause.message

@@ -16,7 +16,7 @@ import java.time.*
 @Serializable
 public data class PullRequestReviewComment(
     @SerialName("author_association")
-    override val authorAssociation: AuthorAssociation,
+    override val association: AuthorAssociation,
     @SerialName("body")
     override val body: String,
     @SerialName("body_text")
@@ -29,7 +29,7 @@ public data class PullRequestReviewComment(
     @SerialName("html_url")
     override val htmlUrl: String,
     @SerialName("id")
-    val id: Int,
+    val id: Long,
     @SerialName("node_id")
     override val nodeId: String,
     @Contextual
@@ -38,7 +38,7 @@ public data class PullRequestReviewComment(
     @SerialName("url")
     override val url: String,
     @SerialName("user")
-    override val user: User,
+    override val user: User?,
     @SerialName("reactions")
     override val reactions: Reactions? = null,
     @SerialName("pull_request_review_id")
@@ -73,7 +73,7 @@ public data class PullRequestReviewComment(
     val originalLine: Int?,
     @SerialName("side")
     val side: Side
-) : Entry, LifeCycle, WebPage, Content, Owner.Product, Comment {
+) : Entry, Comment {
 
     @Deprecated("IssueComment No Close", ReplaceWith("null"))
     override val closedAt: OffsetDateTime?

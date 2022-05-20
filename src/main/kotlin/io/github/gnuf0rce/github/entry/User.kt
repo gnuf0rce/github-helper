@@ -71,5 +71,5 @@ public data class User(
     override val createdAt: OffsetDateTime = OffsetDateTime.MIN,
     @Contextual
     @SerialName("updated_at")
-    override val updatedAt: OffsetDateTime = OffsetDateTime.MIN,
+    override val updatedAt: OffsetDateTime = OffsetDateTime.MIN
 ) : Owner()

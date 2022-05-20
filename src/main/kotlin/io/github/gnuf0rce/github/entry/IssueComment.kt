@@ -17,7 +17,7 @@ import java.time.*
 @SerialName("Comment")
 public data class IssueComment(
     @SerialName("author_association")
-    override val authorAssociation: AuthorAssociation,
+    override val association: AuthorAssociation,
     @SerialName("body")
     override val body: String,
     @SerialName("body_text")
@@ -30,7 +30,7 @@ public data class IssueComment(
     @SerialName("html_url")
     override val htmlUrl: String,
     @SerialName("id")
-    val id: Int,
+    val id: Long,
     @SerialName("issue_url")
     val issueUrl: String,
     @SerialName("node_id")
@@ -41,12 +41,12 @@ public data class IssueComment(
     @SerialName("url")
     override val url: String,
     @SerialName("user")
-    override val user: User,
+    override val user: User?,
     @SerialName("reactions")
     override val reactions: Reactions?,
     @SerialName("performed_via_github_app")
     val performedViaGithubApp: GithubAppInfo? = null
-) : Entry, LifeCycle, WebPage, Content, Owner.Product, Comment {
+) : Entry, Comment {
 
     @Deprecated("IssueComment No Close", ReplaceWith("null"))
     override val closedAt: OffsetDateTime?

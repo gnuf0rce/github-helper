@@ -18,7 +18,10 @@ import kotlinx.serialization.*
 public enum class Visibility { public, private }
 
 @Serializable
-public enum class State { open, closed, all }
+public enum class State { open, closed }
+
+@Serializable
+public enum class StateFilter { open, closed, all }
 
 @Serializable
 public enum class Direction { asc, desc }
@@ -30,10 +33,10 @@ public enum class Affiliation { outside, direct, all }
 public enum class Association { OWNER, MEMBER, CONTRIBUTOR, NONE }
 
 @Serializable
-public enum class IssueFilter { assigned, created, mentioned, subscribed, all, repos }
+public enum class IssueFilter { assigned, created, mentioned, subscribed, repos, all }
 
 @Serializable
-public enum class ElementSort { created, updated, comments }
+public enum class ElementSort { created, updated, comments, popularity, `long-running` }
 
 @Serializable
 public enum class MergeableState { unknown, dirty, blocked, clean }

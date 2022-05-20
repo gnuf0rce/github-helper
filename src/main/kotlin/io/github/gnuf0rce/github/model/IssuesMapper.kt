@@ -13,33 +13,93 @@ package io.github.gnuf0rce.github.model
 import io.github.gnuf0rce.github.*
 import io.github.gnuf0rce.github.entry.*
 import io.ktor.http.*
+import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.*
 
 /**
- * 1. [https://api.github.com/repos/{owner}/{repo}/issues]
+ * [Issues](https://docs.github.com/en/rest/issues)
  */
 public open class IssuesMapper(parent: Url, override val github: GitHubClient) :
     GitHubMapper(parent = parent, path = "issues") {
 
-    public open suspend fun list(page: Int, per: Int = 30, block: IssueQuery.() -> Unit = {}): List<Issue> =
+    // region Issues
+
+    /**
+     * [list-repository-issues](https://docs.github.com/en/rest/issues/issues#list-repository-issues)
+     */
+    public open suspend fun list(page: Int = 1, per: Int = 30, block: IssueQuery.() -> Unit = {}): List<Issue> =
         page(page = page, per = per, context = IssueQuery().apply(block).toJsonObject())
 
-    public open suspend fun new(title: String, block: IssueBody.() -> Unit = {}): Issue =
+    /**
+     * [create-an-issue](https://docs.github.com/en/rest/issues/issues#create-an-issue)
+     */
+    public open suspend fun create(title: String, block: IssueBody.() -> Unit = {}): Issue =
         post(context = IssueBody(title = title).apply(block))
 
-    public open suspend fun get(index: Int): Issue = get(path = "$index")
+    /**
+     * [get-an-issue](https://docs.github.com/en/rest/issues/issues#get-an-issue)
+     */
+    public open suspend fun get(number: Int): Issue = get(path = "$number")
 
-    public open suspend fun update(index: Int, block: IssueBody.() -> Unit): Issue =
-        patch(context = IssueBody().apply(block), path = "$index")
+    /**
+     * [update-an-issue](https://docs.github.com/en/rest/issues/issues#update-an-issue)
+     */
+    public open suspend fun update(number: Int, block: IssueBody.() -> Unit): Issue =
+        patch(context = IssueBody().apply(block), path = "$number")
 
-    public open suspend fun lock(index: Int, reason: String? = null): Unit =
-        put(context = mapOf("lock_reason" to reason), path = "$index/lock")
+    /**
+     * [lock-an-issue](https://docs.github.com/en/rest/issues/issues#lock-an-issue)
+     */
+    public open suspend fun lock(number: Int, reason: String? = null): Unit =
+        put(context = mapOf("lock_reason" to reason), path = "$number/lock")
 
-    public open suspend fun unlock(index: Int): Unit = delete(path = "$index/lock")
+    /**
+     * [unlock-an-issue](https://docs.github.com/en/rest/issues/issues#unlock-an-issue)
+     */
+    public open suspend fun unlock(number: Int): Unit = delete(path = "$number/lock")
 
-    public open suspend fun comments(index: Int, page: Int, per: Int = 30, block: CommentQuery.() -> Unit = {})
+    // endregion
+
+    // region Comments
+
+    /**
+     * [list-issue-comments-for-a-repository](https://docs.github.com/en/rest/issues/comments#list-issue-comments-for-a-repository)
+     */
+    public open val comments: Flow<List<IssueComment>> by lazy {
+        callbackFlow {
+            while (github.isActive) {
+                send(element = page(page = 1, per = 100, path = "comments"))
+            }
+        }
+    }
+
+    /**
+     * [list-issue-comments](https://docs.github.com/en/rest/issues/comments#list-issue-comments)
+     */
+    public open suspend fun comments(number: Int, page: Int = 1, per: Int = 30, block: CommentQuery.() -> Unit = {})
         : List<IssueComment> =
-        page(page = page, per = per, context = CommentQuery().apply(block).toJsonObject(), path = "$index/comments")
+        page(page = page, per = per, context = CommentQuery().apply(block).toJsonObject(), path = "$number/comments")
 
-    public open suspend fun comment(index: Int, block: CommentQuery.() -> Unit = {}): IssueComment =
-        post(context = CommentQuery().apply(block).toJsonObject(), path = "$index/comments")
+    // endregion
+
+    // region Events
+
+    /**
+     * [list-issue-events-for-a-repository](https://docs.github.com/en/rest/issues/events#list-issue-events-for-a-repository)
+     */
+    public open val events: Flow<List<IssueEvent>> by lazy {
+        callbackFlow {
+            while (github.isActive) {
+                send(element = page(page = 1, per = 100, path = "events"))
+            }
+        }
+    }
+
+    /**
+     * [list-issue-events](https://docs.github.com/en/rest/issues/events#list-issue-events)
+     */
+    public open suspend fun events(number: Int, page: Int = 1, per: Int = 30): List<IssueEvent> =
+        page(page = page, per = per, path = "$number/events")
+
+    // endregion
 }

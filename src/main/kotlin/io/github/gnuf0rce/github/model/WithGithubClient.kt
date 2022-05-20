@@ -11,6 +11,7 @@
 package io.github.gnuf0rce.github.model
 
 import io.github.gnuf0rce.github.*
+import io.github.gnuf0rce.github.entry.Query
 import io.ktor.client.request.*
 import io.ktor.http.*
 import kotlinx.serialization.json.*
@@ -104,8 +105,20 @@ internal inline fun <reified T> HttpRequestBuilder.context(context: T) {
                 is Parameters -> {
                     url.parameters.appendAll(context)
                 }
+                is JsonObject -> {
+                    for ((key, value) in context) {
+                        parameter(key, (value as? JsonPrimitive)?.content ?: value)
+                    }
+                }
+                is Query -> {
+                    for ((key, value) in context.toJsonObject()) {
+                        parameter(key, (value as? JsonPrimitive)?.content ?: value)
+                    }
+                }
                 is Map<*, *> -> {
-                    for ((key, value) in context) parameter(key.toString(), value)
+                    for ((key, value) in context) {
+                        parameter(key.toString(), value)
+                    }
                 }
                 else -> {
                     throw IllegalArgumentException("${T::class} can not used as parameters in ${url.buildString()}")

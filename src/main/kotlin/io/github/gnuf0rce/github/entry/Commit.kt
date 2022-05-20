@@ -43,8 +43,11 @@ public data class Commit(
     val files: List<File> = emptyList()
 ) : Entry, Record, LifeCycle, WebPage, Owner.Product {
 
-    override val owner: User
-        get() = author ?: committer ?: throw NoSuchElementException("No owner for the commit")
+    override val owner: User?
+        get() = author ?: committer
+
+    override val ownerNameOrLogin: String
+        get() = author?.name ?: author?.login ?: committer?.name ?: committer?.login ?: detail.author.email
 
     @Deprecated("Commit No Close", ReplaceWith("null"))
     override val closedAt: OffsetDateTime?
@@ -72,6 +75,7 @@ public data class Commit(
 
     @Serializable
     public data class Detail(
+        // XXX: 可能是 null
         @SerialName("author")
         val author: Author,
         @SerialName("comment_count")
