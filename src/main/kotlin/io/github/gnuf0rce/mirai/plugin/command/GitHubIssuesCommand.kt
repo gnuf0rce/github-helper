@@ -15,6 +15,7 @@ import io.github.gnuf0rce.mirai.plugin.*
 import io.github.gnuf0rce.mirai.plugin.data.*
 import net.mamoe.mirai.console.command.*
 import net.mamoe.mirai.contact.*
+import java.time.*
 
 public object GitHubIssuesCommand : CompositeCommand(
     owner = GitHubHelperPlugin,
@@ -26,7 +27,9 @@ public object GitHubIssuesCommand : CompositeCommand(
 
         override val regex: Regex? = null
 
-        override suspend fun GitHubTask.load(per: Int) = current.issues(page = 0, per = per)
+        override suspend fun GitHubTask.load(per: Int, since: OffsetDateTime) : List<Issue> {
+            return current.issues(per = per) { this.since = since }.filter { it.updatedAt > since }
+        }
     }
 
     @SubCommand

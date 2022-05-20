@@ -17,6 +17,7 @@ import io.github.gnuf0rce.mirai.plugin.data.*
 import kotlinx.coroutines.*
 import net.mamoe.mirai.message.data.*
 import net.mamoe.mirai.utils.*
+import java.time.*
 import java.util.*
 import kotlin.collections.*
 
@@ -85,15 +86,16 @@ public abstract class GitHubSubscriber<T>(private val name: String, parent: Coro
         }
     }
 
-    public suspend fun build(id: String, contact: Long): Message {
-        val records = GitHubTask(id).load(PER_PAGE)
+    public suspend fun build(id: String, contact: Long, format: Format = Format.TEXT): Message {
+        val since = OffsetDateTime.now().minusMinutes(10)
+        val records = GitHubTask(id).load(per = PER_PAGE, since = since)
         if (records.isEmpty()) return "内容为空".toPlainText()
         return buildForwardMessage(Contact(contact)) {
             for (record in records) {
                 add(
                     sender = context.bot,
                     time = record.updatedAt.toEpochSecond().toInt(),
-                    message = record.toMessage(context, reply, id)
+                    message = record.toMessage(context, format, id, since)
                 )
             }
             displayStrategy = object : ForwardMessage.DisplayStrategy {
@@ -102,12 +104,12 @@ public abstract class GitHubSubscriber<T>(private val name: String, parent: Coro
         }
     }
 
-    protected abstract suspend fun GitHubTask.load(per: Int): List<T>
+    protected abstract suspend fun GitHubTask.load(per: Int, since: OffsetDateTime): List<T>
 
     private suspend fun GitHubTask.sendMessage(record: T) {
         for (cid in contacts) {
             try {
-                Contact(cid).sendEntry(record, id)
+                Contact(cid).sendEntry(entry = record, notice = id, format = format, since = last)
             } catch (e: Throwable) {
                 logger.warning("发送信息失败(${name})", e)
             }
@@ -125,7 +127,7 @@ public abstract class GitHubSubscriber<T>(private val name: String, parent: Coro
         while (isActive) {
             val current = task(id) ?: break
             try {
-                val records = current.load(PER_PAGE).filter { it.updatedAt > current.last }
+                val records = current.load(per = PER_PAGE, since = current.last)
                 for (record in records) {
                     current.sendMessage(record)
                 }

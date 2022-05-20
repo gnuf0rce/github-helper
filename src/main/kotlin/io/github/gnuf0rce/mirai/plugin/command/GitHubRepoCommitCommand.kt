@@ -15,6 +15,7 @@ import io.github.gnuf0rce.mirai.plugin.*
 import io.github.gnuf0rce.mirai.plugin.data.*
 import net.mamoe.mirai.console.command.*
 import net.mamoe.mirai.contact.*
+import java.time.*
 
 public object GitHubRepoCommitCommand : CompositeCommand(
     owner = GitHubHelperPlugin,
@@ -24,7 +25,9 @@ public object GitHubRepoCommitCommand : CompositeCommand(
     private val subscriber = object : GitHubSubscriber<Commit>(primaryName, GitHubHelperPlugin) {
         override val tasks: MutableMap<String, GitHubTask> by GitHubRepoTaskData::commits
 
-        override suspend fun GitHubTask.load(per: Int) = repo.commits(page = 0, per = per)
+        override suspend fun GitHubTask.load(per: Int, since: OffsetDateTime): List<Commit> {
+            return repo.commits(per = per).filter { it.updatedAt > since }
+        }
     }
 
     @SubCommand

@@ -18,6 +18,7 @@ import org.openqa.selenium.remote.*
 import xyz.cssxsh.mirai.plugin.*
 import java.io.*
 import java.net.*
+import kotlin.coroutines.*
 
 internal const val LOGGER_PROPERTY = "io.github.gnuf0rce.mirai.plugin.logger"
 
@@ -64,6 +65,12 @@ internal val github by lazy {
             timeout = GitHubConfig.timeout * 1000
         }
 
+        override val coroutineContext: CoroutineContext = try {
+            GitHubHelperPlugin.childScopeContext(name = "github-client")
+        } catch (_: Throwable) {
+            EmptyCoroutineContext.childScopeContext(name = "github-client")
+        }
+
         override val ignore: (Throwable) -> Boolean = {
             when (it) {
                 is IOException -> {
@@ -95,8 +102,6 @@ internal inline fun <reified T> useRemoteWebDriver(block: (RemoteWebDriver) -> T
         driver.quit()
     }
 }
-
-internal val Url.filename get() = encodedPath.substringAfterLast('/')
 
 internal fun Url.toProxy(): Proxy {
     val type = when (protocol) {
