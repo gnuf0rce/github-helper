@@ -43,7 +43,7 @@ public data class Release(
     @SerialName("mentions_count")
     val mentionsCount: Int = 0,
     @SerialName("name")
-    val name: String,
+    val name: String?,
     @SerialName("node_id")
     override val nodeId: String,
     @SerialName("prerelease")
@@ -56,7 +56,7 @@ public data class Release(
     @SerialName("tag_name")
     val tagName: String,
     @SerialName("tarball_url")
-    val tarballUrl: String,
+    val tarballUrl: String?,
     @SerialName("target_commitish")
     val targetCommitish: String,
     @SerialName("upload_url")
@@ -64,7 +64,7 @@ public data class Release(
     @SerialName("url")
     override val url: String,
     @SerialName("zipball_url")
-    val zipballUrl: String
+    val zipballUrl: String?
 ) : Entry, LifeCycle, WebPage, Content, Owner.Product {
 
     override val owner: User?
@@ -76,7 +76,7 @@ public data class Release(
     override val closedAt: OffsetDateTime?
         get() = publishedAt
 
-    @Deprecated("Release No Merge", ReplaceWith("null"))
+    @Deprecated("Release No Merged", ReplaceWith("null"))
     override val mergedAt: OffsetDateTime?
         get() = null
 
@@ -85,7 +85,7 @@ public data class Release(
      * @see createdAt
      */
     override val updatedAt: OffsetDateTime
-        get() = assets.maxOfOrNull { it.updatedAt } ?: createdAt
+        get() = assets.maxOfOrNull { it.updatedAt } ?: publishedAt ?: createdAt
 
     @Serializable
     public data class Asset(
@@ -108,24 +108,34 @@ public data class Release(
         @SerialName("node_id")
         override val nodeId: String,
         @SerialName("size")
-        val size: Int,
+        val size: Long,
         @SerialName("state")
         val state: ReleaseState,
         @Contextual
         @SerialName("updated_at")
         override val updatedAt: OffsetDateTime,
         @SerialName("uploader")
-        val uploader: User,
+        val uploader: User?,
+        @Contextual
         @SerialName("url")
         override val url: String
-    ) : Entry, LifeCycle {
+    ) : Entry, LifeCycle, Owner.Product {
 
-        @Deprecated("Asset No Close", ReplaceWith("null"))
+        override val owner: User?
+            get() = uploader
+
+        @Deprecated("Asset No Closed", ReplaceWith("null"))
         override val closedAt: OffsetDateTime?
             get() = null
 
         @Deprecated("Asset No Merged", ReplaceWith("null"))
         override val mergedAt: OffsetDateTime?
             get() = null
+    }
+
+    public val status: String = when {
+        draft -> "draft"
+        prerelease -> "prerelease"
+        else -> "complete"
     }
 }

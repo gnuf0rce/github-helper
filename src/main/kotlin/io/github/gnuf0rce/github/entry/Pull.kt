@@ -27,7 +27,7 @@ public data class Pull(
     @SerialName("author_association")
     override val association: Association,
     @SerialName("auto_merge")
-    val autoMerge: String?,
+    val autoMerge: AutoMerge?,
     @SerialName("base")
     val base: About,
     @SerialName("body")
@@ -166,5 +166,13 @@ public data class Pull(
         val self: Link,
         @SerialName("statuses")
         val statuses: Link
+    )
+
+    @Serializable
+    public data class AutoMerge(
+        val enabledBy: User,
+        val mergeMethod: MergeMethod,
+        val commitTitle: String,
+        val commitMessage: String
     )
 }

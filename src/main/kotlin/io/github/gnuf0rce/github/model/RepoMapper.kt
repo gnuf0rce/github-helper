@@ -71,6 +71,9 @@ public open class RepoMapper(parent: Url, override val github: GitHubClient) :
 
     public open val milestones: MilestonesMapper by lazy { MilestonesMapper(parent = base, github = github) }
 
+    /**
+     * [list-commits](https://docs.github.com/en/rest/commits/commits#list-commits)
+     */
     public open suspend fun commits(page: Int = 1, per: Int = 30): List<Commit> =
         page(page = page, per = per, path = "commits")
 

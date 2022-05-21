@@ -20,9 +20,6 @@ public data class Commit(
     val author: User?,
     @SerialName("comments_url")
     val commentsUrl: String,
-    /**
-     * XXX: name
-     */
     @SerialName("commit")
     val detail: Detail,
     @SerialName("committer")
@@ -44,24 +41,24 @@ public data class Commit(
 ) : Entry, Record, LifeCycle, WebPage, Owner.Product {
 
     override val owner: User?
-        get() = author ?: committer
+        get() = author
 
     override val ownerNameOrLogin: String
-        get() = author?.name ?: author?.login ?: committer?.name ?: committer?.login ?: detail.author.email
+        get() = author?.nameOrLogin ?: detail.author?.email ?: "null"
 
-    @Deprecated("Commit No Close", ReplaceWith("null"))
+    @Deprecated("Commit No Closed", ReplaceWith("null"))
     override val closedAt: OffsetDateTime?
         get() = null
 
-    @Deprecated("Commit No Merge", ReplaceWith("null"))
+    @Deprecated("Commit No Merged", ReplaceWith("null"))
     override val mergedAt: OffsetDateTime?
         get() = null
 
     override val updatedAt: OffsetDateTime
-        get() = detail.committer.date
+        get() = detail.committer?.date ?: OffsetDateTime.MIN
 
     override val createdAt: OffsetDateTime
-        get() = detail.author.date
+        get() = detail.author?.date ?: OffsetDateTime.MIN
 
     @Serializable
     public data class Tree(
@@ -75,13 +72,12 @@ public data class Commit(
 
     @Serializable
     public data class Detail(
-        // XXX: 可能是 null
         @SerialName("author")
-        val author: Author,
+        val author: GitUser?,
         @SerialName("comment_count")
         val commentCount: Int,
         @SerialName("committer")
-        val committer: Author,
+        val committer: GitUser?,
         @SerialName("message")
         val message: String,
         @SerialName("tree")
@@ -93,22 +89,11 @@ public data class Commit(
     )
 
     @Serializable
-    public data class Author(
-        @Contextual
-        @SerialName("date")
-        val date: OffsetDateTime,
-        @SerialName("email")
-        val email: String,
-        @SerialName("name")
-        val name: String
-    )
-
-    @Serializable
     public data class Verification(
         @SerialName("payload")
         val payload: String?,
         @SerialName("reason")
-        val reason: VerificationReason,
+        val reason: String,
         @SerialName("signature")
         val signature: String?,
         @SerialName("verified")
@@ -152,6 +137,6 @@ public data class Commit(
     ) : Record {
 
         override val url: String
-            get() = contentsUrl
+            get() = rawUrl
     }
 }

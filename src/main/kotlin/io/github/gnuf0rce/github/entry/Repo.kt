@@ -197,7 +197,7 @@ public data class Repo(
     val organization: Organization? = null
 ) : Entry, LifeCycle, WebPage, Owner.Product {
 
-    @Deprecated("Repo No Close", ReplaceWith("null"))
+    @Deprecated("Repo No Closed", ReplaceWith("null"))
     override val closedAt: OffsetDateTime?
         get() = null
 

@@ -24,7 +24,7 @@ public sealed class Owner : Entry, LifeCycle, WebPage {
     public abstract val type: String
     public open val nameOrLogin: String get() = name ?: login
 
-    @Deprecated("Owner No Merge", ReplaceWith("null"))
+    @Deprecated("Owner No Merged", ReplaceWith("null"))
     override val mergedAt: OffsetDateTime?
         get() = null
 

@@ -48,11 +48,11 @@ public data class IssueComment(
     val performedViaGithubApp: GithubAppInfo? = null
 ) : Entry, Comment {
 
-    @Deprecated("IssueComment No Close", ReplaceWith("null"))
+    @Deprecated("IssueComment No Closed", ReplaceWith("null"))
     override val closedAt: OffsetDateTime?
         get() = null
 
-    @Deprecated("IssueComment No Merge", ReplaceWith("null"))
+    @Deprecated("IssueComment No Merged", ReplaceWith("null"))
     override val mergedAt: OffsetDateTime?
         get() = null
 }

@@ -42,7 +42,7 @@ public enum class ElementSort { created, updated, comments, popularity, `long-ru
 public enum class MergeableState { unknown, dirty, blocked, clean }
 
 @Serializable
-public enum class VerificationReason { valid, unsigned }
+public enum class MergeMethod { merge, squash, rebase }
 
 @Serializable
 public enum class Encoding { base64 }
@@ -57,7 +57,7 @@ public enum class RepoPermission { pull, push, admin }
 public enum class ReadmeType { file }
 
 @Serializable
-public enum class ReleaseState { uploaded }
+public enum class ReleaseState { uploaded, open }
 
 @Serializable
 public enum class AuthorAssociation { COLLABORATOR, CONTRIBUTOR, FIRST_TIMER, FIRST_TIME_CONTRIBUTOR, MANNEQUIN, MEMBER, NONE, OWNER }

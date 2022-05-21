@@ -11,23 +11,15 @@
 package io.github.gnuf0rce.github.entry
 
 import kotlinx.serialization.*
+import java.time.*
 
 @Serializable
-public data class ApiError(
-    @SerialName("documentation_url")
-    val documentationUrl: String? = "http",
-    @SerialName("message")
-    val message: String = "",
-    @SerialName("errors")
-    val errors: List<Detail> = emptyList()
-) {
-    @Serializable
-    public data class Detail(
-        @SerialName("resource")
-        val resource: String,
-        @SerialName("field")
-        val field: String,
-        @SerialName("code")
-        val code: String
-    )
-}
+public data class GitUser(
+    @Contextual
+    @SerialName("date")
+    val date: OffsetDateTime,
+    @SerialName("email")
+    val email: String,
+    @SerialName("name")
+    val name: String
+)

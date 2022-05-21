@@ -35,7 +35,7 @@ public open class ReleasesMapper(parent: Url, override val github: GitHubClient)
     /**
      * [get-a-release-by-tag-name](https://docs.github.com/en/rest/releases/releases#get-a-release-by-tag-name)
      */
-    public open suspend fun get(tag: String): Release = get(path = "tag/$tag")
+    public open suspend fun get(tag: String): Release = get(path = "tags/$tag")
 
     /**
      * [get-a-release](https://docs.github.com/en/rest/releases/releases#get-a-release)

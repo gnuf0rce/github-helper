@@ -57,11 +57,11 @@ public data class GithubAppInfo(
     override val url: String
         get() = externalUrl
 
-    @Deprecated("GithubAppInfo No Close", ReplaceWith("null"))
+    @Deprecated("GithubAppInfo No Closed", ReplaceWith("null"))
     override val closedAt: OffsetDateTime?
         get() = null
 
-    @Deprecated("GithubAppInfo No Merge", ReplaceWith("null"))
+    @Deprecated("GithubAppInfo No Merged", ReplaceWith("null"))
     override val mergedAt: OffsetDateTime?
         get() = null
 }

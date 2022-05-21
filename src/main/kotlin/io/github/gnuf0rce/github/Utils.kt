@@ -29,15 +29,15 @@ internal val GitHubJson = Json {
     isLenient = true
     allowStructuredMapKeys = true
     serializersModule = SerializersModule {
-        include(serializersModule)
         contextual(OffsetDateTimeSerializer)
         contextual(ContentTypeSerializer)
+        contextual(UrlSerializer)
     }
 }
 
-@Suppress("unused")
-internal val ContentType.Application.GitHubJson
-    get() = ContentType.parse("application/vnd.github.v3.full+json")
+internal val GitHubJsonContentType by lazy {
+    ContentType.parse("application/vnd.github.v3.full+json")
+}
 
 internal object OffsetDateTimeSerializer : KSerializer<OffsetDateTime> {
     override val descriptor: SerialDescriptor =
@@ -65,6 +65,19 @@ internal object ContentTypeSerializer : KSerializer<ContentType> {
     }
 
     override fun serialize(encoder: Encoder, value: ContentType) {
+        encoder.encodeString(value.toString())
+    }
+}
+
+internal object UrlSerializer : KSerializer<Url>  {
+    override val descriptor: SerialDescriptor =
+        PrimitiveSerialDescriptor(Url::class.qualifiedName!!, PrimitiveKind.STRING)
+
+    override fun deserialize(decoder: Decoder): Url {
+        return Url(decoder.decodeString())
+    }
+
+    override fun serialize(encoder: Encoder, value: Url) {
         encoder.encodeString(value.toString())
     }
 }
