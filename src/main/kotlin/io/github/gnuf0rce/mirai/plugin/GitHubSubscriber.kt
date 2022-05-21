@@ -18,7 +18,6 @@ import kotlinx.coroutines.*
 import net.mamoe.mirai.message.data.*
 import net.mamoe.mirai.utils.*
 import java.time.*
-import java.util.*
 import kotlin.collections.*
 
 public abstract class GitHubSubscriber<T>(private val name: String, parent: CoroutineScope) :
@@ -26,10 +25,9 @@ public abstract class GitHubSubscriber<T>(private val name: String, parent: Coro
     where T : LifeCycle, T : WebPage {
 
     public companion object : Sequence<GitHubSubscriber<*>> {
-        public val repos: MutableMap<String, GitHubRepo> = WeakHashMap()
         public const val PER_PAGE: Int = 30
 
-        public val GitHubTask.repo: GitHubRepo get() = repos.getOrPut(id) { github.repo(id) }
+        public val GitHubTask.repo: GitHubRepo get() = repo(id)
         public val current: GitHubCurrent by lazy { github.current() }
 
         private val instances: MutableList<GitHubSubscriber<*>> = ArrayList()

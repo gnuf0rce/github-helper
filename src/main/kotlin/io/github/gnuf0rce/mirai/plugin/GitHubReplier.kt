@@ -12,7 +12,6 @@
 
 package io.github.gnuf0rce.mirai.plugin
 
-import io.github.gnuf0rce.github.entry.*
 import io.github.gnuf0rce.github.*
 import io.ktor.client.request.*
 import io.ktor.http.*
@@ -37,8 +36,6 @@ internal val ReplierPermission: Permission by lazy {
 
 private fun MessageEvent.hasReplierPermission() = toCommandSender().hasPermission(ReplierPermission)
 
-private const val REPLIER_NOTICE = "replier"
-
 // TODO: REPLIER_FORMAT
 private val REPLIER_FORMAT = Format.FORWARD
 
@@ -54,7 +51,7 @@ internal val OwnerReplier: MessageReplier = replier@{ result ->
         val (owner) = result.destructured
         val entry = github.user(owner).load().takeIf { it.type == "User" }
             ?: github.organization(owner).load()
-        entry.toMessage(subject)
+        entry.toMessage(subject, REPLIER_FORMAT, "", OffsetDateTime.MIN)
     } catch (cause: Throwable) {
         logger.warning({ "构建Repo(${result.value})信息失败" }, cause)
         cause.message
@@ -71,8 +68,8 @@ internal val RepoReplier: MessageReplier = replier@{ result ->
     if (hasReplierPermission().not()) return@replier null
     try {
         val (owner, repo) = result.destructured
-        val entry = github.repo(owner, repo).load()
-        entry.toMessage(subject, REPLIER_FORMAT, REPLIER_NOTICE)
+        val entry = repo(owner, repo).load()
+        entry.toMessage(subject, REPLIER_FORMAT, "replier")
     } catch (cause: Throwable) {
         logger.warning({ "构建Repo(${result.value})信息失败" }, cause)
         cause.message
@@ -89,10 +86,10 @@ internal val CommitReplier: MessageReplier = replier@{ result ->
     if (hasReplierPermission().not()) return@replier null
     try {
         val (owner, repo, sha) = result.destructured
-        val entry = github.repo(owner, repo).commit(sha).get()
+        val entry = repo(owner, repo).commit(sha).get()
         entry.toMessage(subject, REPLIER_FORMAT, "$owner/$repo")
     } catch (cause: Throwable) {
-        logger.warning({ "构建Repo(${result.value})信息失败" }, cause)
+        logger.warning({ "构建Commit(${result.value})信息失败" }, cause)
         cause.message
     }
 }
@@ -107,10 +104,10 @@ internal val IssueReplier: MessageReplier = replier@{ result ->
     if (hasReplierPermission().not()) return@replier null
     try {
         val (owner, repo, number) = result.destructured
-        val entry = github.repo(owner, repo).issues.get(number.toInt())
+        val entry = repo(owner, repo).issues.get(number.toInt())
         entry.toMessage(subject, REPLIER_FORMAT, "$owner/$repo", OffsetDateTime.now().minusMinutes(10))
     } catch (cause: Throwable) {
-        logger.warning({ "构建Repo(${result.value})信息失败" }, cause)
+        logger.warning({ "构建Issue(${result.value})信息失败" }, cause)
         cause.message
     }
 }
@@ -125,7 +122,7 @@ internal val PullReplier: MessageReplier = replier@{ result ->
     if (hasReplierPermission().not()) return@replier null
     try {
         val (owner, repo, number) = result.destructured
-        val entry = github.repo(owner, repo).pulls.get(number.toInt())
+        val entry = repo(owner, repo).pulls.get(number.toInt())
         entry.toMessage(subject, REPLIER_FORMAT, "$owner/$repo", OffsetDateTime.now().minusMinutes(10))
     } catch (cause: Throwable) {
         logger.warning({ "构建Pull(${result.value})信息失败" }, cause)
@@ -136,14 +133,18 @@ internal val PullReplier: MessageReplier = replier@{ result ->
 /**
  * 1. [https://github.com/{owner}/{repo}/releases/tag/{name}]
  */
-internal val RELEASE_REGEX = """(?<=github\.com/)([\w-.]+)/([\w-.]+)/releases/tag/([^/#"]+)""".toRegex()
+internal val RELEASE_REGEX = """(?<=github\.com/)([\w-.]+)/([\w-.]+)/releases/(?:tag/)?([^/#"]+)""".toRegex()
 
 internal val ReleaseReplier: MessageReplier = replier@{ result ->
     logger.info { "${sender.render()} 匹配Release(${result.value})" }
     if (hasReplierPermission().not()) return@replier null
     try {
         val (owner, repo, name) = result.destructured
-        val entry: Release = github.repo(owner, repo).releases.get(tag = name)
+        val entry = if (name == "latest") {
+            repo(owner, repo).releases.latest()
+        } else {
+            repo(owner, repo).releases.get(tag = name)
+        }
         entry.toMessage(subject, REPLIER_FORMAT, "$owner/$repo")
     } catch (cause: Throwable) {
         logger.warning({ "构建Release(${result.value})信息失败" }, cause)
@@ -161,7 +162,7 @@ internal val MilestoneReplier: MessageReplier = replier@{ result ->
     if (hasReplierPermission().not()) return@replier null
     try {
         val (owner, repo, number) = result.destructured
-        val entry = github.repo(owner, repo).milestones.get(number.toInt())
+        val entry = repo(owner, repo).milestones.get(number.toInt())
         entry.toMessage(subject, REPLIER_FORMAT, "$owner/$repo")
     } catch (cause: Throwable) {
         logger.warning({ "构建Milestone(${result.value})信息失败" }, cause)

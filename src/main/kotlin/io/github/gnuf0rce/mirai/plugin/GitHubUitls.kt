@@ -18,6 +18,7 @@ import org.openqa.selenium.remote.*
 import xyz.cssxsh.mirai.plugin.*
 import java.io.*
 import java.net.*
+import java.util.*
 import kotlin.coroutines.*
 
 internal const val LOGGER_PROPERTY = "io.github.gnuf0rce.mirai.plugin.logger"
@@ -41,6 +42,10 @@ internal val ImageFolder by lazy {
     val path = System.getProperty(IMAGE_FOLDER_PROPERTY)
     (if (path.isNullOrBlank()) GitHubHelperPlugin.dataFolder else File(path)).resolve("image")
 }
+
+internal const val UserAvatarSize = 50
+
+internal const val TextMaxLength = 200
 
 /**
  * @see [GitHubClient]
@@ -72,6 +77,12 @@ internal val github by lazy {
         }
     }
 }
+
+internal val repos: MutableMap<String, GitHubRepo> = WeakHashMap()
+
+internal fun repo(full: String): GitHubRepo = repos.getOrPut(full) { github.repo(full) }
+
+internal fun repo(owner: String, repo: String): GitHubRepo = repos.getOrPut("$owner/repo") { github.repo(owner, repo) }
 
 internal val selenium: Boolean by lazy {
     try {

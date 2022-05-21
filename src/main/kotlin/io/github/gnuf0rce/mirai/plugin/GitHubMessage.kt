@@ -27,6 +27,7 @@ import net.mamoe.mirai.console.util.ContactUtils.getContactOrNull
 import net.mamoe.mirai.console.util.ContactUtils.render
 import net.mamoe.mirai.contact.Contact
 import net.mamoe.mirai.contact.FileSupported
+import net.mamoe.mirai.contact.file.*
 import net.mamoe.mirai.message.*
 import net.mamoe.mirai.message.data.*
 import net.mamoe.mirai.utils.ExternalResource.Companion.uploadAsImage
@@ -42,7 +43,7 @@ internal fun Contact(id: Long): Contact = Bot.instances.firstNotNullOf { it.getC
 @Serializable
 public enum class Format { OLD, TEXT, FORWARD }
 
-internal suspend fun Owner?.avatar(contact: Contact, size: Int, client: GitHubClient = github): Image {
+internal suspend fun Owner?.avatar(contact: Contact, size: Int = UserAvatarSize, client: GitHubClient = github): Image {
     val avatarUrl = this?.avatarUrl ?: "https://avatars.githubusercontent.com/u/0"
     val login = this?.login.orEmpty()
 
@@ -110,17 +111,6 @@ private val CONTRIB_REGEX = """(?<=contribs[^>]{0,1024}>[^\w]{0,1024})[^<\s]+"""
 
 private val OFFSET_REGEX = """(?<=dashoffset: )\d+\.?\d+""".toRegex()
 
-private fun Reactions.render(): String = buildString {
-    if (plus > 0) append("👍:$plus")
-    if (minus > 0) append("👎:$minus")
-    if (laugh > 0) append("😄:$laugh")
-    if (confused > 0) append("😕:$confused")
-    if (heart > 0) append("❤:$heart")
-    if (hooray > 0) append("🎉:$hooray")
-    if (rocket > 0) append("🚀:$rocket")
-    if (eyes > 0) append("👀:$eyes")
-}
-
 public data class UserStats(
     /**
      * B+, A+, A++, S, S+
@@ -183,8 +173,30 @@ internal suspend fun User.stats(flush: Long = 86400_000, client: GitHubClient = 
 
 internal fun MessageChainBuilder.appendLine(image: Image) = append(image).appendLine()
 
+internal fun Appendable.appendLine(reactions: Reactions?): Appendable {
+    reactions?.run {
+        if (plus > 0) append("👍:$plus")
+        if (minus > 0) append("👎:$minus")
+        if (laugh > 0) append("😄:$laugh")
+        if (confused > 0) append("😕:$confused")
+        if (heart > 0) append("❤:$heart")
+        if (hooray > 0) append("🎉:$hooray")
+        if (rocket > 0) append("🚀:$rocket")
+        if (eyes > 0) append("👀:$eyes")
+    }
+    return appendLine()
+}
+
+internal fun Appendable.appendParagraph(content: String?, maxLength: Int = TextMaxLength) = apply {
+    when {
+        content == null -> Unit
+        content.length <= maxLength -> append(content)
+        else -> appendLine(content.subSequence(0, maxLength)).append("......")
+    }
+}
+
 internal suspend fun User.card(contact: Contact): Message {
-    val image = avatar(contact, 50)
+    val image = avatar(contact)
     val stats = stats()
     return if (selenium) {
         buildMessageChain {
@@ -243,32 +255,26 @@ internal suspend fun User.trophy(contact: Contact): Message {
     }
 }
 
-/**
- * TODO: more info ...
- */
-public suspend fun Owner.toMessage(contact: Contact): Message {
-    return when (this) {
-        is User -> card(contact)
-        is Organization -> avatar(contact, 50)
-    }
-}
-
 public suspend fun WebPage.toMessage(contact: Contact, format: Format, notice: String, since: OffsetDateTime): Message {
     return when (this) {
         is Issue -> toMessage(contact, format, notice, since)
+        is Issue.PullRequest -> htmlUrl.toPlainText()
+        is IssueComment -> toMessage(contact)
         is Pull -> toMessage(contact, format, notice, since)
+        is PullRequestReviewComment -> toMessage(contact)
         is Release -> toMessage(contact, format, notice)
         is Commit -> toMessage(contact, format, notice)
+        is Commit.Tree -> htmlUrl.toPlainText()
+        is Commit.File -> toMessage()
+        is CommitComment -> toMessage(contact)
         is Repo -> toMessage(contact, format, notice)
+        is Repo.CodeOfConduct -> body.toPlainText()
         is Milestone -> toMessage(contact, format, notice)
-        is Owner -> toMessage(contact)
-        is License -> (htmlUrl ?: name).toPlainText()
-        is Issue.PullRequest -> htmlUrl.toPlainText()
+        is User -> toMessage(contact, format)
+        is Organization -> toMessage(contact, format)
+        is License -> htmlUrl.toPlainText()
         is Readme -> toMessage(contact)
         is Team -> htmlUrl.toPlainText()
-        is Commit.Tree -> (htmlUrl ?: sha).toPlainText()
-        is IssueComment -> htmlUrl.toPlainText()
-        is PullRequestReviewComment -> htmlUrl.toPlainText()
         is GithubAppInfo -> htmlUrl.toPlainText()
     }
 }
@@ -281,54 +287,129 @@ private infix fun ForwardMessageBuilder.BuilderNode.at(offsetDateTime: OffsetDat
     time = offsetDateTime.toEpochSecond().toInt()
 }
 
-public suspend fun Issue.toMessage(contact: Contact, format: Format, notice: String, since: OffsetDateTime): Message {
+public suspend fun User.toMessage(contact: Contact, format: Format): Message {
     return when (format) {
         Format.OLD -> buildMessageChain {
-            appendLine(user.avatar(contact, 30))
-            appendLine("$notice with issue by ${owner?.nameOrLogin} ")
+            appendLine(avatar(contact))
+            appendLine("NAME: $name ")
             appendLine("URL: $htmlUrl ")
             appendLine("CREATED_AT: $createdAt ")
             appendLine("UPDATED_AT: $updatedAt ")
+            appendLine("BLOG: $blog")
+            appendLine("EMAIL: $email")
+        }
+        Format.TEXT -> buildMessageChain {
+            appendLine("<$nameOrLogin> created at $createdAt")
+            appendLine(blog ?: htmlUrl)
+            appendLine("email: $email, twitter: $twitterUsername")
+            appendLine("$publicRepos repos, $followers followers")
+        }
+        Format.FORWARD -> buildForwardMessage(contact) {
+            displayStrategy = object : ForwardMessage.DisplayStrategy {
+                override fun generateTitle(forward: RawForwardMessage): String = nameOrLogin
+                override fun generatePreview(forward: RawForwardMessage): List<String> = listOfNotNull(
+                    "<$nameOrLogin> created at $createdAt",
+                    "email: $email, twitter: $twitterUsername",
+                    "$publicRepos repos, $followers followers"
+                )
+            }
+            contact.bot named nameOrLogin at createdAt says buildMessageChain {
+                append(avatar(contact)).appendLine(nameOrLogin)
+                appendLine(blog ?: htmlUrl)
+                appendLine("email: $email, twitter: $twitterUsername")
+                appendLine("$publicRepos repos, $followers followers")
+            }
+
+            // TODO: more info for user
+        }
+    }
+}
+
+public suspend fun Organization.toMessage(contact: Contact, format: Format): Message {
+    return when (format) {
+        Format.OLD -> buildMessageChain {
+            appendLine(avatar(contact))
+            appendLine("NAME: $name ")
+            appendLine("URL: $htmlUrl ")
+            appendLine("CREATED_AT: $createdAt ")
+            appendLine("UPDATED_AT: $updatedAt ")
+            appendLine("COMPANY: $company")
+            appendLine("EMAIL: $email")
+            appendLine("VERIFIED: $isVerified")
+            appendParagraph(description)
+        }
+        Format.TEXT -> buildMessageChain {
+            appendLine("<$nameOrLogin> created at $createdAt")
+            appendLine("$email ${if (isVerified) "verified" else ""}")
+            appendLine("$publicRepos repos, $followers followers")
+            appendParagraph(description)
+        }
+        Format.FORWARD -> buildForwardMessage(contact) {
+            displayStrategy = object : ForwardMessage.DisplayStrategy {
+                override fun generateTitle(forward: RawForwardMessage): String = nameOrLogin
+                override fun generatePreview(forward: RawForwardMessage): List<String> = listOfNotNull(
+                    "<$nameOrLogin> created at $createdAt",
+                    "$email ${if (isVerified) "verified" else ""}",
+                    "$publicRepos repos, $followers followers",
+                    description
+                )
+            }
+            contact.bot named nameOrLogin at createdAt says buildMessageChain {
+                append(avatar(contact)).appendLine(nameOrLogin)
+                appendLine(htmlUrl)
+                appendLine("$email ${if (isVerified) "verified" else ""}")
+                appendLine("$publicRepos repos, $followers followers")
+                append(description)
+            }
+
+            // TODO: more info for org
+        }
+    }
+}
+
+public suspend fun Issue.toMessage(contact: Contact, format: Format, notice: String, since: OffsetDateTime): Message {
+    return when (format) {
+        Format.OLD -> buildMessageChain {
+            appendLine(user.avatar(contact, 88))
+            appendLine("$notice with issue by ${owner?.nameOrLogin} ")
+            appendLine("URL: $htmlUrl ")
             appendLine("TITLE: $title ")
+            appendLine("CREATED_AT: $createdAt ")
+            appendLine("UPDATED_AT: $updatedAt ")
             appendLine("STATE: $state ")
             if (labels.isNotEmpty()) appendLine("LABELS: ${labels.joinToString { it.name }} ")
-            if (reactions != null) appendLine(reactions.render())
-            if (text != null && text.length < 50) appendLine(text)
+            if (reactions != null) appendLine(reactions)
+            if (text != null && text.length < TextMaxLength) appendLine(text)
         }
         Format.TEXT -> when {
             // case 1 new open issue
             createdAt == updatedAt -> buildMessageChain {
+                appendLine(user.avatar(contact))
+                appendLine("[$notice] New issue <$title> opened by ${user?.nameOrLogin}")
                 appendLine(htmlUrl)
-                appendLine(user.avatar(contact, 30))
-                appendLine("[$notice] New issue <$title> open by ${user?.nameOrLogin}")
-                if (text != null && text.length < 100) {
-                    appendLine(text)
-                }
+                appendParagraph(text)
             }
             // case 2 merged issue
             mergedAt == updatedAt -> buildMessageChain {
-                appendLine(htmlUrl)
-                appendLine(mergedBy.avatar(contact, 30))
                 appendLine("[$notice] Issue <$title> merged by ${pullRequest?.htmlUrl ?: mergedBy?.nameOrLogin}")
+                appendLine(htmlUrl)
                 appendLine(stateReason)
             }
             // case 3 closed issue
             closedAt == updatedAt -> buildMessageChain {
-                appendLine(htmlUrl)
-                appendLine(closedBy.avatar(contact, 30))
+                appendLine(closedBy.avatar(contact))
                 appendLine("[$notice] Issue <$title> closed by ${closedBy?.nameOrLogin}")
+                appendLine(htmlUrl)
                 appendLine(stateReason)
             }
             // case 4 locked issue
             locked -> buildMessageChain {
-                appendLine(htmlUrl)
                 appendLine("[$notice] Issue <$title> locked by ${activeLockReason ?: stateReason}")
+                appendLine(htmlUrl)
             }
             // case 6 new comment or other update for issue
             else -> buildMessageChain {
-                appendLine(htmlUrl)
-                val (owner, repo) = FULL_REGEX.find(Url(htmlUrl).encodedPath)!!.destructured
-                val comments = github.repo(owner = owner, repo = repo).issues
+                val comments = repo(full = FULL_REGEX.find(Url(htmlUrl).encodedPath)!!.value).issues
                     .comments(number = number) {
                         this.sort = ElementSort.updated
                         this.since = since
@@ -336,11 +417,12 @@ public suspend fun Issue.toMessage(contact: Contact, format: Format, notice: Str
 
                 if (comments.isEmpty()) {
                     appendLine("[$notice] Issue <$title> has change")
-                    appendLine(reactions?.render())
+                    appendLine(htmlUrl)
+                    appendLine(reactions)
                     if (assignees.isNotEmpty()) {
                         appendLine("assignees: ")
                         assignees.forEach { assignee ->
-                            append(assignee.avatar(contact, 30)).append(assignee.nameOrLogin).append(" ")
+                            append(assignee.avatar(contact)).append(assignee.nameOrLogin).append(" ")
                         }
                         appendLine()
                     }
@@ -349,11 +431,12 @@ public suspend fun Issue.toMessage(contact: Contact, format: Format, notice: Str
                     }
                 } else {
                     appendLine("[$notice] Issue <$title> new ${comments.size} comments")
+                    appendLine(htmlUrl)
                     val comment = comments.first()
                     appendLine("last at ${comment.updatedAt}")
-                    append(comment.user.avatar(contact, 30)).append(association.name)
-                    appendLine(comment.reactions?.render())
-                    append(comment.text)
+                    append(comment.user.avatar(contact)).appendLine(user?.nameOrLogin)
+                    appendLine(comment.reactions)
+                    appendParagraph(comment.text)
                 }
             }
         }
@@ -361,7 +444,7 @@ public suspend fun Issue.toMessage(contact: Contact, format: Format, notice: Str
             displayStrategy = object : ForwardMessage.DisplayStrategy {
                 override fun generateTitle(forward: RawForwardMessage): String = title
                 override fun generatePreview(forward: RawForwardMessage): List<String> = listOf(
-                    "$notice with #${number} issue by $ownerNameOrLogin",
+                    "$notice issue #${number} by $ownerNameOrLogin",
                     "$state, $comments comments",
                     "update at $updatedAt",
                     stateReason ?: activeLockReason ?: labels.joinToString { it.name }
@@ -372,113 +455,116 @@ public suspend fun Issue.toMessage(contact: Contact, format: Format, notice: Str
                 }
             }
             contact.bot named association.name at createdAt says buildMessageChain {
-                append(user.avatar(contact, 30)).appendLine(ownerNameOrLogin)
+                append(user.avatar(contact)).appendLine(user?.nameOrLogin)
                 appendLine(htmlUrl)
-                appendLine(labels.joinToString { it.description ?: it.name })
-                appendLine(reactions?.render())
+                appendLine(labels.joinToString { it.name })
+                appendLine(reactions)
                 append(body)
             }
             contact.bot named "status" at createdAt says buildMessageChain {
-                if (closedBy != null) {
-                    append(closedBy.avatar(contact, 30)).appendLine("closed at $closedAt by ${closedBy.nameOrLogin}")
-                }
                 if (assignees.isNotEmpty()) {
                     appendLine("assigned to ")
                     assignees.forEach { assignee ->
-                        append(assignee.avatar(contact, 30)).append(assignee.nameOrLogin).append(" ")
+                        append(assignee.avatar(contact)).append(assignee.nameOrLogin).append(" ")
                     }
                     appendLine()
                 }
                 if (milestone != null) {
                     appendLine("milestone with ${milestone.title}")
                 }
+                if (closedBy != null) {
+                    append(closedBy.avatar(contact)).appendLine("closed at $closedAt by ${closedBy.nameOrLogin}")
+                }
             }
+            val repo = repo(full = FULL_REGEX.find(Url(htmlUrl).encodedPath)!!.value)
             if (comments > 0) {
-                val (owner, repo) = FULL_REGEX.find(Url(htmlUrl).encodedPath)!!.destructured
-                val comments = github.repo(owner = owner, repo = repo).issues
-                    .comments(number = number) {
-                        sort = ElementSort.created
-                        direction = Direction.asc
-                    }
+                val comments = repo.issues.comments(number = number) {
+                    sort = ElementSort.created
+                    direction = Direction.asc
+                }
 
                 for (comment in comments) {
-                    contact.bot named comment.association.name at comment.createdAt says buildMessageChain {
-                        append(comment.user.avatar(contact, 30)).appendLine(comment.user?.nameOrLogin)
-                        appendLine(comment.reactions?.render())
-                        append(comment.body)
-                    }
+                    contact.bot named "comment" at comment.createdAt says comment.toMessage(contact)
                 }
             }
         }
     }
 }
 
+public suspend fun IssueComment.toMessage(contact: Contact): Message = buildMessageChain {
+    append(user.avatar(contact)).appendLine(user?.nameOrLogin)
+    appendLine(reactions)
+    append(body)
+}
+
 public suspend fun Pull.toMessage(contact: Contact, format: Format, notice: String, since: OffsetDateTime): Message {
     return when (format) {
         Format.OLD -> buildMessageChain {
-            appendLine(user.avatar(contact, 30))
+            appendLine(user.avatar(contact, 88))
             appendLine("$notice with pull by $ownerNameOrLogin ")
             appendLine("URL: $htmlUrl ")
+            appendLine("TITLE: $title ")
             appendLine("CREATED_AT: $createdAt ")
             appendLine("UPDATED_AT: $updatedAt ")
-            appendLine("TITLE: $title ")
             appendLine("STATE: $state ")
             if (labels.isNotEmpty()) appendLine("LABELS: ${labels.joinToString { it.name }} ")
-            if (reactions != null) appendLine(reactions.render())
-            if (text != null && text.length < 50) appendLine(text)
+            if (reactions != null) appendLine(reactions)
+            if (text != null && text.length < TextMaxLength) appendLine(text)
         }
         Format.TEXT -> when {
             // case 1 new open pull
             createdAt == updatedAt -> buildMessageChain {
+                appendLine(user.avatar(contact))
+                appendLine("[$notice] New pull request <$title> opened by ${user?.nameOrLogin}")
                 appendLine(htmlUrl)
-                appendLine(user.avatar(contact, 30))
-                appendLine("[$notice] New pull request <$title> open by ${user?.nameOrLogin}")
-                if (body != null && body.length < 100) {
-                    appendLine(body)
-                }
+                appendParagraph(text)
             }
             // case 2 merged pull
             mergedAt == updatedAt -> buildMessageChain {
-                appendLine(htmlUrl)
-                appendLine(mergedBy.avatar(contact, 30))
+                appendLine(mergedBy.avatar(contact))
                 appendLine("[$notice] Pull Request <$title> merged by ${mergedBy?.nameOrLogin}")
-                appendLine(autoMerge)
+                appendLine(htmlUrl)
             }
             // case 3 closed pull
             closedAt == updatedAt -> buildMessageChain {
-                appendLine(htmlUrl)
-                appendLine(closedBy.avatar(contact, 30))
+                appendLine(closedBy.avatar(contact))
                 appendLine("[$notice] Pull Request <$title> closed by ${closedBy?.nameOrLogin}")
+                appendLine(htmlUrl)
+                appendParagraph(autoMerge?.commitTitle)
             }
             // case 4 locked pull
             locked -> buildMessageChain {
-                appendLine(htmlUrl)
                 appendLine("[$notice] Pull Request <$title> locked by $activeLockReason")
+                appendLine(htmlUrl)
             }
             // case 6 new comment or other update for issue
             else -> buildMessageChain {
-                appendLine(htmlUrl)
-                val (owner, repo) = FULL_REGEX.find(Url(htmlUrl).encodedPath)!!.destructured
-                val comments = github.repo(owner = owner, repo = repo).issues
-                    .comments(number = number) {
-                        this.sort = ElementSort.updated
-                        this.since = since
-                    }
+                val repo = repo(full = FULL_REGEX.find(Url(htmlUrl).encodedPath)!!.value)
+                val comments = repo.issues.comments(number = number) {
+                    this.sort = ElementSort.updated
+                    this.direction = Direction.asc
+                    this.since = since
+                } + repo.pulls.comments(number = number) {
+                    this.sort = ElementSort.updated
+                    this.direction = Direction.asc
+                    this.since = since
+                }
 
                 if (comments.isEmpty()) {
                     appendLine("[$notice] Pull Request <$title> has change")
-                    appendLine(reactions?.render())
+                    appendLine(htmlUrl)
+                    appendLine(reactions)
                     if (requestedReviewers.isNotEmpty()) {
                         appendLine("assignees: ")
                         assignees.forEach { assignee ->
-                            append(assignee.avatar(contact, 30)).append(assignee.nameOrLogin).append(" ")
+                            append(assignee.avatar(contact)).append(assignee.nameOrLogin).append(" ")
                         }
                         appendLine()
                     }
                     if (assignees.isNotEmpty()) {
                         appendLine("assignees: ")
                         assignees.forEach { assignee ->
-                            append(assignee.avatar(contact, 30)).append(assignee.nameOrLogin).append(" ")
+                            append(assignee.avatar(contact)).append(assignee.nameOrLogin).append(" ")
                         }
                         appendLine()
                     }
@@ -487,11 +573,12 @@ public suspend fun Pull.toMessage(contact: Contact, format: Format, notice: Stri
                     }
                 } else {
                     appendLine("[$notice] Pull Request <$title> new ${comments.size} comments")
-                    val comment = comments.first()
+                    appendLine(htmlUrl)
+                    val comment = comments.maxByOrNull { it.updatedAt }!!
                     appendLine("last at ${comment.updatedAt}")
-                    append(comment.user.avatar(contact, 30)).appendLine(comment.user?.nameOrLogin)
-                    appendLine(comment.reactions?.render())
-                    append(comment.text)
+                    append(comment.user.avatar(contact)).appendLine(comment.user?.nameOrLogin)
+                    appendLine(comment.reactions)
+                    appendParagraph(comment.text)
                 }
             }
         }
@@ -499,40 +586,40 @@ public suspend fun Pull.toMessage(contact: Contact, format: Format, notice: Stri
             displayStrategy = object : ForwardMessage.DisplayStrategy {
                 override fun generateTitle(forward: RawForwardMessage): String = title
                 override fun generatePreview(forward: RawForwardMessage): List<String> = listOf(
-                    "$notice with #${number} pull by $ownerNameOrLogin",
-                    "$state, $comments comments, $commits commits, $changedFiles files",
+                    "$notice pull #${number} by $ownerNameOrLogin",
+                    "$state, ${comments + reviewComments} comments, $commits commits, $changedFiles files",
                     "update at $updatedAt, $mergeableState",
-                    autoMerge ?: activeLockReason ?: labels.joinToString { it.name }
+                    autoMerge?.commitTitle ?: activeLockReason ?: labels.joinToString { it.name }
                 )
 
                 override fun generateSummary(forward: RawForwardMessage): String {
-                    return autoMerge ?: activeLockReason ?: labels.joinToString { it.name }
+                    return activeLockReason ?: labels.joinToString { it.name }
                 }
             }
             contact.bot named association.name at createdAt says buildMessageChain {
-                append(user.avatar(contact, 30)).appendLine(user?.nameOrLogin)
+                append(user.avatar(contact)).appendLine(user?.nameOrLogin)
                 appendLine(htmlUrl)
-                appendLine(labels.joinToString { it.description ?: it.name })
-                appendLine(reactions?.render())
+                labels.joinTo(this) { it.name }.appendLine()
+                appendLine(reactions)
                 append(body)
             }
             contact.bot named "status" at createdAt says buildMessageChain {
                 if (mergedBy != null) {
-                    append(mergedBy.avatar(contact, 30)).appendLine("merged at $closedAt by ${mergedBy.nameOrLogin}")
+                    append(mergedBy.avatar(contact)).appendLine("merged at $closedAt by ${mergedBy.nameOrLogin}")
                 } else if (closedBy != null) {
-                    append(closedBy.avatar(contact, 30)).appendLine("closed at $closedAt by ${closedBy.nameOrLogin}")
+                    append(closedBy.avatar(contact)).appendLine("closed at $closedAt by ${closedBy.nameOrLogin}")
                 }
                 if (assignees.isNotEmpty()) {
                     appendLine("assigned to ")
                     assignees.forEach { assignee ->
-                        append(assignee.avatar(contact, 30)).append(assignee.nameOrLogin).append(" ")
+                        append(assignee.avatar(contact)).append(assignee.nameOrLogin).append(" ")
                     }
                     appendLine()
                 }
                 if (requestedReviewers.isNotEmpty()) {
                     appendLine("review by ")
                     requestedReviewers.forEach { reviewer ->
-                        append(reviewer.avatar(contact, 30)).append(reviewer.nameOrLogin).append(" ")
+                        append(reviewer.avatar(contact)).append(reviewer.nameOrLogin).append(" ")
                     }
                     appendLine()
                 }
@@ -540,87 +627,354 @@ public suspend fun Pull.toMessage(contact: Contact, format: Format, notice: Stri
                     appendLine("milestone with ${milestone.title}")
                 }
             }
-            if (comments > 0) {
-                val (owner, repo) = FULL_REGEX.find(Url(htmlUrl).encodedPath)!!.destructured
-                val comments = github.repo(owner = owner, repo = repo).pulls
-                    .comments(number = number) {
-                        sort = ElementSort.created
-                        direction = Direction.asc
-                    }
+            val repo = repo(full = FULL_REGEX.find(Url(htmlUrl).encodedPath)!!.value)
+            if (reviewComments > 0) {
+                val comments = repo.pulls.comments(number = number) {
+                    sort = ElementSort.created
+                    direction = Direction.asc
+                }
 
                 for (comment in comments) {
-                    contact.bot named comment.association.name at comment.createdAt says buildMessageChain {
-                        append(comment.user.avatar(contact, 30)).appendLine(comment.user?.nameOrLogin)
-                        appendLine(comment.reactions?.render())
-                        append(comment.body)
-                    }
+                    contact.bot named "review_comment" at comment.createdAt says comment.toMessage(contact)
+                }
+            }
+            if (comments > 0) {
+                val comments = repo.issues.comments(number = number) {
+                    sort = ElementSort.created
+                    direction = Direction.asc
+                }
+
+                for (comment in comments) {
+                    contact.bot named "comment" at comment.createdAt says comment.toMessage(contact)
                 }
             }
         }
     }
 }
 
+public suspend fun PullRequestReviewComment.toMessage(contact: Contact): Message = buildMessageChain {
+    append(user.avatar(contact)).appendLine(user?.nameOrLogin)
+    appendLine(reactions)
+    append(body)
+}
+
 public suspend fun Release.toMessage(contact: Contact, format: Format, notice: String): Message {
+    if (contact is FileSupported) {
+        contact.launch(SupervisorJob()) {
+            uploadTo(contact)
+        }
+    }
+
     return when (format) {
         Format.OLD -> buildMessageChain {
-            appendLine(author.avatar(contact, 50))
+            appendLine(author.avatar(contact))
             appendLine("$notice with release by $ownerNameOrLogin ")
+            appendLine("NAME: ${name ?: tagName} ")
             appendLine("CREATED_AT: $createdAt ")
             appendLine("PUBLISHED_AT: $publishedAt ")
             appendLine("URL: $htmlUrl ")
-            appendLine("NAME: $name ")
-            if (reactions != null) appendLine(reactions.render())
-            if (body != null && body.length < 50) appendLine(body)
+            if (reactions != null) appendLine(reactions)
+            if (text != null && text.length < TextMaxLength) appendLine(text)
         }
-        Format.TEXT -> TODO("Release TEXT")
-        Format.FORWARD -> TODO("Release FORWARD")
+        Format.TEXT -> when {
+            // case 1 new open release
+            createdAt == updatedAt -> buildMessageChain {
+                appendLine(author.avatar(contact))
+                appendLine("[$notice] New release <${name ?: tagName}> opened by ${author?.nameOrLogin}")
+                appendLine(htmlUrl)
+                appendLine(reactions)
+                assets.joinTo(append("assets: ")) { it.name }.appendLine()
+                appendParagraph(text)
+            }
+            // case 2 release change
+            else -> buildMessageChain {
+                appendLine(author.avatar(contact))
+                appendLine("[$notice] Release <${name ?: tagName}> has change")
+                appendLine(htmlUrl)
+                appendLine(reactions)
+                assets.joinTo(append("assets: ")) { it.name }
+            }
+        }
+        Format.FORWARD -> buildForwardMessage(contact) {
+            displayStrategy = object : ForwardMessage.DisplayStrategy {
+                override fun generateTitle(forward: RawForwardMessage): String = name ?: tagName
+                override fun generatePreview(forward: RawForwardMessage): List<String> = listOf(
+                    "$notice release $tagName by $ownerNameOrLogin",
+                    "$status, ${assets.size} assets, $mentionsCount mentions",
+                    "update at $updatedAt",
+                    targetCommitish
+                )
+            }
+
+            contact.bot named targetCommitish at createdAt says buildMessageChain {
+                append(author.avatar(contact)).appendLine(author?.nameOrLogin)
+                appendLine(htmlUrl)
+                appendLine(reactions)
+                append(body)
+            }
+            for (asset in assets) {
+                contact.bot named "asset" at asset.createdAt says asset.toMessage(contact)
+            }
+        }
+    }
+}
+
+public suspend fun Release.uploadTo(contact: FileSupported) {
+    val (owner, repo) = FULL_REGEX.find(Url(htmlUrl).encodedPath)!!.destructured
+    val folder = contact.files.root.createFolder("${repo}@${owner}")
+    for (asset in assets) {
+        // TODO: 上传大小上限
+        asset.uploadTo(folder)
+    }
+}
+
+public suspend fun Release.Asset.toMessage(contact: Contact): Message = buildMessageChain {
+    append(uploader.avatar(contact)).appendLine(uploader?.nameOrLogin)
+    appendLine("update at $updatedAt")
+    appendLine("type: ${contentType.contentType}, size: $size, downloaded: $downloadCount")
+    append(browserDownloadUrl)
+}
+
+public suspend fun Release.Asset.uploadTo(folder: AbsoluteFolder) {
+    github.useHttpClient { http ->
+        http.get<HttpStatement>(browserDownloadUrl).execute { response ->
+            response.receive<java.io.InputStream>().toExternalResource().use { resource ->
+                folder.uploadNewFile(name, resource)
+            }
+        }
     }
 }
 
 public suspend fun Commit.toMessage(contact: Contact, type: Format, notice: String): Message {
     return when (type) {
         Format.OLD -> buildMessageChain {
-            appendLine(author.avatar(contact, 50))
+            appendLine(author.avatar(contact))
             appendLine("$notice with commit by $ownerNameOrLogin ")
             appendLine("URL: $htmlUrl ")
             appendLine("CREATED_AT: $createdAt ")
             appendLine(detail.message)
         }
-        Format.TEXT -> TODO("Commit TEXT")
-        Format.FORWARD -> TODO("Commit FORWARD")
+        Format.TEXT -> when {
+            // case 1 new open commit
+            detail.commentCount == 0 -> buildMessageChain {
+                appendLine(author.avatar(contact))
+                appendLine("[$notice] New commit $key by $ownerNameOrLogin")
+                appendLine(htmlUrl)
+                appendLine("${stats.additions} additions, ${stats.deletions} deletions, ${files.size} files")
+                appendLine(detail.message)
+            }
+            // case 2 new comment for commit
+            else -> buildMessageChain {
+                val repo = repo(full = FULL_REGEX.find(Url(htmlUrl).encodedPath)!!.value)
+                val comment = repo.commit(sha = sha).comments().maxByOrNull { it.updatedAt }!!
+
+                appendLine("[$notice] commit $key new comment by ${comment.user?.nameOrLogin}")
+                appendLine(htmlUrl)
+                appendLine("last at ${comment.updatedAt}")
+                append(comment.user.avatar(contact)).appendLine(comment.user?.nameOrLogin)
+                appendLine(comment.reactions)
+                appendParagraph(comment.text)
+            }
+        }
+        Format.FORWARD -> buildForwardMessage(contact) {
+            displayStrategy = object : ForwardMessage.DisplayStrategy {
+                override fun generateTitle(forward: RawForwardMessage): String = "[$notice] commit $key"
+                override fun generatePreview(forward: RawForwardMessage): List<String> = listOf(
+                    "$notice commit $key by $ownerNameOrLogin",
+                    "${stats.additions} additions, ${stats.deletions} deletions, ${files.size} files, ${detail.commentCount} comment",
+                    detail.verification.reason
+                )
+            }
+
+            contact.bot named ownerNameOrLogin at createdAt says buildMessageChain {
+                appendLine(author.avatar(contact))
+                appendLine("[$notice] commit $key by $ownerNameOrLogin")
+                appendLine(htmlUrl)
+                appendLine("${stats.additions} additions, ${stats.deletions} deletions, ${files.size} files")
+                appendLine(detail.message)
+            }
+
+            for (file in files) {
+                contact.bot named "file" at createdAt says file.toMessage()
+            }
+
+            val repo = repo(full = FULL_REGEX.find(Url(htmlUrl).encodedPath)!!.value)
+            if (detail.commentCount > 0) {
+                val comments = repo.commit(sha = sha).comments()
+
+                for (comment in comments) {
+                    contact.bot named "comment" at comment.createdAt says comment.toMessage(contact)
+                }
+            }
+        }
     }
+}
+
+public fun Commit.File.toMessage(): Message = buildMessageChain {
+    if (previousFilename.isEmpty()) {
+        append("$status ").appendLine(filename)
+    } else {
+        append(previousFilename).append(" $status to ").appendLine(filename)
+    }
+}
+
+public suspend fun CommitComment.toMessage(contact: Contact): Message = buildMessageChain {
+    append(user.avatar(contact)).appendLine(user?.nameOrLogin)
+    appendLine(reactions)
+    append(body)
 }
 
 public suspend fun Repo.toMessage(contact: Contact, type: Format, notice: String): Message {
     return when (type) {
         Format.OLD -> buildMessageChain {
-            appendLine(owner.avatar(contact, 50))
+            appendLine(owner.avatar(contact))
             appendLine("$notice with repo by $ownerNameOrLogin ")
             appendLine("URL: $htmlUrl ")
             appendLine("CREATED_AT: $createdAt ")
-            appendLine("STARGAZERS_COUNT: $stargazersCount")
+            appendLine("STARGAZERS_COUNT: $stargazersCount ")
             appendLine("LANGUAGE: $language ")
-            appendLine("DESCRIPTION: $description ")
+            appendParagraph(description)
         }
-        Format.TEXT -> TODO("Repo TEXT")
-        Format.FORWARD -> TODO("Repo FORWARD")
+        Format.TEXT -> when {
+            // case 1 new open repo
+            createdAt == updatedAt -> buildMessageChain {
+                appendLine("[$fullName] created at $createdAt")
+                appendLine(htmlUrl)
+                when {
+                    templateRepository != null -> appendLine("from template [${templateRepository.fullName}]")
+                    fork -> appendLine("from fork [...]")
+                }
+                appendParagraph(description)
+            }
+            // case 2 has update repo
+            else -> buildMessageChain {
+                appendLine("[$fullName] updated at $updatedAt")
+                appendLine(htmlUrl)
+                when {
+                    templateRepository != null -> appendLine("from template [${templateRepository.fullName}]")
+                    fork -> appendLine("from fork [...]")
+                }
+                appendLine("$stargazersCount stars, $subscribersCount subscribers, $forksCount forks, $openIssuesCount issues")
+                appendLine(topics.joinToString())
+                appendParagraph(description)
+            }
+        }
+        Format.FORWARD -> buildForwardMessage(contact) {
+            displayStrategy = object : ForwardMessage.DisplayStrategy {
+                override fun generateTitle(forward: RawForwardMessage): String = "[$fullName] updated at $updatedAt"
+                override fun generatePreview(forward: RawForwardMessage): List<String> = listOfNotNull(
+                    "$stargazersCount stars, $subscribersCount subscribers, $forksCount forks, $openIssuesCount issues",
+                    topics.joinToString(),
+                    language,
+                    license?.name,
+                    description
+                )
+            }
+
+            val repo = repo(full = fullName)
+
+            contact.bot named "Info" at createdAt says buildMessageChain {
+                append(owner.avatar(contact)).appendLine(owner?.nameOrLogin)
+                appendLine(htmlUrl)
+                appendLine("created at $createdAt")
+                appendLine("updated at $updatedAt")
+                appendLine("pushed at $pushedAt")
+                appendLine("$openIssuesCount issues")
+            }
+
+            contact.bot named "About" at updatedAt says buildMessageChain {
+                appendLine(description)
+                appendLine(homepage)
+                appendLine(license?.name)
+                appendLine("$stargazersCount stars")
+                appendLine("$watchersCount watchers")
+                appendLine("$forksCount forks")
+            }
+
+            contact.bot named "Release" at updatedAt says buildMessageChain {
+                val latest = repo.releases.latest()
+                appendLine(latest.author.avatar(contact))
+                appendLine("latest release ${latest.name ?: latest.tagName} by ${latest.author?.nameOrLogin}")
+                appendLine(latest.reactions)
+                appendParagraph(latest.body)
+            }
+
+            contact.bot named "Contributors" at updatedAt says buildMessageChain {
+                appendLine("some contributors")
+                for (collaborator in repo.collaborators(anonymous = false)) {
+                    append(collaborator.avatar(contact)).appendLine(collaborator.nameOrLogin)
+                }
+            }
+
+            contact.bot named "Languages" at updatedAt says buildMessageChain {
+                appendLine("language and additional")
+                for ((language, additional) in repo.languages()) {
+                    appendLine("$language: $additional")
+                }
+            }
+        }
     }
 }
 
 public suspend fun Milestone.toMessage(contact: Contact, type: Format, notice: String): Message {
     return when (type) {
         Format.OLD -> buildMessageChain {
-            appendLine(creator.avatar(contact, 50))
+            appendLine(creator.avatar(contact))
             appendLine("$notice with milestone by $ownerNameOrLogin ")
             appendLine("URL: $htmlUrl ")
-            appendLine("CREATED_AT: $createdAt ")
-            appendLine("CREATED_AT: $updatedAt ")
             appendLine("TITLE: $title ")
+            appendLine("CREATED_AT: $createdAt ")
+            appendLine("UPDATED_AT: $updatedAt ")
+            appendLine("DUE_ON: $dueOn ")
             appendLine("STATE: $state ")
-            appendLine("DESCRIPTION: $description ")
+            appendParagraph(description)
         }
-        Format.TEXT -> TODO("Milestone TEXT")
-        Format.FORWARD -> TODO("Milestone FORWARD")
+        Format.TEXT -> when {
+            // case 1 new open milestone
+            createdAt == updatedAt -> buildMessageChain {
+                appendLine(creator.avatar(contact))
+                appendLine("[$notice] New milestone $title opened by ${creator?.nameOrLogin}")
+                appendLine(htmlUrl)
+                appendLine(dueOn?.let { "due on $it" } ?: "no due on")
+                appendParagraph(description)
+            }
+            // case 2 milestone closed
+            state == State.closed -> buildMessageChain {
+                appendLine("[$notice] Milestone $title closed at $closedAt")
+                appendLine(htmlUrl)
+                appendLine("${openIssues + closedIssues} issues, $openIssues open, $closedIssues closed")
+            }
+            // case 3 milestone updated
+            else -> buildMessageChain {
+                appendLine("[$notice] Milestone $title update at $updatedAt")
+                appendLine(htmlUrl)
+                appendLine("${openIssues + closedIssues} issues, $openIssues open, $closedIssues closed")
+            }
+        }
+        Format.FORWARD -> buildForwardMessage(contact) {
+            displayStrategy = object : ForwardMessage.DisplayStrategy {
+                override fun generateTitle(forward: RawForwardMessage): String = title
+                override fun generatePreview(forward: RawForwardMessage): List<String> = listOfNotNull(
+                    "$notice milestone $title by $ownerNameOrLogin",
+                    "${openIssues + closedIssues} issues, $openIssues open, $closedIssues closed",
+                    description
+                )
+            }
+
+            contact.bot named ownerNameOrLogin says buildMessageChain {
+                appendLine(creator.avatar(contact))
+                appendLine("[$notice] Milestone $title by $ownerNameOrLogin")
+                appendLine(htmlUrl)
+                when (state) {
+                    State.open -> appendLine("opened at $createdAt")
+                    State.closed -> appendLine("closed at $createdAt")
+                }
+                appendLine(dueOn?.let { "due on $it" } ?: "no due on")
+                appendParagraph(description)
+            }
+
+            // TODO: show open issue
+        }
     }
 }
 
