@@ -16,44 +16,26 @@ import kotlinx.serialization.*
  * @see Pull
  * @see Issue
  */
-public sealed interface ControlRecord : Entry, LifeCycle, WebPage, Content, Owner.Product {
-    override val htmlUrl: String
-    public val title: String
-    public val user: User?
-    public val assignee: User?
-    public val assignees: List<User>
-    public val closedBy: User?
-    public val mergedBy: User?
-    public val state: State
-    public val number: Int
-    public val labels: List<Label>
-    public val association: Association
-    public val comments: Int
-    public val commentsUrl: String
-    public val milestone: Milestone?
-    public val draft: Boolean
-    public val locked: Boolean
-    public val repository: Repo?
+@Serializable
+public sealed class ControlRecord : Entry, LifeCycle, WebPage, Content, Product {
+    public abstract val title: String
+    public abstract val user: User?
+    public abstract val assignee: User?
+    public abstract val assignees: List<User>
+    public abstract val closedBy: User?
+    public abstract val mergedBy: User?
+    public abstract val state: State
+    public abstract val number: Int
+    public abstract val labels: List<Label>
+    public abstract val association: Association
+    public abstract val comments: Int
+    public abstract val commentsUrl: String
+    public abstract val milestone: Milestone?
+    public abstract val draft: Boolean
+    public abstract val locked: Boolean
+    public abstract val repository: Repo?
 
     override val owner: User?
         get() = user
 
-    // TODO: 可能是字符串
-    @Serializable
-    public data class Label(
-        @SerialName("color")
-        val color: String?,
-        @SerialName("default")
-        val default: Boolean,
-        @SerialName("description")
-        val description: String?,
-        @SerialName("id")
-        val id: Long,
-        @SerialName("name")
-        val name: String,
-        @SerialName("node_id")
-        override val nodeId: String,
-        @SerialName("url")
-        override val url: String
-    ) : Entry
 }

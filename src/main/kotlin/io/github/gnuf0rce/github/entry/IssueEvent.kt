@@ -14,6 +14,7 @@ import kotlinx.serialization.*
 import java.time.*
 
 @Serializable
+@SerialName("IssueEvent")
 public data class IssueEvent(
     @SerialName("actor")
     override val actor: User?,
@@ -62,7 +63,7 @@ public data class IssueEvent(
     val stateReason: String? = null,
     @SerialName("performed_via_github_app")
     val performedViaGithubApp: GithubAppInfo? = null
-) : Entry, Event {
+) : Entry, Event() {
 
     override val updatedAt: OffsetDateTime
         get() = issue?.updatedAt ?: createdAt

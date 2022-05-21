@@ -52,7 +52,7 @@ public data class GithubAppInfo(
     val webhookSecret: String? = null,
     @SerialName("pem")
     val pem: String? = null
-) : Entry, LifeCycle, WebPage, Owner.Product {
+) : Entry, LifeCycle, WebPage, Product {
 
     override val url: String
         get() = externalUrl

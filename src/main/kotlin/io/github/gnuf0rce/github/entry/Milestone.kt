@@ -52,7 +52,7 @@ public data class Milestone(
     override val updatedAt: OffsetDateTime,
     @SerialName("url")
     override val url: String
-) : Entry, LifeCycle, WebPage, Owner.Product {
+) : Entry, LifeCycle, WebPage, Product {
 
     override val owner: User?
         get() = creator

@@ -31,9 +31,4 @@ public sealed class Owner : Entry, LifeCycle, WebPage {
     @Deprecated("Owner No Closed", ReplaceWith("null"))
     override val closedAt: OffsetDateTime?
         get() = null
-
-    public sealed interface Product {
-        public val owner: Owner?
-        public val ownerNameOrLogin: String get() = owner?.name ?: owner?.login ?: "null"
-    }
 }

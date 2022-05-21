@@ -73,6 +73,10 @@ internal object UrlSerializer : KSerializer<Url>  {
     override val descriptor: SerialDescriptor =
         PrimitiveSerialDescriptor(Url::class.qualifiedName!!, PrimitiveKind.STRING)
 
+    const val API_HOST = "api.github.com"
+
+    const val DOCS_HOST = "docs.github.com"
+
     override fun deserialize(decoder: Decoder): Url {
         return Url(decoder.decodeString())
     }

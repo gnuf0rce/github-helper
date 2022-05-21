@@ -10,21 +10,26 @@
 
 package io.github.gnuf0rce.github.entry
 
+import kotlinx.serialization.*
 import java.time.*
 
-public sealed interface Comment : Entry, LifeCycle, WebPage, Content, Owner.Product {
-    public val association: AuthorAssociation
-    override val body: String
-    override val text: String
-    override val html: String
-    override val createdAt: OffsetDateTime
-    override val htmlUrl: String
-    override val nodeId: String
-    override val updatedAt: OffsetDateTime
-    override val url: String
-    public val user: User?
-    override val reactions: Reactions?
+@Serializable
+public sealed class Comment : Entry, LifeCycle, WebPage, Content, Product {
+    public abstract val association: AuthorAssociation
+    abstract override val body: String
+    abstract override val text: String
+    abstract override val html: String
+    abstract override val url: String
+    public abstract val user: User?
 
     override val owner: User?
         get() = user
+
+    @Deprecated("Comment No Closed", ReplaceWith("null"))
+    override val closedAt: OffsetDateTime?
+        get() = null
+
+    @Deprecated("Comment No Merged", ReplaceWith("null"))
+    override val mergedAt: OffsetDateTime?
+        get() = null
 }

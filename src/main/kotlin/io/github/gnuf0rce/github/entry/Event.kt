@@ -10,9 +10,11 @@
 
 package io.github.gnuf0rce.github.entry
 
+import kotlinx.serialization.*
 
-public sealed interface Event : Entry, LifeCycle, Owner.Product {
-    public val actor: User?
+@Serializable
+public sealed class Event : Entry, LifeCycle, Product {
+    public abstract val actor: User?
 
     override val owner: Owner?
         get() = actor

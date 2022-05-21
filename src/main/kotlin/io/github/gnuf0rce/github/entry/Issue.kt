@@ -53,7 +53,7 @@ public data class Issue(
     @SerialName("id")
     val id: Long,
     @SerialName("labels")
-    override val labels: List<ControlRecord.Label> = emptyList(),
+    override val labels: List<Label> = emptyList(),
     @SerialName("labels_url")
     val labelsUrl: String,
     @SerialName("locked")
@@ -90,7 +90,7 @@ public data class Issue(
     override val repository: Repo? = null,
     @SerialName("performed_via_github_app")
     val performedViaGithubApp: GithubAppInfo? = null
-) : Entry, ControlRecord {
+) : Entry, ControlRecord() {
 
     @Serializable
     public data class PullRequest(

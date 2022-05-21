@@ -12,19 +12,21 @@ package io.github.gnuf0rce.github.entry
 
 import kotlinx.serialization.*
 
+// TODO: 可能是字符串
 @Serializable
-@SerialName("License")
-public data class License(
-    @SerialName("html_url")
-    override val htmlUrl: String = "",
-    @SerialName("key")
-    val key: String,
+public data class Label(
+    @SerialName("color")
+    val color: String?,
+    @SerialName("default")
+    val default: Boolean,
+    @SerialName("description")
+    val description: String?,
+    @SerialName("id")
+    val id: Long,
     @SerialName("name")
     val name: String,
     @SerialName("node_id")
     override val nodeId: String,
-    @SerialName("spdx_id")
-    val spdxId: String?,
     @SerialName("url")
-    override val url: String?
-) : Entry, WebPage
+    override val url: String
+) : Entry

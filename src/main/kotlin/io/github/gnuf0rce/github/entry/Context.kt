@@ -22,6 +22,11 @@ public sealed interface LifeCycle {
 public sealed interface Record {
     public val sha: String
     public val url: String
+
+    /**
+     * @see sha
+     */
+    public val key: String get() = sha.substring(0, 7)
 }
 
 public sealed interface Entry {
@@ -30,7 +35,7 @@ public sealed interface Entry {
 }
 
 public sealed interface WebPage {
-    public val htmlUrl: String?
+    public val htmlUrl: String
 }
 
 public sealed interface Content {
@@ -38,4 +43,9 @@ public sealed interface Content {
     public val text: String?
     public val html: String?
     public val reactions: Reactions?
+}
+
+public sealed interface Product {
+    public val owner: Owner?
+    public val ownerNameOrLogin: String get() = owner?.name ?: owner?.login ?: "null"
 }

@@ -10,20 +10,24 @@
 
 package io.github.gnuf0rce.github.entry
 
-import kotlinx.serialization.*
-import java.time.*
+import kotlinx.serialization.Contextual
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
+import java.time.OffsetDateTime
 
 @Serializable
-@SerialName("IssueComment")
-public data class IssueComment(
+@SerialName("CommitComment")
+public data class CommitComment(
     @SerialName("author_association")
     override val association: AuthorAssociation,
     @SerialName("body")
     override val body: String,
-    @SerialName("body_text")
+    @SerialName("text")
     override val text: String,
-    @SerialName("body_html")
+    @SerialName("html")
     override val html: String,
+    @SerialName("commit_id")
+    val commitId: String,
     @Contextual
     @SerialName("created_at")
     override val createdAt: OffsetDateTime,
@@ -31,10 +35,14 @@ public data class IssueComment(
     override val htmlUrl: String,
     @SerialName("id")
     val id: Long,
-    @SerialName("issue_url")
-    val issueUrl: String,
+    @SerialName("line")
+    val line: Int?,
     @SerialName("node_id")
     override val nodeId: String,
+    @SerialName("path")
+    val path: String?,
+    @SerialName("position")
+    val position: Int?,
     @Contextual
     @SerialName("updated_at")
     override val updatedAt: OffsetDateTime,
@@ -43,7 +51,5 @@ public data class IssueComment(
     @SerialName("user")
     override val user: User?,
     @SerialName("reactions")
-    override val reactions: Reactions?,
-    @SerialName("performed_via_github_app")
-    val performedViaGithubApp: GithubAppInfo? = null
-) : Entry, Comment()
+    override val reactions: Reactions? = null
+): Entry, Comment()

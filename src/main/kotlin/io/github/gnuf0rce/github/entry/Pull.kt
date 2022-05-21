@@ -69,9 +69,9 @@ public data class Pull(
     @SerialName("issue_url")
     val issueUrl: String,
     @SerialName("labels")
-    override val labels: List<ControlRecord.Label> = emptyList(),
+    override val labels: List<Label> = emptyList(),
     @SerialName("_links")
-    val links: Links, // Map<String, Link>
+    val links: Map<String, Link>,
     @SerialName("locked")
     override val locked: Boolean,
     @SerialName("maintainer_can_modify")
@@ -128,7 +128,7 @@ public data class Pull(
     override val repository: Repo? = null,
     @SerialName("performed_via_github_app")
     val performedViaGithubApp: GithubAppInfo? = null
-) : Entry, ControlRecord {
+) : Entry, ControlRecord() {
 
     @Serializable
     public data class About(
@@ -142,31 +142,11 @@ public data class Pull(
         val sha: String,
         @SerialName("user")
         val user: Owner?
-    ) : Owner.Product {
+    ) : Product {
 
         override val owner: Owner?
             get() = user
     }
-
-    @Serializable
-    public data class Links(
-        @SerialName("comments")
-        val comments: Link,
-        @SerialName("commits")
-        val commits: Link,
-        @SerialName("html")
-        val html: Link,
-        @SerialName("issue")
-        val issue: Link,
-        @SerialName("review_comment")
-        val reviewComment: Link,
-        @SerialName("review_comments")
-        val reviewComments: Link,
-        @SerialName("self")
-        val self: Link,
-        @SerialName("statuses")
-        val statuses: Link
-    )
 
     @Serializable
     public data class AutoMerge(

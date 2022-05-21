@@ -44,7 +44,7 @@ public open class CommitMapper(parent: Url, sha: String, override val github: Gi
     /**
      * [list-commit-comments](https://docs.github.com/en/rest/commits/comments#list-commit-comments)
      */
-    public open suspend fun comments(page: Int, per: Int = 30): List<Temp> =
+    public open suspend fun comments(page: Int = 1, per: Int = 30): List<CommitComment> =
         page(page = page, per = per, path = "comments")
 
     // endregion

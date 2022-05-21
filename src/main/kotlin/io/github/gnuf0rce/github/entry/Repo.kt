@@ -38,6 +38,8 @@ public data class Repo(
     val branchesUrl: String,
     @SerialName("clone_url")
     val cloneUrl: String,
+    @SerialName("code_of_conduct")
+    val codeOfConduct: CodeOfConduct? = null,
     @SerialName("collaborators_url")
     val collaboratorsUrl: String,
     @SerialName("comments_url")
@@ -194,8 +196,10 @@ public data class Repo(
     @SerialName("watchers_count")
     val watchersCount: Int,
     @SerialName("organization")
-    val organization: Organization? = null
-) : Entry, LifeCycle, WebPage, Owner.Product {
+    val organization: Organization? = null,
+    @SerialName("role_name")
+    val roleName: String = ""
+) : Entry, LifeCycle, WebPage, Product {
 
     @Deprecated("Repo No Closed", ReplaceWith("null"))
     override val closedAt: OffsetDateTime?
@@ -206,4 +210,24 @@ public data class Repo(
      */
     override val mergedAt: OffsetDateTime
         get() = pushedAt
+
+    @Serializable
+    public data class CodeOfConduct(
+        @SerialName("key")
+        val key: String,
+        @SerialName("name")
+        val name: String,
+        @SerialName("url")
+        val url: String,
+        @SerialName("body")
+        override val body: String,
+        @SerialName("body_text")
+        override val text: String,
+        @SerialName("body_html")
+        override val html: String,
+        @SerialName("html_url")
+        override val htmlUrl: String,
+        @SerialName("reactions")
+        override val reactions: Reactions? = null
+    ) : Content, WebPage
 }

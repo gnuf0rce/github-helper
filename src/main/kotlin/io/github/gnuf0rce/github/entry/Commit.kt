@@ -38,7 +38,7 @@ public data class Commit(
     val stats: Stats = Stats(),
     @SerialName("files")
     val files: List<File> = emptyList()
-) : Entry, Record, LifeCycle, WebPage, Owner.Product {
+) : Entry, Record, LifeCycle, WebPage, Product {
 
     override val owner: User?
         get() = author
@@ -54,8 +54,9 @@ public data class Commit(
     override val mergedAt: OffsetDateTime?
         get() = null
 
+    @Deprecated("Commit No Updated", ReplaceWith("null"))
     override val updatedAt: OffsetDateTime
-        get() = detail.committer?.date ?: OffsetDateTime.MIN
+        get() = createdAt.plusSeconds(detail.commentCount.toLong())
 
     override val createdAt: OffsetDateTime
         get() = detail.author?.date ?: OffsetDateTime.MIN
@@ -65,7 +66,7 @@ public data class Commit(
         @SerialName("sha")
         override val sha: String,
         @SerialName("html_url")
-        override val htmlUrl: String? = null,
+        override val htmlUrl: String = "",
         @SerialName("url")
         override val url: String
     ) : Record, WebPage
@@ -134,9 +135,12 @@ public data class Commit(
         override val sha: String,
         @SerialName("status")
         val status: FileStatus
-    ) : Record {
+    ) : Record, WebPage {
 
         override val url: String
             get() = rawUrl
+
+        override val htmlUrl: String
+            get() = blobUrl
     }
 }

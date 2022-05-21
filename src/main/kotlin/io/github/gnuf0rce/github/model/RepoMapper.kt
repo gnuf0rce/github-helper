@@ -34,6 +34,9 @@ public open class RepoMapper(parent: Url, override val github: GitHubClient) :
 
     public open suspend fun dispatches(context: Temp): Unit = post(context = context, path = "dispatches")
 
+    /**
+     * [list-repository-languages](https://docs.github.com/en/rest/repos/repos#list-repository-languages)
+     */
     public open suspend fun languages(): Map<String, Long> = get(path = "languages")
 
     public open suspend fun tags(page: Int, per: Int = 30): List<Temp> = page(page = page, per = per, path = "tags")
@@ -57,6 +60,18 @@ public open class RepoMapper(parent: Url, override val github: GitHubClient) :
 
     public open suspend fun generate(context: Temp): Temp = post(context = context, path = "generate")
 
+    /**
+     * [list-commits](https://docs.github.com/en/rest/commits/commits#list-commits)
+     */
+    public open suspend fun commits(page: Int = 1, per: Int = 30): List<Commit> =
+        page(page = page, per = per, path = "commits")
+
+    /**
+     * [list-repository-contributors](https://docs.github.com/en/rest/repos/repos#list-repository-contributors)
+     */
+    public open suspend fun collaborators(page: Int = 1, per: Int = 30, anonymous: Boolean = false): List<User> =
+        page(page = page, per = per, context = mapOf("anon" to anonymous), path = "contributors")
+
     public open val issues: IssuesMapper by lazy { IssuesMapper(parent = base, github = github) }
 
     public open val pulls: PullsMapper by lazy { PullsMapper(parent = base, github = github) }
@@ -65,17 +80,9 @@ public open class RepoMapper(parent: Url, override val github: GitHubClient) :
 
     public open val branches: BranchesMapper by lazy { BranchesMapper(parent = base, github = github) }
 
-    public open val collaborators: CollaboratorsMapper by lazy { CollaboratorsMapper(parent = base, github = github) }
-
     public open val releases: ReleasesMapper by lazy { ReleasesMapper(parent = base, github = github) }
 
     public open val milestones: MilestonesMapper by lazy { MilestonesMapper(parent = base, github = github) }
-
-    /**
-     * [list-commits](https://docs.github.com/en/rest/commits/commits#list-commits)
-     */
-    public open suspend fun commits(page: Int = 1, per: Int = 30): List<Commit> =
-        page(page = page, per = per, path = "commits")
 
     protected open val commits: MutableMap<String, CommitMapper> = WeakHashMap()
 

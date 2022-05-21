@@ -14,6 +14,7 @@ import kotlinx.serialization.*
 import java.time.*
 
 @Serializable
+@SerialName("PullRequestReviewComment")
 public data class PullRequestReviewComment(
     @SerialName("author_association")
     override val association: AuthorAssociation,
@@ -60,7 +61,7 @@ public data class PullRequestReviewComment(
     @SerialName("pull_request_url")
     val pullRequestUrl: String,
     @SerialName("_links")
-    val links: Links,
+    val links: Map<String, Link>,
     @SerialName("start_line")
     val startLine: String?,
     @SerialName("original_start_line")
@@ -73,24 +74,4 @@ public data class PullRequestReviewComment(
     val originalLine: Int?,
     @SerialName("side")
     val side: Side
-) : Entry, Comment {
-
-    @Deprecated("IssueComment No Closed", ReplaceWith("null"))
-    override val closedAt: OffsetDateTime?
-        get() = null
-
-    @Deprecated("IssueComment No Merged", ReplaceWith("null"))
-    override val mergedAt: OffsetDateTime?
-        get() = null
-
-
-    @Serializable
-    public data class Links(
-        @SerialName("self")
-        val self: Link,
-        @SerialName("html")
-        val html: Link,
-        @SerialName("pull_request")
-        val pullRequest: Link
-    )
-}
+) : Entry, Comment()

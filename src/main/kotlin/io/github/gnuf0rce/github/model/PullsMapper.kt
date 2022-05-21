@@ -40,6 +40,12 @@ public open class PullsMapper(parent: Url, override val github: GitHubClient) :
      */
     public open suspend fun get(number: Int): Pull = get(path = "$number")
 
+    /**
+     * [list-commits-on-a-pull-request](https://docs.github.com/en/rest/pulls/pulls#list-commits-on-a-pull-request)
+     */
+    public open suspend fun commits(number: Int, page: Int = 1, per: Int = 30): List<Commit> =
+        page(page = 1, per = per, path = "$number/commit")
+
     // endregion
 
     // region Review comments

@@ -32,7 +32,7 @@ public data class Readme(
     @SerialName("html_url")
     override val htmlUrl: String,
     @SerialName("_links")
-    val links: Links,
+    val links: Map<String, String>,
     @SerialName("name")
     val name: String,
     @SerialName("path")
@@ -46,16 +46,6 @@ public data class Readme(
     @SerialName("url")
     override val url: String
 ) : WebPage, Record {
-
-    @Serializable
-    public data class Links(
-        @SerialName("git")
-        val git: String,
-        @SerialName("html")
-        val html: String,
-        @SerialName("self")
-        val self: String
-    )
 
     @OptIn(InternalAPI::class)
     internal fun decode(): String {

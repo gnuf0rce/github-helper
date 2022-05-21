@@ -65,7 +65,7 @@ public data class Release(
     override val url: String,
     @SerialName("zipball_url")
     val zipballUrl: String?
-) : Entry, LifeCycle, WebPage, Content, Owner.Product {
+) : Entry, LifeCycle, WebPage, Content, Product {
 
     override val owner: User?
         get() = author
@@ -119,7 +119,7 @@ public data class Release(
         @Contextual
         @SerialName("url")
         override val url: String
-    ) : Entry, LifeCycle, Owner.Product {
+    ) : Entry, LifeCycle, Product {
 
         override val owner: User?
             get() = uploader
