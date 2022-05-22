@@ -8,10 +8,10 @@
  */
 
 
-package io.github.gnuf0rce.mirai.plugin.data
+package io.github.gnuf0rce.mirai.github.data
 
 import io.github.gnuf0rce.github.*
-import io.github.gnuf0rce.mirai.plugin.*
+import io.github.gnuf0rce.mirai.github.*
 import kotlinx.serialization.*
 import java.time.*
 

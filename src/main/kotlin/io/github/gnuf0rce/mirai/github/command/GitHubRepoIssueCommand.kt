@@ -8,44 +8,44 @@
  */
 
 
-package io.github.gnuf0rce.mirai.plugin.command
+package io.github.gnuf0rce.mirai.github.command
 
 import io.github.gnuf0rce.github.entry.*
-import io.github.gnuf0rce.mirai.plugin.*
-import io.github.gnuf0rce.mirai.plugin.data.*
+import io.github.gnuf0rce.mirai.github.*
+import io.github.gnuf0rce.mirai.github.data.*
 import net.mamoe.mirai.console.command.*
 import net.mamoe.mirai.contact.*
 import java.time.*
 
-public object GitHubRepoReleaseCommand : CompositeCommand(
+public object GitHubRepoIssueCommand : CompositeCommand(
     owner = GitHubHelperPlugin,
-    "repo-release",
-    description = "Repo Release Notice"
+    "repo-issue",
+    description = "Repo Issue Notice"
 ), GitHubCommand {
-    private val subscriber = object : GitHubSubscriber<Release>(primaryName, GitHubHelperPlugin) {
-        override val tasks: MutableMap<String, GitHubTask> by GitHubRepoTaskData::releases
+    private val subscriber = object : GitHubSubscriber<Issue>(primaryName, GitHubHelperPlugin) {
+        override val tasks: MutableMap<String, GitHubTask> by GitHubRepoTaskData::issues
 
-        override suspend fun GitHubTask.load(per: Int, since: OffsetDateTime): List<Release> {
-            return repo.releases.list(per = per).filter { it.updatedAt > since }
+        override suspend fun GitHubTask.load(per: Int, since: OffsetDateTime): List<Issue> {
+            return repo.issues.list(per = per) { this.since = since }.filter { it.updatedAt > since }
         }
     }
 
     @SubCommand
     public suspend fun CommandSender.add(repo: String, contact: Contact = Contact()) {
         subscriber.add(repo, contact.id)
-        sendMessage("$repo with release 添加完成")
+        sendMessage("$repo with issue 添加完成")
     }
 
     @SubCommand
     public suspend fun CommandSender.remove(repo: String, contact: Contact = Contact()) {
         subscriber.remove(repo, contact.id)
-        sendMessage("$repo with release 移除完成")
+        sendMessage("$repo with issue 移除完成")
     }
 
     @SubCommand
     public suspend fun CommandSender.interval(repo: String, millis: Long) {
         subscriber.interval(repo, millis)
-        sendMessage("$repo interval ${millis}ms with release")
+        sendMessage("$repo interval ${millis}ms with issue")
     }
 
     @SubCommand

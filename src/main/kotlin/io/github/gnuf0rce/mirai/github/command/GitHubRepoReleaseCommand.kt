@@ -8,44 +8,44 @@
  */
 
 
-package io.github.gnuf0rce.mirai.plugin.command
+package io.github.gnuf0rce.mirai.github.command
 
 import io.github.gnuf0rce.github.entry.*
-import io.github.gnuf0rce.mirai.plugin.*
-import io.github.gnuf0rce.mirai.plugin.data.*
+import io.github.gnuf0rce.mirai.github.*
+import io.github.gnuf0rce.mirai.github.data.*
 import net.mamoe.mirai.console.command.*
 import net.mamoe.mirai.contact.*
 import java.time.*
 
-public object GitHubRepoPullCommand : CompositeCommand(
+public object GitHubRepoReleaseCommand : CompositeCommand(
     owner = GitHubHelperPlugin,
-    "repo-pull",
-    description = "Repo Pull Notice"
+    "repo-release",
+    description = "Repo Release Notice"
 ), GitHubCommand {
-    private val subscriber = object : GitHubSubscriber<Pull>(primaryName, GitHubHelperPlugin) {
-        override val tasks: MutableMap<String, GitHubTask> by GitHubRepoTaskData::pulls
+    private val subscriber = object : GitHubSubscriber<Release>(primaryName, GitHubHelperPlugin) {
+        override val tasks: MutableMap<String, GitHubTask> by GitHubRepoTaskData::releases
 
-        override suspend fun GitHubTask.load(per: Int, since: OffsetDateTime): List<Pull> {
-            return repo.pulls.list(per = per).filter { it.updatedAt > since }
+        override suspend fun GitHubTask.load(per: Int, since: OffsetDateTime): List<Release> {
+            return repo.releases.list(per = per).filter { it.updatedAt > since }
         }
     }
 
     @SubCommand
     public suspend fun CommandSender.add(repo: String, contact: Contact = Contact()) {
         subscriber.add(repo, contact.id)
-        sendMessage("$repo with pull 添加完成")
+        sendMessage("$repo with release 添加完成")
     }
 
     @SubCommand
     public suspend fun CommandSender.remove(repo: String, contact: Contact = Contact()) {
         subscriber.remove(repo, contact.id)
-        sendMessage("$repo with pull 移除完成")
+        sendMessage("$repo with release 移除完成")
     }
 
     @SubCommand
     public suspend fun CommandSender.interval(repo: String, millis: Long) {
         subscriber.interval(repo, millis)
-        sendMessage("$repo interval ${millis}ms with pull")
+        sendMessage("$repo interval ${millis}ms with release")
     }
 
     @SubCommand

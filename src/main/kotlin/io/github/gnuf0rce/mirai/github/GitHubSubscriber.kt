@@ -8,12 +8,12 @@
  */
 
 
-package io.github.gnuf0rce.mirai.plugin
+package io.github.gnuf0rce.mirai.github
 
 import io.github.gnuf0rce.github.*
 import io.github.gnuf0rce.github.entry.*
 import io.github.gnuf0rce.github.exception.*
-import io.github.gnuf0rce.mirai.plugin.data.*
+import io.github.gnuf0rce.mirai.github.data.*
 import kotlinx.coroutines.*
 import net.mamoe.mirai.message.data.*
 import net.mamoe.mirai.utils.*

@@ -8,9 +8,9 @@
  */
 
 
-package io.github.gnuf0rce.mirai.plugin.command
+package io.github.gnuf0rce.mirai.github.command
 
-import io.github.gnuf0rce.mirai.plugin.*
+import io.github.gnuf0rce.mirai.github.*
 import net.mamoe.mirai.console.command.*
 import net.mamoe.mirai.message.data.*
 import net.mamoe.mirai.utils.warning

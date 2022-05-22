@@ -8,12 +8,12 @@
  */
 
 
-package io.github.gnuf0rce.mirai.spi
+package io.github.gnuf0rce.mirai.github.spi
 
 import io.github.gnuf0rce.github.exception.*
 import io.github.gnuf0rce.github.*
-import io.github.gnuf0rce.mirai.plugin.data.*
-import io.github.gnuf0rce.mirai.plugin.*
+import io.github.gnuf0rce.mirai.github.data.*
+import io.github.gnuf0rce.mirai.github.*
 import net.mamoe.mirai.console.util.ContactUtils.render
 import net.mamoe.mirai.event.*
 import net.mamoe.mirai.event.events.*

@@ -8,12 +8,12 @@
  */
 
 
-package io.github.gnuf0rce.mirai.plugin.command
+package io.github.gnuf0rce.mirai.github.command
 
 import io.github.gnuf0rce.github.entry.*
 import io.github.gnuf0rce.github.*
 import io.github.gnuf0rce.github.model.get
-import io.github.gnuf0rce.mirai.plugin.*
+import io.github.gnuf0rce.mirai.github.*
 import net.mamoe.mirai.console.command.*
 import net.mamoe.mirai.message.data.*
 import org.openqa.selenium.*

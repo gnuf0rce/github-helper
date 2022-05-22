@@ -8,11 +8,11 @@
  */
 
 
-package io.github.gnuf0rce.mirai.plugin.command
+package io.github.gnuf0rce.mirai.github.command
 
 import io.github.gnuf0rce.github.entry.*
-import io.github.gnuf0rce.mirai.plugin.*
-import io.github.gnuf0rce.mirai.plugin.data.*
+import io.github.gnuf0rce.mirai.github.*
+import io.github.gnuf0rce.mirai.github.data.*
 import net.mamoe.mirai.console.command.*
 import net.mamoe.mirai.contact.*
 import java.time.*

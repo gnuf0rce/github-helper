@@ -10,7 +10,7 @@
 
 @file:OptIn(ConsoleExperimentalApi::class)
 
-package io.github.gnuf0rce.mirai.plugin
+package io.github.gnuf0rce.mirai.github
 
 import io.github.gnuf0rce.github.*
 import io.ktor.client.request.*

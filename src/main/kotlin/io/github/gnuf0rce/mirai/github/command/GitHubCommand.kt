@@ -8,7 +8,7 @@
  */
 
 
-package io.github.gnuf0rce.mirai.plugin.command
+package io.github.gnuf0rce.mirai.github.command
 
 import net.mamoe.mirai.console.command.*
 

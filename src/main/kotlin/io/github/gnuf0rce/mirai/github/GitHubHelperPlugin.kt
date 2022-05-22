@@ -8,11 +8,11 @@
  */
 
 
-package io.github.gnuf0rce.mirai.plugin
+package io.github.gnuf0rce.mirai.github
 
 import io.github.gnuf0rce.github.*
-import io.github.gnuf0rce.mirai.plugin.command.*
-import io.github.gnuf0rce.mirai.plugin.data.*
+import io.github.gnuf0rce.mirai.github.command.*
+import io.github.gnuf0rce.mirai.github.data.*
 import net.mamoe.mirai.*
 import net.mamoe.mirai.console.command.CommandManager.INSTANCE.register
 import net.mamoe.mirai.console.command.CommandManager.INSTANCE.unregister

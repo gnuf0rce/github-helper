@@ -8,10 +8,10 @@
  */
 
 
-package io.github.gnuf0rce.mirai.plugin
+package io.github.gnuf0rce.mirai.github
 
 import io.github.gnuf0rce.github.*
-import io.github.gnuf0rce.mirai.plugin.data.*
+import io.github.gnuf0rce.mirai.github.data.*
 import io.ktor.http.*
 import net.mamoe.mirai.utils.*
 import org.openqa.selenium.remote.*
