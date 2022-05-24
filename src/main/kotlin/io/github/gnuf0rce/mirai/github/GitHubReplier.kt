@@ -22,7 +22,7 @@ import net.mamoe.mirai.console.util.*
 import net.mamoe.mirai.console.util.ContactUtils.render
 import net.mamoe.mirai.event.events.*
 import net.mamoe.mirai.utils.*
-import java.time.OffsetDateTime
+import java.time.*
 
 internal typealias MessageReplier = suspend MessageEvent.(MatchResult) -> Any?
 
@@ -105,7 +105,7 @@ internal val IssueReplier: MessageReplier = replier@{ result ->
     try {
         val (owner, repo, number) = result.destructured
         val entry = repo(owner, repo).issues.get(number.toInt())
-        entry.toMessage(subject, REPLIER_FORMAT, "$owner/$repo", OffsetDateTime.now().minusMinutes(10))
+        entry.toMessage(subject, REPLIER_FORMAT, "$owner/$repo", OffsetDateTime.now())
     } catch (cause: Throwable) {
         logger.warning({ "构建Issue(${result.value})信息失败" }, cause)
         cause.message
@@ -123,7 +123,7 @@ internal val PullReplier: MessageReplier = replier@{ result ->
     try {
         val (owner, repo, number) = result.destructured
         val entry = repo(owner, repo).pulls.get(number.toInt())
-        entry.toMessage(subject, REPLIER_FORMAT, "$owner/$repo", OffsetDateTime.now().minusMinutes(10))
+        entry.toMessage(subject, REPLIER_FORMAT, "$owner/$repo", OffsetDateTime.now())
     } catch (cause: Throwable) {
         logger.warning({ "构建Pull(${result.value})信息失败" }, cause)
         cause.message
