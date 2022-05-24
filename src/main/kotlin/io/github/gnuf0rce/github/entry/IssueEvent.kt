@@ -26,13 +26,15 @@ public data class IssueEvent(
     @SerialName("created_at")
     override val createdAt: OffsetDateTime,
     @SerialName("event")
-    val event: String,
+    override val event: String,
     @SerialName("id")
     val id: Long,
     @SerialName("issue")
     val issue: Issue? = null,
     @SerialName("label")
-    val label: Label? = null,
+    val label: SimpleLabel? = null,
+    @SerialName("labels")
+    val labels: List<Label> = emptyList(),
     @SerialName("assignee")
     val assignee: User? = null,
     @SerialName("assigner")
@@ -44,11 +46,11 @@ public data class IssueEvent(
     @SerialName("requested_team")
     val requestedTeam: Team? = null,
     @SerialName("dismissed_review")
-    val dismissedReview: Review? = null,
+    val dismissedReview: DismissedReview? = null,
     @SerialName("milestone")
-    val milestone: Milestone? = null,
+    val milestone: SimpleMilestone? = null,
     @SerialName("project_card")
-    val projectCard: Card? = null,
+    val projectCard: ProjectCard? = null,
     @SerialName("rename")
     val rename: Rename? = null,
     @SerialName("node_id")
@@ -66,16 +68,18 @@ public data class IssueEvent(
 ) : Entry, Event() {
 
     override val updatedAt: OffsetDateTime
-        get() = issue?.updatedAt ?: createdAt
+        get() = createdAt
 
+    @Deprecated("IssueEvent No Merged", ReplaceWith("null"))
     override val mergedAt: OffsetDateTime?
-        get() = issue?.mergedAt
+        get() = null
 
+    @Deprecated("IssueEvent No Closed", ReplaceWith("null"))
     override val closedAt: OffsetDateTime?
-        get() = issue?.closedAt
+        get() = null
 
     @Serializable
-    public data class Label(
+    public data class SimpleLabel(
         @SerialName("color")
         val color: String?,
         @SerialName("name")
@@ -83,7 +87,7 @@ public data class IssueEvent(
     )
 
     @Serializable
-    public data class Review(
+    public data class DismissedReview(
         @SerialName("state")
         val state: String,
         @SerialName("review_id")
@@ -95,13 +99,13 @@ public data class IssueEvent(
     )
 
     @Serializable
-    public data class Milestone(
+    public data class SimpleMilestone(
         @SerialName("title")
         val title: String
     )
 
     @Serializable
-    public data class Card(
+    public data class ProjectCard(
         @SerialName("url")
         val url: String,
         @SerialName("id")

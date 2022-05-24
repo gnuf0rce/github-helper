@@ -15,6 +15,7 @@ import kotlinx.serialization.*
 @Serializable
 public sealed class Event : Entry, LifeCycle, Product {
     public abstract val actor: User?
+    public abstract val event: String
 
     override val owner: Owner?
         get() = actor
