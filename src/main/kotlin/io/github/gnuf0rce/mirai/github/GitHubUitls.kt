@@ -15,7 +15,7 @@ import io.github.gnuf0rce.mirai.github.data.*
 import io.ktor.http.*
 import net.mamoe.mirai.utils.*
 import org.openqa.selenium.remote.*
-import xyz.cssxsh.mirai.plugin.*
+import xyz.cssxsh.mirai.selenium.*
 import java.io.*
 import java.net.*
 import java.util.*

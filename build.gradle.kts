@@ -42,8 +42,8 @@ dependencies {
         exclude(group = "io.ktor", module = "ktor-client-core")
     }
     compileOnly("net.mamoe:mirai-core-utils:2.11.0")
-    compileOnly("xyz.cssxsh.mirai:mirai-selenium-plugin:2.0.10")
-    compileOnly("xyz.cssxsh.mirai:mirai-administrator:1.0.7")
+    compileOnly("xyz.cssxsh.mirai:mirai-selenium-plugin:2.1.0")
+    compileOnly("xyz.cssxsh.mirai:mirai-administrator:1.1.0")
     // test
     testRuntimeOnly("xyz.cssxsh.mirai:mirai-selenium-plugin:2.11.0")
     testImplementation(kotlin("test", "1.6.21"))
