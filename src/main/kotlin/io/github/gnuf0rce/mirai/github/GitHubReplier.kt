@@ -37,7 +37,6 @@ internal val ReplierPermission: Permission by lazy {
 
 private fun MessageEvent.hasReplierPermission() = toCommandSender().hasPermission(ReplierPermission)
 
-// TODO: REPLIER_FORMAT
 private val REPLIER_FORMAT get() = GitHubConfig.replier
 
 /**
@@ -52,7 +51,7 @@ internal val OwnerReplier: MessageReplier = replier@{ result ->
         val (owner) = result.destructured
         val entry = github.user(owner).load().takeIf { it.type == "User" }
             ?: github.organization(owner).load()
-        entry.toMessage(subject, REPLIER_FORMAT, "", OffsetDateTime.MIN)
+        entry.toMessage(subject, REPLIER_FORMAT, "replier", OffsetDateTime.MIN)
     } catch (cause: Throwable) {
         logger.warning({ "构建Repo(${result.value})信息失败" }, cause)
         cause.message
