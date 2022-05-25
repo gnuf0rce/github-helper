@@ -21,6 +21,8 @@ import java.util.*
 public open class RepoMapper(parent: Url, override val github: GitHubClient) :
     GitHubMapper(parent = parent, path = "") {
 
+    // region Repositories
+
     public open suspend fun load(): Repo = get()
 
     public open suspend fun update(context: Temp): Temp = patch(context = context)
@@ -76,8 +78,6 @@ public open class RepoMapper(parent: Url, override val github: GitHubClient) :
 
     public open val pulls: PullsMapper by lazy { PullsMapper(parent = base, github = github) }
 
-    public open val autolinks: AutoLinksMapper by lazy { AutoLinksMapper(parent = base, github = github) }
-
     public open val branches: BranchesMapper by lazy { BranchesMapper(parent = base, github = github) }
 
     public open val releases: ReleasesMapper by lazy { ReleasesMapper(parent = base, github = github) }
@@ -89,10 +89,35 @@ public open class RepoMapper(parent: Url, override val github: GitHubClient) :
     public open fun commit(sha: String): CommitMapper =
         commits.getOrPut(sha) { CommitMapper(parent = base, sha = sha, github = github) }
 
+    // endregion
+
+    // region Autolinks
+
+    public open val autolinks: AutoLinksMapper by lazy { AutoLinksMapper(parent = base, github = github) }
+
+    // endregion
+
+    // region Contents
+
     protected open val contents: MutableMap<String, ContentMapper> = WeakHashMap()
 
     public open fun content(path: String): ContentMapper =
         contents.getOrPut(path) { ContentMapper(parent = base, path = path, github = github) }
 
+    /**
+     * [get-a-repository-readme-for-a-directory](https://docs.github.com/en/rest/repos/contents#get-a-repository-readme-for-a-directory)
+     */
     public open suspend fun readme(dir: String = ""): Readme = get(path = "readme/$dir")
+
+    /**
+     * [download-a-repository-archive-tar](https://docs.github.com/en/rest/repos/contents#download-a-repository-archive-tar)
+     */
+    public open suspend fun tar(ref: String): Readme = get(path = "tarball/$ref")
+
+    /**
+     * [download-a-repository-archive-zip](https://docs.github.com/en/rest/repos/contents#download-a-repository-archive-zip)
+     */
+    public open suspend fun zip(ref: String): Readme = get(path = "zipball/$ref")
+
+    // endregion
 }
