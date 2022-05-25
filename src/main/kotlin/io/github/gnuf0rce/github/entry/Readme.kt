@@ -24,15 +24,15 @@ public data class Readme(
     @SerialName("content")
     val content: String,
     @SerialName("download_url")
-    val downloadUrl: String,
+    val downloadUrl: String = "",
     @SerialName("encoding")
-    val encoding: Encoding,
+    val encoding: String,
     @SerialName("git_url")
-    val gitUrl: String,
+    val gitUrl: String?,
     @SerialName("html_url")
-    override val htmlUrl: String,
+    override val htmlUrl: String = "",
     @SerialName("_links")
-    val links: Map<String, String>,
+    val links: Map<String, String?>,
     @SerialName("name")
     val name: String,
     @SerialName("path")
@@ -42,15 +42,20 @@ public data class Readme(
     @SerialName("size")
     val size: Int,
     @SerialName("type")
-    val type: ReadmeType,
+    val type: String,
     @SerialName("url")
-    override val url: String
+    override val url: String,
+    @SerialName("target")
+    val target: String = "",
+    @SerialName("submodule_git_url")
+    val submoduleGitUrl: String = ""
 ) : WebPage, Record {
 
     @OptIn(InternalAPI::class)
     internal fun decode(): String {
         return when (encoding) {
-            Encoding.base64 -> content.lineSequence().joinToString("") { it.decodeBase64String() }
+            "base64" -> content.lineSequence().joinToString("") { it.decodeBase64String() }
+            else -> throw UnsupportedOperationException("decode $encoding")
         }
     }
 }

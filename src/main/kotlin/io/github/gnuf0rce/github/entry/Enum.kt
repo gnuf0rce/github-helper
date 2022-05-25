@@ -45,16 +45,10 @@ public enum class MergeableState { unknown, dirty, blocked, clean }
 public enum class MergeMethod { merge, squash, rebase }
 
 @Serializable
-public enum class Encoding { base64 }
-
-@Serializable
 public enum class Privacy { secret, closed }
 
 @Serializable
 public enum class RepoPermission { pull, push, admin }
-
-@Serializable
-public enum class ReadmeType { file }
 
 @Serializable
 public enum class ReleaseState { uploaded, open }
