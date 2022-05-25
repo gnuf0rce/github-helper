@@ -17,4 +17,4 @@ import io.ktor.http.*
  * @see [UserMapper]
  */
 public class GitHubUser(public val user: String, override val github: GitHubClient = GitHubClient()) :
-    WithGithubClient, UserMapper(parent = Url("https://api.github.com/users/${user}"), github = github)
+    WithGithubClient, UserMapper(parent = Url("https://api.github.com/users/"), user = user, github = github)

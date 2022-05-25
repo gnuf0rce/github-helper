@@ -27,7 +27,7 @@ public data class User(
     @SerialName("gists_url")
     val gistsUrl: String,
     @SerialName("gravatar_id")
-    val gravatarId: String,
+    val gravatarId: String?,
     @SerialName("html_url")
     override val htmlUrl: String,
     @SerialName("id")
@@ -72,6 +72,16 @@ public data class User(
     val publicRepos: Int = 0,
     @SerialName("public_gists")
     val publicGists: Int = 0,
+    @SerialName("private_gists")
+    val privateGists: Int = 0,
+    @SerialName("total_private_repos")
+    val totalPrivateRepos: Int = 0,
+    @SerialName("owned_private_repos")
+    val ownedPrivateRepos: Int = 0,
+    @SerialName("disk_usage")
+    val diskUsage: Int = 0,
+    @SerialName("collaborators")
+    val collaborators: Int = 0,
     @SerialName("followers")
     val followers: Int = 0,
     @SerialName("following")
@@ -81,5 +91,23 @@ public data class User(
     override val createdAt: OffsetDateTime = OffsetDateTime.MIN,
     @Contextual
     @SerialName("updated_at")
-    override val updatedAt: OffsetDateTime = OffsetDateTime.MIN
-) : Owner()
+    override val updatedAt: OffsetDateTime = OffsetDateTime.MIN,
+    @Contextual
+    @SerialName("suspended_at")
+    val suspendedAt: OffsetDateTime? = null,
+    @SerialName("plan")
+    val plan: Plan? = null
+) : Owner() {
+
+    @Serializable
+    public data class Plan(
+        @SerialName("collaborators")
+        val collaborators: Int,
+        @SerialName("name")
+        val name: String,
+        @SerialName("space")
+        val space: Int,
+        @SerialName("private_repos")
+        val privateRepos: Int
+    )
+}

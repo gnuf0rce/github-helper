@@ -26,6 +26,9 @@ public open class CurrentMapper(parent: Url, override val github: GitHubClient) 
     public suspend fun issues(page: Int = 1, per: Int = 30, block: IssueQuery.() -> Unit = {}): List<Issue> =
         page(page = page, per = per, context = IssueQuery().apply(block).toJsonObject(), path = "issues")
 
+    /**
+     * [get-the-authenticated-user](https://docs.github.com/en/rest/users/users#get-the-authenticated-user)
+     */
     public suspend fun user(): User = get(path = "user")
 
     public suspend fun rate(): RateLimit = get(path = "rate_limit")

@@ -15,13 +15,19 @@ import io.github.gnuf0rce.github.entry.*
 import io.ktor.http.*
 
 /**
- * 1. [https://api.github.com/users/{user}]
- * 2. [https://api.github.com/users/{user}/repos]
+ * [Users](https://docs.github.com/en/rest/users)
  */
-public open class UserMapper(parent: Url, override val github: GitHubClient) :
-    GitHubMapper(parent = parent, path = "") {
+public open class UserMapper(parent: Url, user: String, override val github: GitHubClient) :
+    GitHubMapper(parent = parent, path = user) {
 
+    // region Users
+
+    /**
+     * [about-the-users-api](https://docs.github.com/en/rest/users/users#about-the-users-api)
+     */
     public open suspend fun load(): User = get()
 
     public open suspend fun repos(page: Int, per: Int = 30): List<Repo> = page(page = page, per = per, path = "repos")
+
+    // endregion
 }

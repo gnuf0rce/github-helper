@@ -11,7 +11,7 @@
 package io.github.gnuf0rce.github.model
 
 import io.github.gnuf0rce.github.*
-import io.github.gnuf0rce.github.entry.Query
+import io.github.gnuf0rce.github.entry.*
 import io.ktor.client.request.*
 import io.ktor.http.*
 import kotlinx.serialization.json.*
