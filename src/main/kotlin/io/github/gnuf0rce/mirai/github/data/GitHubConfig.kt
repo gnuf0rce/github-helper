@@ -23,8 +23,8 @@ public object GitHubConfig : ReadOnlyPluginConfig("GithubConfig") {
     public val token: String by value(System.getenv("GITHUB_TOKEN").orEmpty())
 
     @ValueName("reply_type")
-    @ValueDescription("Subscriber Reply Message Type")
-    public val reply: Format by value(Format.TEXT)// TODO
+    @ValueDescription("Replier Reply Message Type")
+    public val replier: Format by value(Format.FORWARD)
 
     @ValueName("timeout")
     @ValueDescription("Http Timeout Second")

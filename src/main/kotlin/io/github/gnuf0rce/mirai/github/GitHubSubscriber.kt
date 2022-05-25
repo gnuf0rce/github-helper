@@ -75,16 +75,23 @@ public abstract class GitHubSubscriber<T>(private val name: String, parent: Coro
         }
     }
 
-    public fun list(contact: Long): String = buildString {
-        val records = synchronized(jobs) { tasks.filter { (_, task) -> contact in task.contacts } }
-        appendLine("| name | last | interval |")
-        appendLine("|:----:|:----:|:--------:|")
-        for ((_, task) in records) {
-            appendLine("| ${task.id} | ${task.last} | ${task.interval} |")
+    public fun format(id: String, type: Format) {
+        check(regex?.matches(id) ?: true) { "$id no matches $regex" }
+        compute(id) {
+            format = type
         }
     }
 
-    public suspend fun build(id: String, contact: Long, format: Format = Format.TEXT): Message {
+    public fun list(contact: Long): String = buildString {
+        val records = synchronized(jobs) { tasks.filter { (_, task) -> contact in task.contacts } }
+        appendLine("| name | last | interval | format |")
+        appendLine("|:----:|:----:|:--------:|:------:|")
+        for ((_, task) in records) {
+            appendLine("| ${task.id} | ${task.last} | ${task.interval} | ${task.format} |")
+        }
+    }
+
+    public suspend fun test(id: String, contact: Long, format: Format): Message {
         val since = OffsetDateTime.now().minusMinutes(10)
         val records = GitHubTask(id).load(per = PER_PAGE, since = since)
         if (records.isEmpty()) return "内容为空".toPlainText()

@@ -51,12 +51,18 @@ public object GitHubIssuesCommand : CompositeCommand(
     }
 
     @SubCommand
+    public suspend fun CommandSender.format(type: Format) {
+        subscriber.format("current", type)
+        sendMessage("current format $type with issue")
+    }
+
+    @SubCommand
     public suspend fun CommandSender.list(contact: Contact = Contact()) {
         sendMessage(subscriber.list(contact.id))
     }
 
     @SubCommand
-    public suspend fun CommandSender.build(contact: Contact = Contact()) {
-        sendMessage(subscriber.build("current", contact.id))
+    public suspend fun CommandSender.test(type: Format, contact: Contact = Contact()) {
+        sendMessage(subscriber.test("current", contact.id, type))
     }
 }

@@ -13,6 +13,7 @@
 package io.github.gnuf0rce.mirai.github
 
 import io.github.gnuf0rce.github.*
+import io.github.gnuf0rce.mirai.github.data.GitHubConfig
 import io.ktor.client.request.*
 import io.ktor.http.*
 import net.mamoe.mirai.console.command.CommandSender.Companion.toCommandSender
@@ -37,7 +38,7 @@ internal val ReplierPermission: Permission by lazy {
 private fun MessageEvent.hasReplierPermission() = toCommandSender().hasPermission(ReplierPermission)
 
 // TODO: REPLIER_FORMAT
-private val REPLIER_FORMAT = Format.FORWARD
+private val REPLIER_FORMAT get() = GitHubConfig.replier
 
 /**
  * 1. [https://github.com/{owner}/]

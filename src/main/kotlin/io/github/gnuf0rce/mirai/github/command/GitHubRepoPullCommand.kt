@@ -49,12 +49,18 @@ public object GitHubRepoPullCommand : CompositeCommand(
     }
 
     @SubCommand
+    public suspend fun CommandSender.format(repo: String, type: Format) {
+        subscriber.format(repo, type)
+        sendMessage("$repo format $type with pull")
+    }
+
+    @SubCommand
     public suspend fun CommandSender.list(contact: Contact = Contact()) {
         sendMessage(subscriber.list(contact.id))
     }
 
     @SubCommand
-    public suspend fun CommandSender.build(repo: String, contact: Contact = Contact()) {
-        sendMessage(subscriber.build(repo, contact.id))
+    public suspend fun CommandSender.test(repo: String, type: Format, contact: Contact = Contact()) {
+        sendMessage(subscriber.test(repo, contact.id, type))
     }
 }
