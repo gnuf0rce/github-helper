@@ -511,10 +511,7 @@ public suspend fun IssueEvent.toMessage(contact: Contact): Message = buildMessag
             append(" <").append(rename?.from).append("> to <").append(rename?.to).append(">")
         }
         "labeled" -> {
-            if (label != null) append(" ").append(label.name)
-            for (label in labels) {
-                append(" ").append(label.name)
-            }
+            append(" ").append(label?.name)
         }
         "assigned" -> {
             append(" ").append(assignee.avatar(contact)).append(assignee?.nameOrLogin)
@@ -536,6 +533,9 @@ public suspend fun IssueEvent.toMessage(contact: Contact): Message = buildMessag
         }
         "head_ref_force_pushed", "ready_for_review", "connected" -> {
             //
+        }
+        "review_requested" -> {
+            append(" from ").append(requestedReviewer.avatar(contact)).append(requestedReviewer?.nameOrLogin)
         }
         else -> {
             logger.warning { "未知事件类型 $event with $url" }
