@@ -19,8 +19,10 @@ import kotlinx.coroutines.*
 /**
  * [Issues](https://docs.github.com/en/rest/issues)
  */
-public open class IssuesMapper(parent: Url, override val github: GitHubClient) :
+public open class IssuesMapper(parent: Url) :
     GitHubMapper(parent = parent, path = "issues") {
+
+    override val github: GitHubClient = GitHubClient()
 
     // region Issues
 

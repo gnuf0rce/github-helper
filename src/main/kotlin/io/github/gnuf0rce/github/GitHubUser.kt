@@ -11,10 +11,9 @@
 package io.github.gnuf0rce.github
 
 import io.github.gnuf0rce.github.model.*
-import io.ktor.http.*
 
 /**
  * @see [UserMapper]
  */
-public class GitHubUser(public val user: String, override val github: GitHubClient = GitHubClient()) :
-    WithGithubClient, UserMapper(parent = Url("https://api.github.com/users/"), user = user, github = github)
+public class GitHubUser(user: String, override val github: GitHubClient = GitHubClient()) :
+    WithGithubClient, UserMapper(parent = api("users"), user = user)

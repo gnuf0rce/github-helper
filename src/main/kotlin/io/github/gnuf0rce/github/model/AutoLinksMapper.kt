@@ -15,10 +15,12 @@ import io.github.gnuf0rce.github.entry.*
 import io.ktor.http.*
 
 /**
- * 1. [https://api.github.com/repos/{owner}/{repo}/autolinks]
+ * [Repository autolinks](https://docs.github.com/en/rest/repos/autolinks)
  */
-public open class AutoLinksMapper(parent: Url, override val github: GitHubClient) :
+public open class AutoLinksMapper(parent: Url) :
     GitHubMapper(parent = parent, path = "autolinks") {
+
+    override val github: GitHubClient = GitHubClient()
 
     public open suspend fun list(page: Int, per: Int = 30): List<AutoLink> = page(page = page, per = per)
 

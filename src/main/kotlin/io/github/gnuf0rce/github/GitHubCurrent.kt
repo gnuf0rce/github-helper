@@ -11,10 +11,9 @@
 package io.github.gnuf0rce.github
 
 import io.github.gnuf0rce.github.model.*
-import io.ktor.http.*
 
 /**
  * @see [CurrentMapper]
  */
 public class GitHubCurrent(override val github: GitHubClient = GitHubClient()) :
-    WithGithubClient, CurrentMapper(parent = Url("https://api.github.com"), github = github)
+    WithGithubClient, CurrentMapper(parent = api())

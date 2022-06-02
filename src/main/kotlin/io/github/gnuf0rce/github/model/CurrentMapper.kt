@@ -17,8 +17,10 @@ import io.ktor.http.*
 /**
  * [REST API](https://docs.github.com/en/rest)
  */
-public open class CurrentMapper(parent: Url, override val github: GitHubClient) :
+public open class CurrentMapper(parent: Url) :
     GitHubMapper(parent = parent, path = "") {
+
+    override val github: GitHubClient = GitHubClient()
 
     /**
      * [list-issues-assigned-to-the-authenticated-user](https://docs.github.com/en/rest/issues/issues#list-issues-assigned-to-the-authenticated-user)

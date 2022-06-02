@@ -19,8 +19,10 @@ import kotlinx.coroutines.*
 /**
  * [Pulls](https://docs.github.com/en/rest/pulls/pulls)
  */
-public open class PullsMapper(parent: Url, override val github: GitHubClient) :
+public open class PullsMapper(parent: Url) :
     GitHubMapper(parent = parent, path = "pulls") {
+
+    override val github: GitHubClient = GitHubClient()
 
     // region Pulls
 

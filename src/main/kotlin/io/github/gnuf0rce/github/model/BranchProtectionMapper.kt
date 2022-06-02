@@ -16,8 +16,10 @@ import io.ktor.http.*
 /**
  * 1. [https://api.github.com/repos/{owner}/{repo}/branches/{branch}/protection]
  */
-public open class BranchProtectionMapper(parent: Url, branch: String, override val github: GitHubClient) :
+public open class BranchProtectionMapper(parent: Url, branch: String) :
     GitHubMapper(parent = parent, path = "${branch}/protection") {
+
+    override val github: GitHubClient = GitHubClient()
 
     public open suspend fun get(): Temp = get(path = "")
 

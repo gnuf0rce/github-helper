@@ -15,11 +15,12 @@ import io.github.gnuf0rce.github.entry.*
 import io.ktor.http.*
 
 /**
- * 1. [https://api.github.com/orgs/{org}]
- * 2. [https://api.github.com/orgs/{org}/repos]
+ * [Organizations](https://docs.github.com/en/rest/orgs)
  */
-public open class OrganizationMapper(parent: Url, override val github: GitHubClient) :
-    GitHubMapper(parent = parent, path = "") {
+public open class OrganizationMapper(parent: Url, public val org: String) :
+    GitHubMapper(parent = parent, path = org) {
+
+    override val github: GitHubClient = GitHubClient()
 
     public open suspend fun load(): Organization = get()
 

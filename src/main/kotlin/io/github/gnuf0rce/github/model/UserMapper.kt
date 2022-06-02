@@ -17,8 +17,10 @@ import io.ktor.http.*
 /**
  * [Users](https://docs.github.com/en/rest/users)
  */
-public open class UserMapper(parent: Url, user: String, override val github: GitHubClient) :
+public open class UserMapper(parent: Url, public val user: String) :
     GitHubMapper(parent = parent, path = user) {
+
+    override val github: GitHubClient = GitHubClient()
 
     // region Users
 

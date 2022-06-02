@@ -16,10 +16,12 @@ import io.ktor.http.*
 import java.util.*
 
 /**
- * 1. [https://api.github.com/repos/{owner}/{repo}]
+ * [Repositories](https://docs.github.com/en/rest/repos)
  */
-public open class RepoMapper(parent: Url, override val github: GitHubClient) :
-    GitHubMapper(parent = parent, path = "") {
+public open class ReposMapper(parent: Url, public val owner: String, public val repo: String) :
+    GitHubMapper(parent = parent, path = "$owner/$repo") {
+
+    override val github: GitHubClient = GitHubClient()
 
     // region Repositories
 
@@ -74,35 +76,53 @@ public open class RepoMapper(parent: Url, override val github: GitHubClient) :
     public open suspend fun collaborators(page: Int = 1, per: Int = 30, anonymous: Boolean = false): List<User> =
         page(page = page, per = per, context = mapOf("anon" to anonymous), path = "contributors")
 
-    public open val issues: IssuesMapper by lazy { IssuesMapper(parent = base, github = github) }
+    public open val issues: IssuesMapper = object : IssuesMapper(parent = base) {
+        override val github: GitHubClient get() = this@ReposMapper.github
+    }
 
-    public open val pulls: PullsMapper by lazy { PullsMapper(parent = base, github = github) }
+    public open val pulls: PullsMapper = object : PullsMapper(parent = base) {
+        override val github: GitHubClient get() = this@ReposMapper.github
+    }
 
-    public open val branches: BranchesMapper by lazy { BranchesMapper(parent = base, github = github) }
+    public open val branches: BranchesMapper = object : BranchesMapper(parent = base) {
+        override val github: GitHubClient get() = this@ReposMapper.github
+    }
 
-    public open val releases: ReleasesMapper by lazy { ReleasesMapper(parent = base, github = github) }
+    public open val releases: ReleasesMapper = object : ReleasesMapper(parent = base) {
+        override val github: GitHubClient get() = this@ReposMapper.github
+    }
 
-    public open val milestones: MilestonesMapper by lazy { MilestonesMapper(parent = base, github = github) }
+    public open val milestones: MilestonesMapper = object : MilestonesMapper(parent = base) {
+        override val github: GitHubClient get() = this@ReposMapper.github
+    }
 
     protected open val commits: MutableMap<String, CommitMapper> = WeakHashMap()
 
-    public open fun commit(sha: String): CommitMapper =
-        commits.getOrPut(sha) { CommitMapper(parent = base, sha = sha, github = github) }
+    public open fun commit(sha: String): CommitMapper = commits.getOrPut(sha) {
+        object : CommitMapper(parent = base, sha = sha) {
+            override val github: GitHubClient get() = this@ReposMapper.github
+        }
+    }
 
     // endregion
 
     // region Autolinks
 
-    public open val autolinks: AutoLinksMapper by lazy { AutoLinksMapper(parent = base, github = github) }
+    public open val autolinks: AutoLinksMapper = object : AutoLinksMapper(parent = base) {
+        override val github: GitHubClient get() = this@ReposMapper.github
+    }
 
     // endregion
 
     // region Contents
 
-    protected open val contents: MutableMap<String, ContentMapper> = WeakHashMap()
+    protected open val contents: MutableMap<String, ContentsMapper> = WeakHashMap()
 
-    public open fun content(path: String): ContentMapper =
-        contents.getOrPut(path) { ContentMapper(parent = base, path = path, github = github) }
+    public open fun content(path: String): ContentsMapper = contents.getOrPut(path) {
+        object : ContentsMapper(parent = base, path = path) {
+            override val github: GitHubClient get() = this@ReposMapper.github
+        }
+    }
 
     /**
      * [get-a-repository-readme-for-a-directory](https://docs.github.com/en/rest/repos/contents#get-a-repository-readme-for-a-directory)

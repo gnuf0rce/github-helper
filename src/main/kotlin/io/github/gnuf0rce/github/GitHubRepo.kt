@@ -11,10 +11,9 @@
 package io.github.gnuf0rce.github
 
 import io.github.gnuf0rce.github.model.*
-import io.ktor.http.*
 
 /**
- * @see [RepoMapper]
+ * @see [ReposMapper]
  */
-public class GitHubRepo(public val owner: String, public val repo: String, override val github: GitHubClient) :
-    WithGithubClient, RepoMapper(parent = Url("https://api.github.com/repos/${owner}/${repo}"), github = github)
+public class GitHubRepo(owner: String, repo: String, override val github: GitHubClient) :
+    WithGithubClient, ReposMapper(parent = api("repos"), owner = owner, repo = repo)

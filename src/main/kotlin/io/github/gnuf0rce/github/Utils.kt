@@ -85,3 +85,9 @@ internal object UrlSerializer : KSerializer<Url>  {
         encoder.encodeString(value.toString())
     }
 }
+
+internal fun api(vararg components: String): Url {
+    return URLBuilder(protocol = URLProtocol.HTTPS, host = UrlSerializer.API_HOST)
+        .path(*components)
+        .build()
+}

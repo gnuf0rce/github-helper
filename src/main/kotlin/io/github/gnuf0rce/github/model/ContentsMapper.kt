@@ -13,8 +13,13 @@ package io.github.gnuf0rce.github.model
 import io.github.gnuf0rce.github.*
 import io.ktor.http.*
 
-public open class ContentMapper(parent: Url, path: String, override val github: GitHubClient) :
+/**
+ * [Repository contents](https://docs.github.com/en/rest/repos/contents)
+ */
+public open class ContentsMapper(parent: Url, path: String) :
     GitHubMapper(parent = parent, path = path) {
+
+    override val github: GitHubClient = GitHubClient()
 
     public open suspend fun load(): Temp = get()
 

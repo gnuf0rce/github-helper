@@ -8,12 +8,17 @@
  */
 
 
-package io.github.gnuf0rce.github
+package io.github.gnuf0rce.github.model
 
-import io.github.gnuf0rce.github.model.*
+import io.github.gnuf0rce.github.*
+import io.ktor.http.*
 
 /**
- * @see [OrganizationMapper]
+ * [Actions](https://docs.github.com/en/rest/actions)
  */
-public class GitHubOrganization(org: String, override val github: GitHubClient = GitHubClient()) :
-    WithGithubClient, OrganizationMapper(parent = api("orgs"), org = org)
+public open class ActionMapper(parent: Url) :
+    GitHubMapper(parent = parent, path = "actions") {
+
+    override val github: GitHubClient = GitHubClient()
+
+}

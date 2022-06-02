@@ -17,8 +17,10 @@ import io.ktor.http.*
 /**
  * [Commits](https://docs.github.com/en/rest/commits)
  */
-public open class CommitMapper(parent: Url, sha: String, override val github: GitHubClient) :
+public open class CommitMapper(parent: Url, sha: String) :
     GitHubMapper(parent = parent, path = "commits/$sha") {
+
+    override val github: GitHubClient = GitHubClient()
 
     // region Commits
 

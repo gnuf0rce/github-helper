@@ -17,8 +17,10 @@ import io.ktor.http.*
 /**
  * [Releases](https://docs.github.com/en/rest/releases)
  */
-public open class ReleasesMapper(parent: Url, override val github: GitHubClient) :
+public open class ReleasesMapper(parent: Url) :
     GitHubMapper(parent = parent, path = "releases") {
+
+    override val github: GitHubClient = GitHubClient()
 
     // region Releases
 

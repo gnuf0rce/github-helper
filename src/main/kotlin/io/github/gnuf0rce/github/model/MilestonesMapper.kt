@@ -15,10 +15,12 @@ import io.github.gnuf0rce.github.entry.*
 import io.ktor.http.*
 
 /**
- * 1. [https://api.github.com/repos/{owner}/{repo}/milestones]
+ * [Milestones](https://docs.github.com/en/rest/issues/milestones)
  */
-public open class MilestonesMapper(parent: Url, override val github: GitHubClient) :
+public open class MilestonesMapper(parent: Url) :
     GitHubMapper(parent = parent, path = "milestones") {
+
+    override val github: GitHubClient = GitHubClient()
 
     public open suspend fun list(page: Int, per: Int = 30, context: Temp? = null): List<Milestone> =
         page(page = page, per = per, context = context)

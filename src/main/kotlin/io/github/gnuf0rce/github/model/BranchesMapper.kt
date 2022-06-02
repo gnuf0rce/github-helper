@@ -17,8 +17,10 @@ import java.util.*
 /**
  * 1. [https://api.github.com/repos/{owner}/{repo}/branches]
  */
-public open class BranchesMapper(parent: Url, override val github: GitHubClient) :
+public open class BranchesMapper(parent: Url) :
     GitHubMapper(parent = parent, path = "branches") {
+
+    override val github: GitHubClient = GitHubClient()
 
     public open suspend fun list(protected: Boolean, page: Int, per: Int = 30): List<Temp> =
         page(page = page, per = per, context = mapOf("protected" to protected))
@@ -27,6 +29,9 @@ public open class BranchesMapper(parent: Url, override val github: GitHubClient)
 
     protected open val protections: MutableMap<String, BranchProtectionMapper> = WeakHashMap()
 
-    public open suspend fun protection(branch: String): BranchProtectionMapper =
-        protections.getOrPut(branch) { BranchProtectionMapper(parent = base, branch = branch, github = github) }
+    public open suspend fun protection(branch: String): BranchProtectionMapper = protections.getOrPut(branch) {
+        object : BranchProtectionMapper(parent = base, branch = branch) {
+            override val github: GitHubClient get() = this@BranchesMapper.github
+        }
+    }
 }
