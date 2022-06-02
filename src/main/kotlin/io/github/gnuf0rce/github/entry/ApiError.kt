@@ -15,7 +15,7 @@ import kotlinx.serialization.*
 @Serializable
 public data class ApiError(
     @SerialName("documentation_url")
-    val documentationUrl: String? = "http",
+    val documentationUrl: String?,
     @SerialName("message")
     val message: String = "",
     @SerialName("errors")
