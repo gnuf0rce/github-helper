@@ -14,6 +14,7 @@ package io.github.gnuf0rce.mirai.github
 
 import io.github.gnuf0rce.github.*
 import io.github.gnuf0rce.github.entry.*
+import io.github.gnuf0rce.github.exception.*
 import io.github.gnuf0rce.mirai.github.data.*
 import io.ktor.client.call.*
 import io.ktor.client.request.*
@@ -760,24 +761,13 @@ public suspend fun Release.toMessage(contact: Contact, format: Format, notice: S
             if (reactions != null) appendLine(reactions)
             if (text != null && text.length < TextMaxLength) appendLine(text)
         }
-        Format.TEXT -> when {
-            // case 1 new open release
-            createdAt == updatedAt -> buildMessageChain {
-                appendLine(author.avatar(contact))
-                appendLine("[$notice] New release <${name ?: tagName}> opened by ${author?.nameOrLogin}")
-                appendLine(htmlUrl)
-                appendLine(reactions)
-                assets.joinTo(append("assets: ")) { it.name }.appendLine()
-                appendParagraph(text)
-            }
-            // case 2 release change
-            else -> buildMessageChain {
-                appendLine(author.avatar(contact))
-                appendLine("[$notice] Release <${name ?: tagName}> has change")
-                appendLine(htmlUrl)
-                appendLine(reactions)
-                assets.joinTo(append("assets: ")) { it.name }
-            }
+        Format.TEXT -> buildMessageChain {
+            appendLine(author.avatar(contact))
+            appendLine("[$notice] New release <${name ?: tagName}> opened by ${author?.nameOrLogin}")
+            appendLine(htmlUrl)
+            appendLine(reactions)
+            assets.joinTo(buffer = this, prefix = "assets: ") { it.name }.appendLine()
+            appendParagraph(text)
         }
         Format.FORWARD -> buildForwardMessage(contact) {
             displayStrategy = object : ForwardMessage.DisplayStrategy {
@@ -983,10 +973,16 @@ public suspend fun Repo.toMessage(contact: Contact, type: Format, notice: String
                 appendLine("$forksCount forks")
             }
 
-            contact.bot named "Release" at updatedAt says {
-                val latest = repo.releases.latest()
+            contact.bot named "Release" at updatedAt says release@{
+                val latest = try {
+                    repo.releases.latest()
+                } catch (exception: GitHubApiException) {
+                    append(exception.message)
+                    return@release
+                }
                 appendLine(latest.author.avatar(contact))
                 appendLine("latest release ${latest.name ?: latest.tagName} by ${latest.author?.nameOrLogin}")
+                appendLine(latest.htmlUrl)
                 appendLine(latest.reactions)
                 appendParagraph(latest.body)
             }
