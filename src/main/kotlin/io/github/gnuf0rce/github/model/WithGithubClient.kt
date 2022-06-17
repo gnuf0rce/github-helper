@@ -23,7 +23,13 @@ public interface WithGithubClient {
     public val github: GitHubClient
 }
 
-internal fun Url.resolve(path: String) = if (path.isEmpty()) this else copy(encodedPath = encodedPath + "/${path}")
+internal fun Url.resolve(path: String): Url {
+    return when {
+        path.isEmpty() -> this
+        encodedPath.endsWith("/") -> copy(encodedPath = encodedPath + path)
+        else -> copy(encodedPath = "$encodedPath/$path")
+    }
+}
 
 internal suspend inline fun <reified R> WithGithubClient.rest(
     path: String = "",
