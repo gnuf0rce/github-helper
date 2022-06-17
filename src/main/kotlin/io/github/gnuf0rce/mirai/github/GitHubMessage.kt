@@ -532,7 +532,12 @@ public suspend fun IssueEvent.toMessage(contact: Contact): Message = buildMessag
         "closed" -> {
             append(" as ").append(stateReason)
         }
-        "head_ref_force_pushed", "ready_for_review", "connected", "pined" -> {
+        "head_ref_force_pushed",
+        "ready_for_review",
+        "connected",
+        "mentioned",
+        "subscribed",
+        "pined" -> {
             //
         }
         "review_requested" -> {
