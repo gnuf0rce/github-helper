@@ -532,11 +532,17 @@ public suspend fun IssueEvent.toMessage(contact: Contact): Message = buildMessag
         "closed" -> {
             append(" as ").append(stateReason)
         }
-        "head_ref_force_pushed", "ready_for_review", "connected" -> {
+        "head_ref_force_pushed", "ready_for_review", "connected", "pined" -> {
             //
         }
         "review_requested" -> {
             append(" from ").append(requestedReviewer.avatar(contact)).append(requestedReviewer?.nameOrLogin)
+        }
+        "added_to_project" -> {
+            append(" ").append(projectCard?.projectId).append(" column ").append(projectCard?.columnName)
+            if (projectCard?.previousColumnName != null) {
+                append(" from ").append(projectCard.previousColumnName)
+            }
         }
         else -> {
             logger.warning { "未知事件类型 $event with $url" }
