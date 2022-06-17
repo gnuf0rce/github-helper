@@ -21,17 +21,17 @@ import java.net.*
 import java.util.*
 import kotlin.coroutines.*
 
-internal const val LOGGER_PROPERTY = "io.github.gnuf0rce.mirai.plugin.logger"
-
 internal const val IMAGE_FOLDER_PROPERTY = "io.github.gnuf0rce.mirai.plugin.image"
 
 /**
- * @see [LOGGER_PROPERTY]
  * @see [GitHubHelperPlugin.logger]
  */
 internal val logger by lazy {
-    val open = System.getProperty(LOGGER_PROPERTY, "${true}").toBoolean()
-    if (open) GitHubHelperPlugin.logger else SilentLogger
+    try {
+        GitHubHelperPlugin.logger
+    } catch (_: Throwable) {
+        MiraiLogger.Factory.create(GitHubSubscriber::class)
+    }
 }
 
 /**
