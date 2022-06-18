@@ -511,7 +511,7 @@ public suspend fun IssueEvent.toMessage(contact: Contact): Message = buildMessag
         "renamed" -> {
             append(" <").append(rename?.from).append("> to <").append(rename?.to).append(">")
         }
-        "labeled" -> {
+        "labeled", "unlabeled" -> {
             append(" ").append(label?.name)
         }
         "assigned" -> {
