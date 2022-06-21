@@ -83,7 +83,7 @@ internal suspend fun User.stats(flush: Long = 86400_000, client: GitHubClient = 
             http.get(STATS_API) {
                 parameter("username", login)
                 for ((key, value) in GitHubConfig.stats) parameter(key, value)
-            }
+            }.body()
         })
     }
 
