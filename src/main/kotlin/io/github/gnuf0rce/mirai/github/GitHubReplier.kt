@@ -188,7 +188,7 @@ private suspend fun Url.location(): String? {
         client.config {
             followRedirects = false
             expectSuccess = false
-        }.head<HttpMessage>(this@location)
+        }.head(this@location)
     }.headers[HttpHeaders.Location]
 }
 

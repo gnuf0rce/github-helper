@@ -15,12 +15,12 @@ import io.github.gnuf0rce.github.exception.*
 import io.ktor.client.*
 import io.ktor.client.call.*
 import io.ktor.client.engine.okhttp.*
-import io.ktor.client.features.*
-import io.ktor.client.features.compression.*
-import io.ktor.client.features.json.*
-import io.ktor.client.features.json.serializer.*
+import io.ktor.client.plugins.*
+import io.ktor.client.plugins.compression.*
+import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.client.request.*
 import io.ktor.http.*
+import io.ktor.serialization.kotlinx.json.*
 import kotlinx.coroutines.*
 import java.io.*
 import java.net.*
@@ -40,9 +40,8 @@ public open class GitHubClient(public open val token: String?) : CoroutineScope,
             connectTimeoutMillis = timeout
             requestTimeoutMillis = null
         }
-        Json {
-            serializer = KotlinxSerializer(GitHubJson)
-            accept(GitHubJsonContentType)
+        install(ContentNegotiation) {
+            json(json = GitHubJson)
         }
         defaultRequest {
             accept(ContentType.Text.Html)
@@ -51,11 +50,11 @@ public open class GitHubClient(public open val token: String?) : CoroutineScope,
             header(HttpHeaders.Authorization, token?.let { "token $it" })
         }
         HttpResponseValidator {
-            handleResponseException { cause ->
+            handleResponseExceptionWithRequest { cause, _ ->
                 if (cause is ClientRequestException && "documentation_url" in cause.message) {
                     throw GitHubApiException(
                         cause, try {
-                            cause.response.call.save().response.receive()
+                            cause.response.call.save().response.body()
                         } catch (_: Throwable) {
                             val json = cause.message.substringAfter("Text: \"").removeSuffix("\"")
                             GitHubJson.decodeFromString(ApiError.serializer(), json)

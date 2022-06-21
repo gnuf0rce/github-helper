@@ -18,7 +18,6 @@ import io.github.gnuf0rce.github.exception.*
 import io.github.gnuf0rce.mirai.github.data.*
 import io.ktor.client.call.*
 import io.ktor.client.request.*
-import io.ktor.client.statement.*
 import io.ktor.http.*
 import kotlinx.coroutines.*
 import kotlinx.serialization.*
@@ -197,14 +196,13 @@ internal suspend fun Owner?.avatar(contact: Contact, size: Int = UserAvatarSize,
     }
 
     val file = client.useHttpClient { http ->
-        http.get<HttpStatement>(avatarUrl) { url.parameters["s"] = size.toString() }.execute { response ->
-            val format = response.contentType()?.contentSubtype ?: "jpg"
-            val file = folder.resolve("${login}.${size}.${format}")
+        val response = http.get(avatarUrl) { url.parameters["s"] = size.toString() }
+        val format = response.contentType()?.contentSubtype ?: "jpg"
+        val file = folder.resolve("${login}.${size}.${format}")
 
-            file.writeBytes(response.receive())
+        file.writeBytes(response.body())
 
-            file
-        }
+        file
     }
 
     return file.uploadAsImage(contact)
@@ -822,10 +820,9 @@ public suspend fun Release.Asset.toMessage(contact: Contact): Message = buildMes
 
 public suspend fun Release.Asset.uploadTo(folder: AbsoluteFolder) {
     github.useHttpClient { http ->
-        http.get<HttpStatement>(browserDownloadUrl).execute { response ->
-            response.receive<java.io.InputStream>().toExternalResource().use { resource ->
-                folder.uploadNewFile(name, resource)
-            }
+        val response = http.get(browserDownloadUrl)
+        response.body<ByteArray>().toExternalResource().use { resource ->
+            folder.uploadNewFile(name, resource)
         }
     }
 }

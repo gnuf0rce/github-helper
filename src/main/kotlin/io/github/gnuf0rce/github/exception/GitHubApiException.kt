@@ -11,7 +11,7 @@
 package io.github.gnuf0rce.github.exception
 
 import io.github.gnuf0rce.github.entry.*
-import io.ktor.client.features.*
+import io.ktor.client.plugins.*
 
 public class GitHubApiException(override val cause: ResponseException, public val json: ApiError) :
     IllegalStateException(cause) {

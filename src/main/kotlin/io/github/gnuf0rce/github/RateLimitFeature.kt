@@ -11,7 +11,7 @@
 package io.github.gnuf0rce.github
 
 import io.ktor.client.*
-import io.ktor.client.features.*
+import io.ktor.client.plugins.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
@@ -44,17 +44,17 @@ public class RateLimitFeature internal constructor(public val send: suspend (Sta
         delay((reset - OffsetDateTime.now().toEpochSecond()) * 1_000)
     }
 
-    public companion object Feature : HttpClientFeature<Config, RateLimitFeature> {
+    public companion object Feature : HttpClientPlugin<Config, RateLimitFeature> {
         private val resource: AttributeKey<String> = AttributeKey("RateLimitResource")
 
         override val key: AttributeKey<RateLimitFeature> = AttributeKey("RateLimit")
 
         override fun prepare(block: Config.() -> Unit): RateLimitFeature = RateLimitFeature(Config().apply(block))
 
-        override fun install(feature: RateLimitFeature, scope: HttpClient) {
+        override fun install(plugin: RateLimitFeature, scope: HttpClient) {
             scope.sendPipeline.intercept(HttpSendPipeline.Before) {
                 val type = context.attributes.computeIfAbsent(resource) { "rate" }
-                with(feature) {
+                with(plugin) {
                     mutex.withLock {
                         val rate = rates.getValue(type)
                         if (rate.remaining == 0) {
@@ -66,7 +66,7 @@ public class RateLimitFeature internal constructor(public val send: suspend (Sta
 
             scope.receivePipeline.intercept(HttpReceivePipeline.State) { response ->
                 val type = response.request.attributes[resource]
-                with(feature) {
+                with(plugin) {
                     mutex.withLock {
                         val rate = response.rate() ?: return@withLock
                         rates[type] = rate

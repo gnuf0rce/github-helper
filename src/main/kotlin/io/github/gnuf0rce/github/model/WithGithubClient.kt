@@ -12,6 +12,7 @@ package io.github.gnuf0rce.github.model
 
 import io.github.gnuf0rce.github.*
 import io.github.gnuf0rce.github.entry.*
+import io.ktor.client.call.*
 import io.ktor.client.request.*
 import io.ktor.http.*
 import kotlinx.serialization.json.*
@@ -26,8 +27,10 @@ public interface WithGithubClient {
 internal fun Url.resolve(path: String): Url {
     return when {
         path.isEmpty() -> this
-        encodedPath.endsWith("/") -> copy(encodedPath = encodedPath + path)
-        else -> copy(encodedPath = "$encodedPath/$path")
+        else -> URLBuilder(this).apply {
+            if (!encodedPath.endsWith("/")) encodedPath += '/'
+            encodedPath += path
+        }.build()
     }
 }
 
@@ -38,7 +41,7 @@ internal suspend inline fun <reified R> WithGithubClient.rest(
     client.request(
         url = base.resolve(path),
         block = block
-    )
+    ).body()
 }
 
 internal suspend inline fun <reified R> WithGithubClient.get(
@@ -132,7 +135,7 @@ internal inline fun <reified T> HttpRequestBuilder.context(context: T) {
             }
         }
         HttpMethod.Post, HttpMethod.Put, HttpMethod.Patch -> {
-            body = context
+            setBody(body = context)
             contentType(ContentType.Application.Json)
         }
         else -> {
