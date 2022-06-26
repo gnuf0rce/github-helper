@@ -13,11 +13,13 @@ package io.github.gnuf0rce.mirai.github
 import io.github.gnuf0rce.github.*
 import io.github.gnuf0rce.mirai.github.command.*
 import io.github.gnuf0rce.mirai.github.data.*
-import net.mamoe.mirai.*
+import net.mamoe.mirai.console.MiraiConsole
 import net.mamoe.mirai.console.command.CommandManager.INSTANCE.register
 import net.mamoe.mirai.console.command.CommandManager.INSTANCE.unregister
 import net.mamoe.mirai.console.extension.*
 import net.mamoe.mirai.console.plugin.jvm.*
+import net.mamoe.mirai.console.plugin.*
+import net.mamoe.mirai.console.util.*
 import net.mamoe.mirai.event.*
 import net.mamoe.mirai.event.events.*
 import net.mamoe.mirai.utils.*
@@ -48,6 +50,11 @@ public object GitHubHelperPlugin : KotlinPlugin(
     }
 
     override fun onEnable() {
+        // XXX: mirai console version check
+        check(SemVersion.parseRangeRequirement(">= 2.12.0-RC").test(MiraiConsole.version)) {
+            "$name $version 需要 Mirai-Console 版本 >= 2.12.0，目前版本是 ${MiraiConsole.version}"
+        }
+
         GitHubConfig.reload()
         GitHubRepoTaskData.reload()
         GitHubTaskData.reload()
