@@ -21,7 +21,6 @@ import net.mamoe.mirai.console.plugin.jvm.*
 import net.mamoe.mirai.console.plugin.*
 import net.mamoe.mirai.console.util.*
 import net.mamoe.mirai.event.*
-import net.mamoe.mirai.event.events.*
 import net.mamoe.mirai.utils.*
 
 public object GitHubHelperPlugin : KotlinPlugin(
@@ -36,16 +35,13 @@ public object GitHubHelperPlugin : KotlinPlugin(
         dependsOn("xyz.cssxsh.mirai.plugin.mirai-administrator", true)
     }
 ) {
-
-    override fun PluginComponentStorage.onLoad() {
+    init {
         System.setProperty(IGNORE_UNKNOWN_KEYS, "true")
     }
 
-    private fun waitOnline(block: () -> Unit) {
-        if (Bot.instances.isEmpty()) {
-            globalEventChannel().subscribeOnce<BotOnlineEvent> { block() }
-        } else {
-            block()
+    override fun PluginComponentStorage.onLoad() {
+        runAfterStartup {
+            for (subscriber in GitHubSubscriber) subscriber.start()
         }
     }
 
@@ -60,10 +56,6 @@ public object GitHubHelperPlugin : KotlinPlugin(
         GitHubTaskData.reload()
 
         for (command in GitHubCommand) command.register()
-
-        waitOnline {
-            for (subscriber in GitHubSubscriber) subscriber.start()
-        }
 
         logger.info { "url auto reply: /perm add u* ${ReplierPermission.id}" }
 
