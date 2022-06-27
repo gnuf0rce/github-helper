@@ -49,6 +49,7 @@ public open class GitHubClient(public open val token: String?) : CoroutineScope,
             accept(GitHubJsonContentType)
             header(HttpHeaders.Authorization, token?.let { "token $it" })
         }
+        expectSuccess = true
         HttpResponseValidator {
             handleResponseExceptionWithRequest { cause, _ ->
                 if (cause is ClientRequestException && "documentation_url" in cause.message) {
