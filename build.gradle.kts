@@ -2,7 +2,7 @@ plugins {
     kotlin("jvm") version "1.6.21"
     kotlin("plugin.serialization") version "1.6.21"
 
-    id("net.mamoe.mirai-console") version "2.12.0-RC"
+    id("net.mamoe.mirai-console") version "2.12.0"
     id("net.mamoe.maven-central-publish") version "0.7.1"
 }
 
@@ -29,22 +29,22 @@ kotlin {
 }
 
 dependencies {
-    implementation("io.ktor:ktor-client-okhttp:2.0.2") {
+    implementation("io.ktor:ktor-client-okhttp:2.0.3") {
         exclude(group = "org.jetbrains.kotlin")
         exclude(group = "org.jetbrains.kotlinx")
         exclude(group = "org.slf4j")
     }
-    implementation("io.ktor:ktor-client-encoding:2.0.2") {
+    implementation("io.ktor:ktor-client-encoding:2.0.3") {
         exclude(group = "org.jetbrains.kotlin")
         exclude(group = "org.jetbrains.kotlinx")
         exclude(group = "org.slf4j")
     }
-    implementation("io.ktor:ktor-client-content-negotiation:2.0.2") {
+    implementation("io.ktor:ktor-client-content-negotiation:2.0.3") {
         exclude(group = "org.jetbrains.kotlin")
         exclude(group = "org.jetbrains.kotlinx")
         exclude(group = "org.slf4j")
     }
-    implementation("io.ktor:ktor-serialization-kotlinx-json:2.0.2") {
+    implementation("io.ktor:ktor-serialization-kotlinx-json:2.0.3") {
         exclude(group = "org.jetbrains.kotlin")
         exclude(group = "org.jetbrains.kotlinx")
         exclude(group = "org.slf4j")
@@ -54,7 +54,7 @@ dependencies {
         exclude(group = "org.jetbrains.kotlinx")
         exclude(group = "org.slf4j")
     }
-    compileOnly("net.mamoe:mirai-core-utils:2.12.0-RC")
+    compileOnly("net.mamoe:mirai-core-utils:2.12.0")
     compileOnly("xyz.cssxsh.mirai:mirai-selenium-plugin:2.1.1")
     compileOnly("xyz.cssxsh.mirai:mirai-administrator:1.2.0")
     // test
