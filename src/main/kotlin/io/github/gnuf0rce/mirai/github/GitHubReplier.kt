@@ -13,7 +13,7 @@
 package io.github.gnuf0rce.mirai.github
 
 import io.github.gnuf0rce.github.*
-import io.github.gnuf0rce.mirai.github.data.GitHubConfig
+import io.github.gnuf0rce.mirai.github.data.*
 import io.ktor.client.request.*
 import io.ktor.http.*
 import net.mamoe.mirai.console.command.CommandSender.Companion.toCommandSender

@@ -38,7 +38,12 @@ import xyz.cssxsh.selenium.*
 import java.io.File
 import java.time.*
 
-internal fun Contact(id: Long): Contact = Bot.instances.firstNotNullOf { it.getContactOrNull(id) }
+internal fun Contact(id: Long): Contact {
+    for (bot in Bot.instances.shuffled()) {
+        return bot.getContactOrNull(id) ?: continue
+    }
+    throw NoSuchElementException("Contact($id)")
+}
 
 // region UserStats
 
@@ -535,7 +540,8 @@ public suspend fun IssueEvent.toMessage(contact: Contact): Message = buildMessag
         "connected",
         "mentioned",
         "subscribed",
-        "pined" -> {
+        "pined",
+        "reopened" -> {
             //
         }
         "review_requested" -> {
