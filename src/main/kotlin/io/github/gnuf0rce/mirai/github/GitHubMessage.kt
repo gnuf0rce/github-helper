@@ -8,8 +8,6 @@
  */
 
 
-@file:OptIn(MiraiExperimentalApi::class, ConsoleExperimentalApi::class)
-
 package io.github.gnuf0rce.mirai.github
 
 import io.github.gnuf0rce.github.*
@@ -22,8 +20,6 @@ import io.ktor.http.*
 import kotlinx.coroutines.*
 import kotlinx.serialization.*
 import net.mamoe.mirai.*
-import net.mamoe.mirai.console.util.*
-import net.mamoe.mirai.console.util.ContactUtils.getContactOrNull
 import net.mamoe.mirai.console.util.ContactUtils.render
 import net.mamoe.mirai.contact.Contact
 import net.mamoe.mirai.contact.FileSupported
@@ -40,9 +36,17 @@ import java.time.*
 
 internal fun Contact(id: Long): Contact {
     for (bot in Bot.instances.shuffled()) {
-        return bot.getContactOrNull(id) ?: continue
+        for (friend in bot.friends) {
+            if (friend.id == id) return friend
+        }
+        for (group in bot.groups) {
+            if (group.id == id) return group
+            for (member in group.members) {
+                if (member.id == id) return member
+            }
+        }
     }
-    throw NoSuchElementException("Contact($id)")
+    throw kotlin.NoSuchElementException("Contact($id)")
 }
 
 // region UserStats
