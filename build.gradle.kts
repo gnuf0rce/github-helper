@@ -7,7 +7,7 @@ plugins {
 }
 
 group = "io.github.gnuf0rce"
-version = "1.2.1"
+version = "1.2.2"
 
 mavenCentralPublish {
     useCentralS01()
@@ -15,7 +15,6 @@ mavenCentralPublish {
     licenseFromGitHubProject("AGPL-3.0", "master")
     publication {
         artifact(tasks.getByName("buildPlugin"))
-        artifact(tasks.getByName("buildPluginLegacy"))
     }
 }
 
