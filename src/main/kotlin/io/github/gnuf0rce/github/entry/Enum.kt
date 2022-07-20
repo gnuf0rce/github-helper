@@ -39,7 +39,7 @@ public enum class IssueFilter { assigned, created, mentioned, subscribed, repos,
 public enum class ElementSort { created, updated, comments, popularity, `long-running` }
 
 @Serializable
-public enum class MergeableState { unknown, dirty, blocked, clean }
+public enum class MergeableState { unknown, dirty, blocked, clean, unstable }
 
 @Serializable
 public enum class MergeMethod { merge, squash, rebase }
