@@ -23,6 +23,7 @@ import net.mamoe.mirai.*
 import net.mamoe.mirai.console.util.ContactUtils.render
 import net.mamoe.mirai.contact.Contact
 import net.mamoe.mirai.contact.FileSupported
+import net.mamoe.mirai.contact.PermissionDeniedException
 import net.mamoe.mirai.contact.file.*
 import net.mamoe.mirai.message.*
 import net.mamoe.mirai.message.data.*
@@ -815,7 +816,13 @@ public suspend fun Release.toMessage(contact: Contact, format: Format, notice: S
 
 public suspend fun Release.uploadTo(contact: FileSupported) {
     val (owner, repo) = FULL_REGEX.find(Url(htmlUrl).encodedPath)!!.destructured
-    val folder = contact.files.root.createFolder("${repo}@${owner}")
+    val folder = with(contact.files.root) {
+        resolveFolder("${repo}@${owner}") ?: try {
+            createFolder("${repo}@${owner}")
+        } catch (_: PermissionDeniedException) {
+            this
+        }
+    }
     for (asset in assets) {
         // TODO: 上传大小上限
         asset.uploadTo(folder)
