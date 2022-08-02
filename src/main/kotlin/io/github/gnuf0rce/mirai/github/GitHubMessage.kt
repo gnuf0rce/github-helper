@@ -54,17 +54,17 @@ internal fun Contact(id: Long): Contact {
 
 private const val STATS_API = "https://github-readme-stats.vercel.app/api"
 
-private val RANK_REGEX = """(?<=rank-text[^>]{0,1024}>[^>]{0,1024}>[^\w]{0,1024})[\w+-]+""".toRegex()
+private val RANK_REGEX = """(?<=rank-text[^>]{0,1024}>[^>]{0,1024}>\W{0,1024})[\w+-]+""".toRegex()
 
-private val STARS_REGEX = """(?<=stars[^>]{0,1024}>[^\w]{0,1024})[^<\s]+""".toRegex()
+private val STARS_REGEX = """(?<=stars[^>]{0,1024}>\W{0,1024})[^<\s]+""".toRegex()
 
-private val COMMITS_REGEX = """(?<=commits[^>]{0,1024}>[^\w]{0,1024})[^<\s]+""".toRegex()
+private val COMMITS_REGEX = """(?<=commits[^>]{0,1024}>\W{0,1024})[^<\s]+""".toRegex()
 
-private val PRS_REGEX = """(?<=prs[^>]{0,1024}>[^\w]{0,1024})[^<\s]+""".toRegex()
+private val PRS_REGEX = """(?<=prs[^>]{0,1024}>\W{0,1024})[^<\s]+""".toRegex()
 
-private val ISSUES_REGEX = """(?<=issues[^>]{0,1024}>[^\w]{0,1024})[^<\s]+""".toRegex()
+private val ISSUES_REGEX = """(?<=issues[^>]{0,1024}>\W{0,1024})[^<\s]+""".toRegex()
 
-private val CONTRIB_REGEX = """(?<=contribs[^>]{0,1024}>[^\w]{0,1024})[^<\s]+""".toRegex()
+private val CONTRIB_REGEX = """(?<=contribs[^>]{0,1024}>\W{0,1024})[^<\s]+""".toRegex()
 
 private val OFFSET_REGEX = """(?<=dashoffset: )\d+\.?\d+""".toRegex()
 
@@ -81,7 +81,6 @@ public data class UserStats(
     val percentage: Int
 )
 
-@Suppress("BlockingMethodInNonBlockingContext")
 internal suspend fun User.stats(flush: Long = 86400_000, client: GitHubClient = github): UserStats {
     val stats = ImageFolder.resolve("stats")
     val svg = stats.resolve("${login}.svg")
@@ -550,7 +549,7 @@ public suspend fun IssueEvent.toMessage(contact: Contact): Message = buildMessag
         "reopened" -> {
             //
         }
-        "review_requested" -> {
+        "review_requested", "review_request_removed" -> {
             append(" from ").append(requestedReviewer.avatar(contact)).append(requestedReviewer?.nameOrLogin)
         }
         "added_to_project" -> {

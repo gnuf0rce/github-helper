@@ -51,7 +51,6 @@ public data class Readme(
     val submoduleGitUrl: String = ""
 ) : WebPage, Record {
 
-    @OptIn(InternalAPI::class)
     internal fun decode(): String {
         return when (encoding) {
             "base64" -> content.lineSequence().joinToString("") { it.decodeBase64String() }

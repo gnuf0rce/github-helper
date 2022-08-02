@@ -192,7 +192,7 @@ private suspend fun Url.location(): String? {
     }.headers[HttpHeaders.Location]
 }
 
-internal val SHORT_LINK_REGEX = """git\.io/[\w]+""".toRegex()
+internal val SHORT_LINK_REGEX = """git\.io/\w+""".toRegex()
 
 internal val ShortLinkReplier: MessageReplier = replier@{ result ->
     logger.info { "${sender.render()} 匹配ShortLink(${result.value})" }

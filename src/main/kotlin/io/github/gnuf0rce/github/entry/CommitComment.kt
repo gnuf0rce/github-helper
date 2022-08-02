@@ -52,4 +52,4 @@ public data class CommitComment(
     override val user: User?,
     @SerialName("reactions")
     override val reactions: Reactions? = null
-): Entry, Comment()
+) : Entry, Comment()

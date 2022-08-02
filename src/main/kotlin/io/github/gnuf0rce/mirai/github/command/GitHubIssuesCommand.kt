@@ -27,7 +27,7 @@ public object GitHubIssuesCommand : CompositeCommand(
 
         override val regex: Regex? = null
 
-        override suspend fun GitHubTask.load(per: Int, since: OffsetDateTime) : List<Issue> {
+        override suspend fun GitHubTask.load(per: Int, since: OffsetDateTime): List<Issue> {
             return current.issues(per = per) { this.since = since }.filter { it.updatedAt > since }
         }
     }

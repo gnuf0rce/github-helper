@@ -69,7 +69,7 @@ internal object ContentTypeSerializer : KSerializer<ContentType> {
     }
 }
 
-internal object UrlSerializer : KSerializer<Url>  {
+internal object UrlSerializer : KSerializer<Url> {
     override val descriptor: SerialDescriptor =
         PrimitiveSerialDescriptor(Url::class.qualifiedName!!, PrimitiveKind.STRING)
 
