@@ -12,7 +12,7 @@ version = "1.2.4"
 mavenCentralPublish {
     useCentralS01()
     singleDevGithubProject("gnuf0rce", "github-helper", "cssxsh")
-    licenseFromGitHubProject("AGPL-3.0", "master")
+    licenseFromGitHubProject("AGPL-3.0")
     workingDir = System.getenv("PUBLICATION_TEMP")?.let { file(it).resolve(projectName) }
         ?: project.buildDir.resolve("publishing-tmp")
     publication {
@@ -59,12 +59,12 @@ dependencies {
     testImplementation(kotlin("test"))
 }
 
-kotlin {
-    explicitApi()
-}
-
 mirai {
     jvmTarget = JavaVersion.VERSION_11
+}
+
+kotlin {
+    explicitApi()
 }
 
 tasks {
