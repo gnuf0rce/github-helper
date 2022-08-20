@@ -19,10 +19,15 @@ import net.mamoe.mirai.message.data.*
 import net.mamoe.mirai.utils.*
 import java.time.*
 import kotlin.collections.*
+import kotlin.coroutines.*
 
-public abstract class GitHubSubscriber<T>(private val name: String, parent: CoroutineScope) :
-    CoroutineScope by parent.childScope(name)
+public abstract class GitHubSubscriber<T>(private val name: String) : CoroutineScope
     where T : LifeCycle, T : WebPage {
+
+    override val coroutineContext: CoroutineContext =
+        CoroutineName(name = name) + SupervisorJob() + CoroutineExceptionHandler { context, throwable ->
+            logger.warning({ "$throwable in $context" }, throwable)
+        }
 
     public companion object : Sequence<GitHubSubscriber<*>> {
         public const val PER_PAGE: Int = 30

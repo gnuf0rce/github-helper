@@ -22,7 +22,7 @@ public object GitHubRepoIssueCommand : CompositeCommand(
     "repo-issue",
     description = "Repo Issue Notice"
 ), GitHubCommand {
-    private val subscriber = object : GitHubSubscriber<Issue>(primaryName, GitHubHelperPlugin) {
+    private val subscriber = object : GitHubSubscriber<Issue>(primaryName) {
         override val tasks: MutableMap<String, GitHubTask> by GitHubRepoTaskData::issues
 
         override suspend fun GitHubTask.load(per: Int, since: OffsetDateTime): List<Issue> {

@@ -22,7 +22,7 @@ public object GitHubRepoPullCommand : CompositeCommand(
     "repo-pull",
     description = "Repo Pull Notice"
 ), GitHubCommand {
-    private val subscriber = object : GitHubSubscriber<Pull>(primaryName, GitHubHelperPlugin) {
+    private val subscriber = object : GitHubSubscriber<Pull>(primaryName) {
         override val tasks: MutableMap<String, GitHubTask> by GitHubRepoTaskData::pulls
 
         override suspend fun GitHubTask.load(per: Int, since: OffsetDateTime): List<Pull> {

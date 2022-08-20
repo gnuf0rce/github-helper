@@ -22,7 +22,7 @@ public object GitHubRepoReleaseCommand : CompositeCommand(
     "repo-release",
     description = "Repo Release Notice"
 ), GitHubCommand {
-    private val subscriber = object : GitHubSubscriber<Release>(primaryName, GitHubHelperPlugin) {
+    private val subscriber = object : GitHubSubscriber<Release>(primaryName) {
         override val tasks: MutableMap<String, GitHubTask> by GitHubRepoTaskData::releases
 
         override suspend fun GitHubTask.load(per: Int, since: OffsetDateTime): List<Release> {
