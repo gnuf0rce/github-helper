@@ -7,7 +7,7 @@ plugins {
 }
 
 group = "io.github.gnuf0rce"
-version = "1.2.4"
+version = "1.2.5"
 
 mavenCentralPublish {
     useCentralS01()
@@ -52,7 +52,7 @@ dependencies {
         exclude(group = "org.slf4j")
     }
     compileOnly("xyz.cssxsh.mirai:mirai-selenium-plugin:2.2.3")
-    compileOnly("xyz.cssxsh.mirai:mirai-administrator:1.2.5")
+    compileOnly("xyz.cssxsh.mirai:mirai-administrator:1.2.6")
     // test
     testRuntimeOnly("xyz.cssxsh.mirai:mirai-selenium-plugin:2.2.3")
     testImplementation(kotlin("test"))

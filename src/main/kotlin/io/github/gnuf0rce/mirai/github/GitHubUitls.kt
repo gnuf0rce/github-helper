@@ -13,6 +13,7 @@ package io.github.gnuf0rce.mirai.github
 import io.github.gnuf0rce.github.*
 import io.github.gnuf0rce.mirai.github.data.*
 import io.ktor.http.*
+import kotlinx.coroutines.*
 import net.mamoe.mirai.utils.*
 import org.openqa.selenium.remote.*
 import xyz.cssxsh.mirai.selenium.*
@@ -58,11 +59,10 @@ internal val github by lazy {
             timeout = GitHubConfig.timeout * 1000
         }
 
-        override val coroutineContext: CoroutineContext = try {
-            GitHubHelperPlugin.childScopeContext(name = "github-client")
-        } catch (_: Throwable) {
-            EmptyCoroutineContext.childScopeContext(name = "github-client")
-        }
+        override val coroutineContext: CoroutineContext =
+            CoroutineName(name = "github-client") + SupervisorJob() + CoroutineExceptionHandler { context, throwable ->
+                logger.warning({ "$throwable in $context" }, throwable)
+            }
 
         override val ignore: (Throwable) -> Boolean = {
             when (it) {
