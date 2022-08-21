@@ -68,11 +68,11 @@ public open class IssuesMapper(parent: Url) :
      * [list-issue-comments-for-a-repository](https://docs.github.com/en/rest/issues/comments#list-issue-comments-for-a-repository)
      */
     public open val comments: Flow<List<IssueComment>> by lazy {
-        callbackFlow {
-            while (github.isActive) {
+        callbackFlow<List<IssueComment>> {
+            while (isActive) {
                 send(element = page(page = 1, per = 100, path = "comments"))
             }
-        }
+        }.flowOn(github.coroutineContext)
     }
 
     /**
@@ -90,11 +90,11 @@ public open class IssuesMapper(parent: Url) :
      * [list-issue-events-for-a-repository](https://docs.github.com/en/rest/issues/events#list-issue-events-for-a-repository)
      */
     public open val events: Flow<List<IssueEvent>> by lazy {
-        callbackFlow {
-            while (github.isActive) {
+        callbackFlow<List<IssueEvent>> {
+            while (isActive) {
                 send(element = page(page = 1, per = 100, path = "events"))
             }
-        }
+        }.flowOn(github.coroutineContext)
     }
 
     /**

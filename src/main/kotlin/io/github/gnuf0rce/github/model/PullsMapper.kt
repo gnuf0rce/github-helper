@@ -63,11 +63,11 @@ public open class PullsMapper(parent: Url) :
      * [list-review-comments-in-a-repository](https://docs.github.com/en/rest/pulls/comments#list-review-comments-in-a-repository)
      */
     public open val comments: Flow<List<PullRequestReviewComment>> by lazy {
-        callbackFlow {
-            while (github.isActive) {
+        callbackFlow<List<PullRequestReviewComment>> {
+            while (isActive) {
                 send(element = page(page = 1, per = 100, path = "comments"))
             }
-        }
+        }.flowOn(github.coroutineContext)
     }
 
     // endregion
