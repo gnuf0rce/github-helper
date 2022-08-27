@@ -199,7 +199,7 @@ internal suspend fun Owner?.avatar(contact: Contact, size: Int = UserAvatarSize,
     val login = this?.login.orEmpty()
 
     val folder = ImageFolder.resolve("avatar")
-    folder.mkdir()
+    folder.mkdirs()
     val cache = folder.listFiles()?.find { it.name.startsWith("${login}.${size}") }
     if (cache != null && System.currentTimeMillis() - cache.lastModified() < 7 * 24 * 3600_000) {
         return cache.uploadAsImage(contact)
