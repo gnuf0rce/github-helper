@@ -120,8 +120,8 @@ public abstract class GitHubSubscriber<T>(private val name: String) : CoroutineS
         for (cid in contacts) {
             try {
                 Contact(cid).sendEntry(entry = record, notice = id, format = format, since = last)
-            } catch (e: Throwable) {
-                logger.warning("发送信息失败(${name})", e)
+            } catch (cause: Exception) {
+                logger.warning("发送信息失败(${name})", cause)
             }
         }
     }
@@ -144,7 +144,7 @@ public abstract class GitHubSubscriber<T>(private val name: String) : CoroutineS
                 compute(current.id) { last = records.maxOfOrNull { it.updatedAt } ?: current.last }
             } catch (cause: GitHubApiException) {
                 logger.warning { "$name with $id api fail, ${cause.json}" }
-            } catch (cause: Throwable) {
+            } catch (cause: Exception) {
                 logger.warning({ "$name with $id run fail" }, cause)
             }
             delay(current.interval)

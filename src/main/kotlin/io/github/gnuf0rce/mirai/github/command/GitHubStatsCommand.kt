@@ -47,7 +47,7 @@ public object GitHubStatsCommand : CompositeCommand(
     public suspend fun UserCommandSender.card(name: String) {
         val message = try {
             user(name).card(subject)
-        } catch (cause: Throwable) {
+        } catch (cause: Exception) {
             cause.rawMessage.toPlainText()
         }
         sendMessage(message)
@@ -57,7 +57,7 @@ public object GitHubStatsCommand : CompositeCommand(
     public suspend fun UserCommandSender.contribution(name: String) {
         val message = try {
             user(name).contribution(subject)
-        } catch (cause: Throwable) {
+        } catch (cause: Exception) {
             cause.rawMessage.toPlainText()
         }
         sendMessage(message)
@@ -67,7 +67,7 @@ public object GitHubStatsCommand : CompositeCommand(
     public suspend fun UserCommandSender.trophy(name: String) {
         val message = try {
             user(name).trophy(subject)
-        } catch (cause: Throwable) {
+        } catch (cause: Exception) {
             cause.rawMessage.toPlainText()
         }
         sendMessage(message)

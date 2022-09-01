@@ -30,7 +30,7 @@ internal const val IMAGE_FOLDER_PROPERTY = "io.github.gnuf0rce.mirai.plugin.imag
 internal val logger by lazy {
     try {
         GitHubHelperPlugin.logger
-    } catch (_: Throwable) {
+    } catch (_: Exception) {
         MiraiLogger.Factory.create(GitHubSubscriber::class)
     }
 }
@@ -87,8 +87,8 @@ internal fun repo(owner: String, repo: String): GitHubRepo = repos.getOrPut("$ow
 internal val selenium: Boolean by lazy {
     try {
         MiraiSeleniumPlugin.setup()
-    } catch (exception: NoClassDefFoundError) {
-        logger.warning { "相关类加载失败，请安装 https://github.com/cssxsh/mirai-selenium-plugin $exception" }
+    } catch (error: NoClassDefFoundError) {
+        logger.warning { "相关类加载失败，请安装 https://github.com/cssxsh/mirai-selenium-plugin $error" }
         false
     }
 }

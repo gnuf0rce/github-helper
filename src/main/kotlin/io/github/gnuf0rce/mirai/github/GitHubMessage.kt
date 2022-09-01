@@ -121,7 +121,7 @@ internal suspend fun User.stats(flush: Long = 86400_000, client: GitHubClient = 
                 ((1 - next.value.toDouble() / pre.value.toDouble()) * 100).toInt()
             }
         )
-    } catch (cause: Throwable) {
+    } catch (cause: Exception) {
         svg.renameTo(stats.resolve("${login}.error.svg"))
         throw cause
     }
@@ -1001,8 +1001,8 @@ public suspend fun Repo.toMessage(contact: Contact, type: Format, notice: String
             contact.bot named "Release" at updatedAt says release@{
                 val latest = try {
                     repo.releases.latest()
-                } catch (exception: GitHubApiException) {
-                    append(exception.message)
+                } catch (cause: GitHubApiException) {
+                    append(cause.message)
                     return@release
                 }
                 appendLine(latest.author.avatar(contact))

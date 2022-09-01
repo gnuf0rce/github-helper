@@ -52,7 +52,7 @@ internal val OwnerReplier: MessageReplier = replier@{ result ->
         val entry = github.user(owner).load().takeIf { it.type == "User" }
             ?: github.organization(owner).load()
         entry.toMessage(subject, REPLIER_FORMAT, "replier", OffsetDateTime.MIN)
-    } catch (cause: Throwable) {
+    } catch (cause: Exception) {
         logger.warning({ "构建Repo(${result.value})信息失败" }, cause)
         cause.message
     }
@@ -70,7 +70,7 @@ internal val RepoReplier: MessageReplier = replier@{ result ->
         val (owner, repo) = result.destructured
         val entry = repo(owner, repo).load()
         entry.toMessage(subject, REPLIER_FORMAT, "replier")
-    } catch (cause: Throwable) {
+    } catch (cause: Exception) {
         logger.warning({ "构建Repo(${result.value})信息失败" }, cause)
         cause.message
     }
@@ -88,7 +88,7 @@ internal val CommitReplier: MessageReplier = replier@{ result ->
         val (owner, repo, sha) = result.destructured
         val entry = repo(owner, repo).commit(sha).get()
         entry.toMessage(subject, REPLIER_FORMAT, "$owner/$repo")
-    } catch (cause: Throwable) {
+    } catch (cause: Exception) {
         logger.warning({ "构建Commit(${result.value})信息失败" }, cause)
         cause.message
     }
@@ -106,7 +106,7 @@ internal val IssueReplier: MessageReplier = replier@{ result ->
         val (owner, repo, number) = result.destructured
         val entry = repo(owner, repo).issues.get(number.toInt())
         entry.toMessage(subject, REPLIER_FORMAT, "$owner/$repo", OffsetDateTime.now())
-    } catch (cause: Throwable) {
+    } catch (cause: Exception) {
         logger.warning({ "构建Issue(${result.value})信息失败" }, cause)
         cause.message
     }
@@ -124,7 +124,7 @@ internal val PullReplier: MessageReplier = replier@{ result ->
         val (owner, repo, number) = result.destructured
         val entry = repo(owner, repo).pulls.get(number.toInt())
         entry.toMessage(subject, REPLIER_FORMAT, "$owner/$repo", OffsetDateTime.now())
-    } catch (cause: Throwable) {
+    } catch (cause: Exception) {
         logger.warning({ "构建Pull(${result.value})信息失败" }, cause)
         cause.message
     }
@@ -146,7 +146,7 @@ internal val ReleaseReplier: MessageReplier = replier@{ result ->
             repo(owner, repo).releases.get(tag = name)
         }
         entry.toMessage(subject, REPLIER_FORMAT, "$owner/$repo")
-    } catch (cause: Throwable) {
+    } catch (cause: Exception) {
         logger.warning({ "构建Release(${result.value})信息失败" }, cause)
         cause.message
     }
@@ -164,7 +164,7 @@ internal val MilestoneReplier: MessageReplier = replier@{ result ->
         val (owner, repo, number) = result.destructured
         val entry = repo(owner, repo).milestones.get(number.toInt())
         entry.toMessage(subject, REPLIER_FORMAT, "$owner/$repo")
-    } catch (cause: Throwable) {
+    } catch (cause: Exception) {
         logger.warning({ "构建Milestone(${result.value})信息失败" }, cause)
         cause.message
     }
@@ -203,7 +203,7 @@ internal val ShortLinkReplier: MessageReplier = replier@{ result ->
             val new = regex.find(location) ?: continue
             return@replier replier(new)
         }
-    } catch (cause: Throwable) {
+    } catch (cause: Exception) {
         logger.warning({ "构建ShortLink(${result.value})信息失败" }, cause)
         cause.message
     }

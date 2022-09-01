@@ -25,7 +25,7 @@ public object GitHubReadmeCommand : SimpleCommand(
     public suspend fun UserCommandSender.handle(name: String) {
         val message = try {
             repo(if ('/' in name) name else "${name}/${name}").readme().toMessage(subject)
-        } catch (cause: Throwable) {
+        } catch (cause: Exception) {
             logger.warning({ "readme with $name 获取失败" }, cause)
             "readme with $name 获取失败".toPlainText()
         }

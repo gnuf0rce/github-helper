@@ -56,7 +56,7 @@ public open class GitHubClient(public open val token: String?) : CoroutineScope,
                     throw GitHubApiException(
                         cause, try {
                             cause.response.call.save().response.body()
-                        } catch (_: Throwable) {
+                        } catch (_: Exception) {
                             val json = cause.message.substringAfter("Text: \"").removeSuffix("\"")
                             GitHubJson.decodeFromString(ApiError.serializer(), json)
                         }
@@ -86,19 +86,21 @@ public open class GitHubClient(public open val token: String?) : CoroutineScope,
 
     public suspend fun <T> useHttpClient(block: suspend (HttpClient) -> T): T = supervisorScope {
         var count = 0
+        var current: Throwable? = null
         while (isActive) {
             try {
                 return@supervisorScope block(client)
-            } catch (throwable: Throwable) {
-                if (isActive && ignore(throwable)) {
+            } catch (cause: Throwable) {
+                current = cause
+                if (isActive && ignore(cause)) {
                     if (++count > maxIgnoreCount) {
-                        throw throwable
+                        throw cause
                     }
                 } else {
-                    throw throwable
+                    throw cause
                 }
             }
         }
-        throw CancellationException(null, null)
+        throw CancellationException(null, current)
     }
 }
