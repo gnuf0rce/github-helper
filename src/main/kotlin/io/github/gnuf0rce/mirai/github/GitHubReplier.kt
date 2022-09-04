@@ -42,7 +42,7 @@ private val REPLIER_FORMAT get() = GitHubConfig.replier
 /**
  * 1. [https://github.com/{owner}/]
  */
-internal val OWNER_REGEX = """(?<=github\.com/)([\w-.]+)(?![\w-.]*/[\w-.])""".toRegex()
+internal val OWNER_REGEX = """(?<=github\.com/)([\w-.]+)(?!\S*/\S+)""".toRegex()
 
 internal val OwnerReplier: MessageReplier = replier@{ result ->
     logger.info { "${sender.render()} 匹配Owner(${result.value})" }
@@ -61,7 +61,7 @@ internal val OwnerReplier: MessageReplier = replier@{ result ->
 /**
  * 1. [https://github.com/{owner}/{repo}/]
  */
-internal val REPO_REGEX = """(?<=github\.com/)([\w-.]+)/([\w-.]+)(?![\w-.]*/[\w-.])""".toRegex()
+internal val REPO_REGEX = """(?<=github\.com/)([\w-.]+)/([\w-.]+)(?!\S*/\S+)""".toRegex()
 
 internal val RepoReplier: MessageReplier = replier@{ result ->
     logger.info { "${sender.render()} 匹配Repo(${result.value})" }
@@ -79,7 +79,7 @@ internal val RepoReplier: MessageReplier = replier@{ result ->
 /**
  * 1. [https://github.com/{owner}/{repo}/commit/{sha}]
  */
-internal val COMMIT_REGEX = """(?<=github\.com/)([\w-.]+)/([\w-]+)/commit/(\w+)""".toRegex()
+internal val COMMIT_REGEX = """(?<=github\.com/)([\w-.]+)/([\w-]+)/commit/([0-9a-f]{40})""".toRegex()
 
 internal val CommitReplier: MessageReplier = replier@{ result ->
     logger.info { "${sender.render()} 匹配Commit(${result.value})" }
@@ -133,14 +133,14 @@ internal val PullReplier: MessageReplier = replier@{ result ->
 /**
  * 1. [https://github.com/{owner}/{repo}/releases/tag/{name}]
  */
-internal val RELEASE_REGEX = """(?<=github\.com/)([\w-.]+)/([\w-.]+)/releases/(?:tag/)?([^/#"]+)""".toRegex()
+internal val RELEASE_REGEX = """(?<=github\.com/)([\w-.]+)/([\w-.]+)/releases/(tag|latest)/?(\S*)""".toRegex()
 
 internal val ReleaseReplier: MessageReplier = replier@{ result ->
     logger.info { "${sender.render()} 匹配Release(${result.value})" }
     if (hasReplierPermission().not()) return@replier null
     try {
-        val (owner, repo, name) = result.destructured
-        val entry = if (name == "latest") {
+        val (owner, repo, type, name) = result.destructured
+        val entry = if (type == "latest") {
             repo(owner, repo).releases.latest()
         } else {
             repo(owner, repo).releases.get(tag = name)
