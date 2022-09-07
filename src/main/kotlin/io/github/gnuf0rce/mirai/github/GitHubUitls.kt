@@ -30,7 +30,7 @@ internal const val IMAGE_FOLDER_PROPERTY = "io.github.gnuf0rce.mirai.plugin.imag
 internal val logger by lazy {
     try {
         GitHubHelperPlugin.logger
-    } catch (_: Exception) {
+    } catch (_: ExceptionInInitializerError) {
         MiraiLogger.Factory.create(GitHubSubscriber::class)
     }
 }

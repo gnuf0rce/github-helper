@@ -7,7 +7,7 @@ plugins {
 }
 
 group = "io.github.gnuf0rce"
-version = "1.2.5"
+version = "1.2.6"
 
 mavenCentralPublish {
     useCentralS01()
@@ -52,10 +52,12 @@ dependencies {
         exclude(group = "org.slf4j")
     }
     compileOnly("xyz.cssxsh.mirai:mirai-selenium-plugin:2.2.3")
-    compileOnly("xyz.cssxsh.mirai:mirai-administrator:1.2.6")
+    compileOnly("xyz.cssxsh.mirai:mirai-administrator:1.2.7")
     // test
     testRuntimeOnly("xyz.cssxsh.mirai:mirai-selenium-plugin:2.2.3")
     testImplementation(kotlin("test"))
+    testImplementation("org.slf4j:slf4j-simple:2.0.0")
+    testImplementation("net.mamoe:mirai-logging-slf4j:2.13.0-M1")
 }
 
 mirai {

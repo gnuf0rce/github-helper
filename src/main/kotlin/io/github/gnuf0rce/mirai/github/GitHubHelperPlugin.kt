@@ -13,6 +13,7 @@ package io.github.gnuf0rce.mirai.github
 import io.github.gnuf0rce.github.*
 import io.github.gnuf0rce.mirai.github.command.*
 import io.github.gnuf0rce.mirai.github.data.*
+import kotlinx.coroutines.*
 import net.mamoe.mirai.console.MiraiConsole
 import net.mamoe.mirai.console.command.CommandManager.INSTANCE.register
 import net.mamoe.mirai.console.command.CommandManager.INSTANCE.unregister
@@ -27,7 +28,7 @@ public object GitHubHelperPlugin : KotlinPlugin(
     JvmPluginDescription(
         id = "io.github.gnuf0rce.github-helper",
         name = "github-helper",
-        version = "1.2.5",
+        version = "1.2.6",
     ) {
         author("cssxsh")
 
@@ -69,5 +70,6 @@ public object GitHubHelperPlugin : KotlinPlugin(
     override fun onDisable() {
         for (command in GitHubCommand) command.unregister()
         for (subscriber in GitHubSubscriber) subscriber.stop()
+        coroutineContext.cancelChildren()
     }
 }
