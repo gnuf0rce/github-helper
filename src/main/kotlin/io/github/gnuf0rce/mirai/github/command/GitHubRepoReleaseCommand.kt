@@ -21,7 +21,7 @@ public object GitHubRepoReleaseCommand : CompositeCommand(
     owner = GitHubHelperPlugin,
     "repo-release",
     description = "Repo Release Notice"
-), GitHubCommand {
+) {
     private val subscriber = object : GitHubSubscriber<Release>(primaryName) {
         override val tasks: MutableMap<String, GitHubTask> by GitHubRepoTaskData::releases
 

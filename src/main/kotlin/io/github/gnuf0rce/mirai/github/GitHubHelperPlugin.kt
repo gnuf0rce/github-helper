@@ -11,10 +11,10 @@
 package io.github.gnuf0rce.mirai.github
 
 import io.github.gnuf0rce.github.*
-import io.github.gnuf0rce.mirai.github.command.*
 import io.github.gnuf0rce.mirai.github.data.*
 import kotlinx.coroutines.*
 import net.mamoe.mirai.console.MiraiConsole
+import net.mamoe.mirai.console.command.*
 import net.mamoe.mirai.console.command.CommandManager.INSTANCE.register
 import net.mamoe.mirai.console.command.CommandManager.INSTANCE.unregister
 import net.mamoe.mirai.console.extension.*
@@ -46,6 +46,17 @@ public object GitHubHelperPlugin : KotlinPlugin(
         }
     }
 
+    @Suppress("INVISIBLE_MEMBER")
+    private inline fun <reified T : Any> services(): Lazy<List<T>> = lazy {
+        with(net.mamoe.mirai.console.internal.util.PluginServiceHelper) {
+            jvmPluginClasspath.pluginClassLoader
+                .findServices<T>()
+                .loadAllServices()
+        }
+    }
+
+    private val commands: List<Command> by services()
+
     override fun onEnable() {
         // XXX: mirai console version check
         check(SemVersion.parseRangeRequirement(">= 2.12.0-RC").test(MiraiConsole.version)) {
@@ -56,7 +67,7 @@ public object GitHubHelperPlugin : KotlinPlugin(
         GitHubRepoTaskData.reload()
         GitHubTaskData.reload()
 
-        for (command in GitHubCommand) command.register()
+        for (command in commands) command.register()
 
         logger.info { "url auto reply: /perm add u* ${ReplierPermission.id}" }
 
@@ -68,7 +79,7 @@ public object GitHubHelperPlugin : KotlinPlugin(
     }
 
     override fun onDisable() {
-        for (command in GitHubCommand) command.unregister()
+        for (command in commands) command.unregister()
         for (subscriber in GitHubSubscriber) subscriber.stop()
         coroutineContext.cancelChildren()
     }

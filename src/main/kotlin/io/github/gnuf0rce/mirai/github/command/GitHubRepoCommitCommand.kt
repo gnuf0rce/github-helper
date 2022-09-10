@@ -21,7 +21,7 @@ public object GitHubRepoCommitCommand : CompositeCommand(
     owner = GitHubHelperPlugin,
     "repo-commit",
     description = "Repo Commit Notice"
-), GitHubCommand {
+) {
     private val subscriber = object : GitHubSubscriber<Commit>(primaryName) {
         override val tasks: MutableMap<String, GitHubTask> by GitHubRepoTaskData::commits
 

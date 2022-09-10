@@ -19,7 +19,7 @@ public object GitHubReadmeCommand : SimpleCommand(
     owner = GitHubHelperPlugin,
     "readme",
     description = "Readme.md"
-), GitHubCommand {
+) {
 
     @Handler
     public suspend fun UserCommandSender.handle(name: String) {

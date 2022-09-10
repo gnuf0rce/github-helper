@@ -23,7 +23,7 @@ public object GitHubStatsCommand : CompositeCommand(
     owner = GitHubHelperPlugin,
     "stats",
     description = "User Stats"
-), GitHubCommand {
+) {
 
     private val cache: MutableMap<String, User> = WeakHashMap()
 

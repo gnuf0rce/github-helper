@@ -21,7 +21,7 @@ public object GitHubRepoIssueCommand : CompositeCommand(
     owner = GitHubHelperPlugin,
     "repo-issue",
     description = "Repo Issue Notice"
-), GitHubCommand {
+) {
     private val subscriber = object : GitHubSubscriber<Issue>(primaryName) {
         override val tasks: MutableMap<String, GitHubTask> by GitHubRepoTaskData::issues
 
