@@ -18,6 +18,10 @@ public object GitHubConfig : ReadOnlyPluginConfig("GithubConfig") {
     @ValueDescription("Proxy Format http://127.0.0.1:8080 or socks://127.0.0.1:1080")
     public val proxy: String by value("")
 
+    @ValueName("doh")
+    @ValueDescription("Dns Over Https Url")
+    public val doh: String by value("https://public.dns.iij.jp/dns-query")
+
     @ValueName("github_token")
     @ValueDescription("GitHub Token by https://github.com/settings/tokens")
     public val token: String by value(System.getenv("GITHUB_TOKEN").orEmpty())

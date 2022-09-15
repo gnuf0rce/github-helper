@@ -22,6 +22,9 @@ import io.ktor.client.request.*
 import io.ktor.http.*
 import io.ktor.serialization.kotlinx.json.*
 import kotlinx.coroutines.*
+import okhttp3.HttpUrl.Companion.toHttpUrl
+import okhttp3.OkHttpClient
+import okhttp3.dnsoverhttps.DnsOverHttps
 import java.io.*
 import java.net.*
 import kotlin.coroutines.*
@@ -31,6 +34,8 @@ public open class GitHubClient(public open val token: String?) : CoroutineScope,
     protected var proxy: Proxy? = null
 
     protected var timeout: Long = 30 * 1000L
+
+    protected var doh: String = ""
 
     protected open val client: HttpClient = HttpClient(OkHttp) {
         BrowserUserAgent()
@@ -72,6 +77,9 @@ public open class GitHubClient(public open val token: String?) : CoroutineScope,
         engine {
             config {
                 proxy(this@GitHubClient.proxy)
+                if (doh.isNotEmpty()) {
+                    dns(DnsOverHttps.Builder().client(OkHttpClient()).url(doh.toHttpUrl()).build())
+                }
             }
         }
     }

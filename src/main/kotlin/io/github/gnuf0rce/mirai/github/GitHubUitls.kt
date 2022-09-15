@@ -57,6 +57,7 @@ internal val github by lazy {
         init {
             proxy = GitHubConfig.proxy.takeIf { it.isNotBlank() }?.let(::Url)?.toProxy()
             timeout = GitHubConfig.timeout * 1000
+            doh = GitHubConfig.doh
         }
 
         override val coroutineContext: CoroutineContext =
