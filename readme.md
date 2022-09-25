@@ -109,8 +109,10 @@
 ### GithubConfig
 
 * `proxy` Format http://127.0.0.1:8080 or socks://127.0.0.1:1080
-* `token` [Personal Access Tokens](https://github.com/settings/tokens)
-* `reply` URL解析回复的消息格式
+* `doh` Dns Over Https Url
+* `github_token` [Personal Access Tokens](https://github.com/settings/tokens)
+* `reply_type` URL解析回复的消息格式
+* `timeout` Http 访问超时时间，单位秒
 * `percentage_member_join` 加群放行 GitHub 活跃等级（百分制），默认0，不开启功能
 * `percentages` 加群放行 GitHub 活跃等级（百分制），默认0，不开启功能
 * `sign_member_join` 加群放行提示信息
