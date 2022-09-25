@@ -765,8 +765,10 @@ public suspend fun PullRequestReviewComment.toMessage(contact: Contact): Message
 
 public suspend fun Release.toMessage(contact: Contact, format: Format, notice: String): Message {
     if (contact is FileSupported) {
-        contact.launch(SupervisorJob()) {
-            uploadTo(contact)
+        supervisorScope {
+            launch {
+                uploadTo(contact)
+            }
         }
     }
 

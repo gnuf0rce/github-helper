@@ -7,16 +7,16 @@ plugins {
 }
 
 group = "io.github.gnuf0rce"
-version = "1.2.6"
+version = "1.2.7"
 
 mavenCentralPublish {
     useCentralS01()
     singleDevGithubProject("gnuf0rce", "github-helper", "cssxsh")
     licenseFromGitHubProject("AGPL-3.0")
     workingDir = System.getenv("PUBLICATION_TEMP")?.let { file(it).resolve(projectName) }
-        ?: project.buildDir.resolve("publishing-tmp")
+        ?: buildDir.resolve("publishing-tmp")
     publication {
-        artifact(tasks.getByName("buildPlugin"))
+        artifact(tasks["buildPlugin"])
     }
 }
 
@@ -26,33 +26,33 @@ repositories {
 }
 
 dependencies {
-    implementation("io.ktor:ktor-client-okhttp:2.1.0") {
+    implementation("io.ktor:ktor-client-okhttp:2.1.1") {
         exclude(group = "org.jetbrains.kotlin")
         exclude(group = "org.jetbrains.kotlinx")
         exclude(group = "org.slf4j")
     }
-    implementation("io.ktor:ktor-client-encoding:2.1.0") {
+    implementation("io.ktor:ktor-client-encoding:2.1.1") {
         exclude(group = "org.jetbrains.kotlin")
         exclude(group = "org.jetbrains.kotlinx")
         exclude(group = "org.slf4j")
     }
-    implementation("io.ktor:ktor-client-content-negotiation:2.1.0") {
+    implementation("io.ktor:ktor-client-content-negotiation:2.1.1") {
         exclude(group = "org.jetbrains.kotlin")
         exclude(group = "org.jetbrains.kotlinx")
         exclude(group = "org.slf4j")
     }
-    implementation("io.ktor:ktor-serialization-kotlinx-json:2.1.0") {
+    implementation("io.ktor:ktor-serialization-kotlinx-json:2.1.1") {
         exclude(group = "org.jetbrains.kotlin")
         exclude(group = "org.jetbrains.kotlinx")
         exclude(group = "org.slf4j")
     }
-    implementation("com.squareup.okhttp3:okhttp:4.10.0") {
+    implementation("com.squareup.okhttp3:okhttp-dnsoverhttps:4.10.0") {
         exclude(group = "org.jetbrains.kotlin")
         exclude(group = "org.jetbrains.kotlinx")
         exclude(group = "org.slf4j")
     }
     compileOnly("xyz.cssxsh.mirai:mirai-selenium-plugin:2.2.3")
-    compileOnly("xyz.cssxsh.mirai:mirai-administrator:1.2.7")
+    compileOnly("xyz.cssxsh.mirai:mirai-administrator:1.2.8")
     // test
     testRuntimeOnly("xyz.cssxsh.mirai:mirai-selenium-plugin:2.2.3")
     testImplementation(kotlin("test"))

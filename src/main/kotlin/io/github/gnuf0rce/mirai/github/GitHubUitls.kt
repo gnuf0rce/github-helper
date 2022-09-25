@@ -67,8 +67,14 @@ internal val github by lazy {
 
         override val ignore: (Throwable) -> Boolean = {
             when (it) {
+                is UnknownHostException,
+                is NoRouteToHostException -> false
+                is SocketTimeoutException -> {
+                    logger.warning { "HttpClient Ignore ${it.message}" }
+                    true
+                }
                 is IOException -> {
-                    logger.warning { "HttpClient Ignore $it" }
+                    logger.warning({ "HttpClient Ignore" }, it)
                     true
                 }
                 else -> {
