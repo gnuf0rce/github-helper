@@ -54,11 +54,10 @@ internal const val TextMaxLength = 200
  */
 internal val github by lazy {
     object : GitHubClient(token = GitHubConfig.token.takeIf { it.isNotBlank() }) {
-        init {
-            proxy = GitHubConfig.proxy.takeIf { it.isNotBlank() }?.let(::Url)?.toProxy()
-            timeout = GitHubConfig.timeout * 1000
-            doh = GitHubConfig.doh
-        }
+        override val proxy: Proxy? get() = GitHubConfig.proxy.takeIf { it.isNotBlank() }?.let(::Url)?.toProxy()
+        override val timeout: Long get() =  GitHubConfig.timeout * 1000
+        override val doh: String get() = GitHubConfig.doh
+        override val ipv6: Boolean get() = GitHubConfig.ipv6
 
         override val coroutineContext: CoroutineContext =
             CoroutineName(name = "github-client") + SupervisorJob() + CoroutineExceptionHandler { context, throwable ->

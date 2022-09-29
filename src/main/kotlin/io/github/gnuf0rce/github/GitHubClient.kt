@@ -31,11 +31,13 @@ import kotlin.coroutines.*
 
 public open class GitHubClient(public open val token: String?) : CoroutineScope, Closeable {
 
-    protected var proxy: Proxy? = null
+    protected open val proxy: Proxy? = null
 
-    protected var timeout: Long = 30 * 1000L
+    protected open val timeout: Long = 30 * 1000L
 
-    protected var doh: String = ""
+    protected open val doh: String = ""
+
+    protected open val ipv6: Boolean = false
 
     protected open val client: HttpClient = HttpClient(OkHttp) {
         BrowserUserAgent()
@@ -78,7 +80,12 @@ public open class GitHubClient(public open val token: String?) : CoroutineScope,
             config {
                 proxy(this@GitHubClient.proxy)
                 if (doh.isNotEmpty()) {
-                    dns(DnsOverHttps.Builder().client(OkHttpClient()).url(doh.toHttpUrl()).build())
+                    dns(DnsOverHttps.Builder()
+                        .client(OkHttpClient())
+                        .url(doh.toHttpUrl())
+                        .includeIPv6(ipv6)
+                        .build()
+                    )
                 }
             }
         }
