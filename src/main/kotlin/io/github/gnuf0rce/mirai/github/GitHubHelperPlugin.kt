@@ -17,6 +17,7 @@ import net.mamoe.mirai.console.MiraiConsole
 import net.mamoe.mirai.console.command.*
 import net.mamoe.mirai.console.command.CommandManager.INSTANCE.register
 import net.mamoe.mirai.console.command.CommandManager.INSTANCE.unregister
+import net.mamoe.mirai.console.data.*
 import net.mamoe.mirai.console.extension.*
 import net.mamoe.mirai.console.plugin.jvm.*
 import net.mamoe.mirai.console.plugin.*
@@ -56,6 +57,8 @@ public object GitHubHelperPlugin : KotlinPlugin(
     }
 
     private val commands: List<Command> by services()
+    private val data: List<PluginData> by services()
+    private val config: List<PluginConfig> by services()
 
     override fun onEnable() {
         // XXX: mirai console version check
@@ -68,6 +71,8 @@ public object GitHubHelperPlugin : KotlinPlugin(
         GitHubTaskData.reload()
 
         for (command in commands) command.register()
+        for (data in data) data.reload()
+        for (config in config) config.reload()
 
         logger.info { "url auto reply: /perm add u* ${ReplierPermission.id}" }
 
