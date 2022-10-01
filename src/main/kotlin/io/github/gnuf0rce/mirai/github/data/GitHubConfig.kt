@@ -22,6 +22,10 @@ public object GitHubConfig : ReadOnlyPluginConfig("GithubConfig") {
     @ValueDescription("Dns Over Https Url")
     public val doh: String by value("https://public.dns.iij.jp/dns-query")
 
+    @ValueName("ipv6")
+    @ValueDescription("Dns Over Https Url")
+    public val ipv6: Boolean by value(false)
+
     @ValueName("github_token")
     @ValueDescription("GitHub Token by https://github.com/settings/tokens")
     public val token: String by value(System.getenv("GITHUB_TOKEN").orEmpty())
