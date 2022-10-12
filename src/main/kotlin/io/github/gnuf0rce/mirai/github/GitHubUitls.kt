@@ -88,7 +88,7 @@ internal val repos: MutableMap<String, GitHubRepo> = WeakHashMap()
 
 internal fun repo(full: String): GitHubRepo = repos.getOrPut(full) { github.repo(full) }
 
-internal fun repo(owner: String, repo: String): GitHubRepo = repos.getOrPut("$owner/repo") { github.repo(owner, repo) }
+internal fun repo(owner: String, repo: String): GitHubRepo = repos.getOrPut("$owner/$repo") { github.repo(owner, repo) }
 
 internal val selenium: Boolean by lazy {
     try {
