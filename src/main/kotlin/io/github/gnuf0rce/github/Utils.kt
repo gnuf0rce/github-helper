@@ -61,7 +61,11 @@ internal object ContentTypeSerializer : KSerializer<ContentType> {
         PrimitiveSerialDescriptor(ContentType::class.qualifiedName!!, PrimitiveKind.STRING)
 
     override fun deserialize(decoder: Decoder): ContentType {
-        return ContentType.parse(decoder.decodeString())
+        return try {
+            ContentType.parse(decoder.decodeString())
+        } catch (_: BadContentTypeFormatException) {
+            ContentType.Application.OctetStream
+        }
     }
 
     override fun serialize(encoder: Encoder, value: ContentType) {
