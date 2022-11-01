@@ -201,6 +201,9 @@ public data class Repo(
     val roleName: String = ""
 ) : Entry, LifeCycle, WebPage, Product {
 
+    public val graph: String
+        get() = "https://opengraph.githubassets.com/${System.currentTimeMillis()}/${owner?.name}/${name}"
+
     @Deprecated("Repo No Closed", ReplaceWith("null"))
     override val closedAt: OffsetDateTime?
         get() = null

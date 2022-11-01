@@ -130,6 +130,9 @@ public data class Pull(
     val performedViaGithubApp: GithubAppInfo? = null
 ) : Entry, ControlRecord() {
 
+    public val cover: String
+        get() = "https://opengraph.githubassets.com/${System.currentTimeMillis()}/${owner?.name}/${repository?.name}/pulls/$number"
+
     @Serializable
     public data class About(
         @SerialName("label")
