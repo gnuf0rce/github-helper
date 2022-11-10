@@ -12,4 +12,4 @@ package io.github.gnuf0rce.mirai.github.command
 
 import net.mamoe.mirai.console.command.*
 
-internal fun CommandSender.Contact() = requireNotNull(subject) { "无法从当前环境获取联系人" }
+internal fun CommandSender.context() = subject ?: throw IllegalCommandArgumentException("无法从当前环境获取联系人")

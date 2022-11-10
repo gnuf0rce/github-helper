@@ -31,13 +31,13 @@ public object GitHubRepoPullCommand : CompositeCommand(
     }
 
     @SubCommand
-    public suspend fun CommandSender.add(repo: String, contact: Contact = Contact()) {
+    public suspend fun CommandSender.add(repo: String, contact: Contact = context()) {
         subscriber.add(repo, contact.id)
         sendMessage("$repo with pull 添加完成")
     }
 
     @SubCommand
-    public suspend fun CommandSender.remove(repo: String, contact: Contact = Contact()) {
+    public suspend fun CommandSender.remove(repo: String, contact: Contact = context()) {
         subscriber.remove(repo, contact.id)
         sendMessage("$repo with pull 移除完成")
     }
@@ -55,12 +55,12 @@ public object GitHubRepoPullCommand : CompositeCommand(
     }
 
     @SubCommand
-    public suspend fun CommandSender.list(contact: Contact = Contact()) {
+    public suspend fun CommandSender.list(contact: Contact = context()) {
         sendMessage(subscriber.list(contact.id))
     }
 
     @SubCommand
-    public suspend fun CommandSender.test(repo: String, type: Format, contact: Contact = Contact()) {
+    public suspend fun CommandSender.test(repo: String, type: Format, contact: Contact = context()) {
         sendMessage(subscriber.test(repo, contact.id, type))
     }
 }

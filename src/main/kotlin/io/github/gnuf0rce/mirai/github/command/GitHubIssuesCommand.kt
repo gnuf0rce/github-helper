@@ -33,13 +33,13 @@ public object GitHubIssuesCommand : CompositeCommand(
     }
 
     @SubCommand
-    public suspend fun CommandSender.add(contact: Contact = Contact()) {
+    public suspend fun CommandSender.add(contact: Contact = context()) {
         subscriber.add("current", contact.id)
         sendMessage("current with issue 添加完成")
     }
 
     @SubCommand
-    public suspend fun CommandSender.remove(contact: Contact = Contact()) {
+    public suspend fun CommandSender.remove(contact: Contact = context()) {
         subscriber.remove("current", contact.id)
         sendMessage("current with issue 移除完成")
     }
@@ -57,12 +57,12 @@ public object GitHubIssuesCommand : CompositeCommand(
     }
 
     @SubCommand
-    public suspend fun CommandSender.list(contact: Contact = Contact()) {
+    public suspend fun CommandSender.list(contact: Contact = context()) {
         sendMessage(subscriber.list(contact.id))
     }
 
     @SubCommand
-    public suspend fun CommandSender.test(type: Format, contact: Contact = Contact()) {
+    public suspend fun CommandSender.test(type: Format, contact: Contact = context()) {
         sendMessage(subscriber.test("current", contact.id, type))
     }
 }
