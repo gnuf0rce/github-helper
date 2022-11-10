@@ -1024,7 +1024,13 @@ public suspend fun Repo.toMessage(contact: Contact, type: Format, notice: String
             contact.bot named "Languages" at updatedAt says {
                 appendLine("language and additional")
                 for ((language, additional) in repo.languages()) {
-                    appendLine("$language: $additional")
+                    val size = when (additional) {
+                        0L -> "0"
+                        in 1L until (1 shl 10) -> "${additional}B"
+                        in (1 shl 10)  until (1 shl 20) -> "${additional.toDouble().div(1 shl 10)}KB"
+                        else -> "${additional.toDouble().div(1 shl 20)}MB"
+                    }
+                    appendLine("$language: $size")
                 }
             }
         }
