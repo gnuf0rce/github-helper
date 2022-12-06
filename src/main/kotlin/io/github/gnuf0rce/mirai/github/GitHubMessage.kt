@@ -1027,8 +1027,8 @@ public suspend fun Repo.toMessage(contact: Contact, type: Format, notice: String
                     val size = when (additional) {
                         0L -> "0"
                         in 1L until (1 shl 10) -> "${additional}B"
-                        in (1 shl 10)  until (1 shl 20) -> "${additional.toDouble().div(1 shl 10)}KB"
-                        else -> "${additional.toDouble().div(1 shl 20)}MB"
+                        in (1 shl 10)  until (1 shl 20) -> "${additional.div(1 shl 10)}KB"
+                        else -> "${additional.div(1 shl 20)}MB"
                     }
                     appendLine("$language: $size")
                 }
@@ -1109,7 +1109,7 @@ public suspend fun Milestone.toMessage(contact: Contact, type: Format, notice: S
 
 public suspend fun Readme.toMessage(contact: Contact): Message {
     if (contact is FileSupported) {
-        contact.launch(SupervisorJob()) {
+        contact.launch {
             val file = if (selenium) {
                 logger.info { "将尝试发送 ${sha}.pdf to ${contact.render()}" }
                 pdf()

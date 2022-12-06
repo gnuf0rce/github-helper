@@ -132,7 +132,7 @@ public abstract class GitHubSubscriber<T>(private val name: String) : CoroutineS
         }
     }
 
-    private fun launch(id: String) = launch(SupervisorJob()) {
+    private fun launch(id: String) = launch {
         logger.info { "$name with $id run start" }
         while (isActive) {
             val current = task(id) ?: break

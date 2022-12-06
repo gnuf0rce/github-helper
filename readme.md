@@ -3,7 +3,7 @@
 > 基于 [Mirai Console](https://github.com/mamoe/mirai-console) 的 GitHub Notice 订阅插件
 
 [![Release](https://img.shields.io/github/v/release/gnuf0rce/github-helper)](https://github.com/gnuf0rce/github-helper/releases)
-[![Downloads](https://img.shields.io/github/downloads/gnuf0rce/github-helper/total)](https://shields.io/category/downloads)
+[![Downloads](https://img.shields.io/github/downloads/gnuf0rce/github-helper/total)](https://repo1.maven.org/maven2/io/github/gnuf0rce/mirai-content-censor/)
 [![MiraiForum](https://img.shields.io/badge/post-on%20MiraiForum-yellow)](https://mirai.mamoe.net/topic/554)
 
 **使用前应该查阅的相关文档或项目**
@@ -97,7 +97,7 @@
 
 举例：
 
-```
+```text
 问题：GitHub ID ?
 答案：cssxsh
 ```
@@ -108,24 +108,24 @@
 
 ### GithubConfig
 
-* `proxy` Format http://127.0.0.1:8080 or socks://127.0.0.1:1080
-* `doh` Dns Over Https Url
-* `github_token` [Personal Access Tokens](https://github.com/settings/tokens)
-* `reply_type` URL解析回复的消息格式
-* `timeout` Http 访问超时时间，单位秒
-* `percentage_member_join` 加群放行 GitHub 活跃等级（百分制），默认0，不开启功能
-* `percentages` 加群放行 GitHub 活跃等级（百分制），默认0，不开启功能
-* `sign_member_join` 加群放行提示信息
-* `github_readme_stats` stats card 绘制参数
+*   `proxy` Format http://127.0.0.1:8080 or socks://127.0.0.1:1080
+*   `doh` Dns Over Https Url
+*   `github_token` [Personal Access Tokens](https://github.com/settings/tokens)
+*   `reply_type` URL解析回复的消息格式
+*   `timeout` Http 访问超时时间，单位秒
+*   `percentage_member_join` 加群放行 GitHub 活跃等级（百分制），默认0，不开启功能
+*   `percentages` 加群放行 GitHub 活跃等级（百分制），默认0，不开启功能
+*   `sign_member_join` 加群放行提示信息
+*   `github_readme_stats` stats card 绘制参数
 
 ## 安装
 
 ### MCL 指令安装
 
 **请确认 mcl.jar 的版本是 2.1.0+**  
-`./mcl --update-package io.github.gnuf0rce:github-helper --channel stable --type plugin`
+`./mcl --update-package io.github.gnuf0rce:github-helper --channel maven-stable --type plugin`
 
 ### 手动安装
 
-* 运行 [Mirai Console](https://github.com/mamoe/mirai-console) 生成`plugins`文件夹
-* 从 [Releases](https://github.com/gnuf0rce/github-helper/releases) 下载`jar`并将其放入`plugins`文件夹中
+1.  从 [Releases](https://github.com/gnuf0rce/github-helper/releases) 或者 [Maven](https://repo1.maven.org/maven2/io/github/gnuf0rce/mirai-content-censor/) 下载 `mirai2.jar`
+2.  将其放入 `plugins` 文件夹中

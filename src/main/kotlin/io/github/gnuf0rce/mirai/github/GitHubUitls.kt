@@ -22,7 +22,7 @@ import java.net.*
 import java.util.*
 import kotlin.coroutines.*
 
-internal const val IMAGE_FOLDER_PROPERTY = "io.github.gnuf0rce.mirai.plugin.image"
+internal const val IMAGE_FOLDER_PROPERTY = "io.github.gnuf0rce.mirai.github.image"
 
 /**
  * @see [GitHubHelperPlugin.logger]
@@ -73,7 +73,11 @@ internal val github by lazy {
                     true
                 }
                 is IOException -> {
-                    logger.warning({ "HttpClient Ignore" }, it)
+                    if (it.message == "Connection reset") {
+                        logger.warning { "HttpClient Ignore ${it.message}" }
+                    } else {
+                        logger.warning({ "HttpClient Ignore" }, it)
+                    }
                     true
                 }
                 else -> {

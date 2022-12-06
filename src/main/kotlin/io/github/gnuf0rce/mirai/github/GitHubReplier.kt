@@ -132,6 +132,7 @@ internal val PullReplier: MessageReplier = replier@{ result ->
 
 /**
  * 1. [https://github.com/{owner}/{repo}/releases/tag/{name}]
+ * 2. [https://github.com/{owner}/{repo}/releases/latest]
  */
 internal val RELEASE_REGEX = """(?<=github\.com/)([\w-.]+)/([\w-.]+)/releases/(tag|latest)/?(\S*)""".toRegex()
 
