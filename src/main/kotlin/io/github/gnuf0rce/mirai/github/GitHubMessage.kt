@@ -1,5 +1,5 @@
 /*
- * Copyright 2021-2022 dsstudio Technologies and contributors.
+ * Copyright 2021-2023 dsstudio Technologies and contributors.
  *
  *  此源代码的使用受 GNU AFFERO GENERAL PUBLIC LICENSE version 3 许可证的约束, 可以在以下链接找到该许可证.
  *  Use of this source code is governed by the GNU AGPLv3 license that can be found through the following link.
@@ -196,7 +196,7 @@ public enum class Format { OLD, TEXT, FORWARD }
 
 internal suspend fun Owner?.avatar(contact: Contact, size: Int = UserAvatarSize, client: GitHubClient = github): Image {
     val avatarUrl = this?.avatarUrl ?: "https://avatars.githubusercontent.com/u/0"
-    val login = this?.login.orEmpty()
+    val login = this?.login ?: "ghost"
 
     val folder = ImageFolder.resolve("avatar")
     folder.mkdirs()
@@ -288,12 +288,12 @@ public suspend fun User.toMessage(contact: Contact, format: Format): Message {
             appendLine("BLOG: $blog")
             appendLine("EMAIL: $email")
         }
-        Format.TEXT -> buildMessageChain {
+        Format.TEXT -> buildString {
             appendLine("<$nameOrLogin> created at $createdAt")
             appendLine(blog ?: htmlUrl)
             appendLine("email: $email, twitter: $twitterUsername")
             appendLine("$publicRepos repos, $followers followers")
-        }
+        }.toPlainText()
         Format.FORWARD -> buildForwardMessage(contact) {
             displayStrategy = object : ForwardMessage.DisplayStrategy {
                 override fun generateTitle(forward: RawForwardMessage): String = nameOrLogin
@@ -332,12 +332,12 @@ public suspend fun Organization.toMessage(contact: Contact, format: Format): Mes
             appendLine("VERIFIED: $isVerified")
             appendParagraph(description)
         }
-        Format.TEXT -> buildMessageChain {
+        Format.TEXT -> buildString {
             appendLine("<$nameOrLogin> created at $createdAt")
             appendLine("$email ${if (isVerified) "verified" else ""}")
             appendLine("$publicRepos repos, $followers followers")
             appendParagraph(description)
-        }
+        }.toPlainText()
         Format.FORWARD -> buildForwardMessage(contact) {
             displayStrategy = object : ForwardMessage.DisplayStrategy {
                 override fun generateTitle(forward: RawForwardMessage): String = nameOrLogin
@@ -381,27 +381,27 @@ public suspend fun Issue.toMessage(contact: Contact, format: Format, notice: Str
         }
         Format.TEXT -> when {
             // case 1 new open issue
-            createdAt == updatedAt -> buildMessageChain {
+            createdAt == updatedAt -> buildString {
                 appendLine(user.avatar(contact))
                 appendLine("[$notice] New issue <$title> opened by ${user?.nameOrLogin}")
                 appendLine(htmlUrl)
                 appendParagraph(text)
             }
             // case 2 merged issue
-            mergedAt == updatedAt -> buildMessageChain {
+            mergedAt == updatedAt -> buildString {
                 appendLine("[$notice] Issue <$title> merged by ${pullRequest?.htmlUrl ?: mergedBy?.nameOrLogin}")
                 appendLine(htmlUrl)
                 appendLine(stateReason)
             }
             // case 3 closed issue
-            closedAt == updatedAt -> buildMessageChain {
+            closedAt == updatedAt -> buildString {
                 appendLine(closedBy.avatar(contact))
                 appendLine("[$notice] Issue <$title> closed by ${closedBy?.nameOrLogin}")
                 appendLine(htmlUrl)
                 appendLine(stateReason)
             }
             // case 4 new comment or event for issue
-            else -> buildMessageChain {
+            else -> buildString {
                 val repo = repo(full = FULL_REGEX.find(Url(htmlUrl).encodedPath)!!.value)
 
                 val comments = repo.issues.comments(number = number) {
@@ -419,7 +419,7 @@ public suspend fun Issue.toMessage(contact: Contact, format: Format, notice: Str
                     appendLine(comment.reactions)
                     appendParagraph(comment.text)
 
-                    return@buildMessageChain
+                    return@buildString
                 }
 
                 val events = repo.issues.events(number = number).filter { it.createdAt >= since }
@@ -430,7 +430,7 @@ public suspend fun Issue.toMessage(contact: Contact, format: Format, notice: Str
                         append(event.toMessage(contact)).appendLine()
                     }
 
-                    return@buildMessageChain
+                    return@buildString
                 }
 
                 appendLine("[$notice] Issue <$title> has change")
@@ -450,7 +450,7 @@ public suspend fun Issue.toMessage(contact: Contact, format: Format, notice: Str
                     appendLine("milestone with ${milestone.title}")
                 }
             }
-        }
+        }.toPlainText()
         Format.FORWARD -> buildForwardMessage(contact) {
             displayStrategy = object : ForwardMessage.DisplayStrategy {
                 override fun generateTitle(forward: RawForwardMessage): String = title
@@ -584,27 +584,27 @@ public suspend fun Pull.toMessage(contact: Contact, format: Format, notice: Stri
         }
         Format.TEXT -> when {
             // case 1 new open pull
-            createdAt == updatedAt -> buildMessageChain {
+            createdAt == updatedAt -> buildString {
                 appendLine(user.avatar(contact))
                 appendLine("[$notice] New pull request <$title> opened by ${user?.nameOrLogin}")
                 appendLine(htmlUrl)
                 appendParagraph(text)
             }
             // case 2 merged pull
-            mergedAt == updatedAt -> buildMessageChain {
+            mergedAt == updatedAt -> buildString {
                 appendLine(mergedBy.avatar(contact))
                 appendLine("[$notice] Pull Request <$title> merged by ${mergedBy?.nameOrLogin}")
                 appendLine(htmlUrl)
             }
             // case 3 closed pull
-            closedAt == updatedAt -> buildMessageChain {
+            closedAt == updatedAt -> buildString {
                 appendLine(closedBy.avatar(contact))
                 appendLine("[$notice] Pull Request <$title> closed by ${closedBy?.nameOrLogin}")
                 appendLine(htmlUrl)
                 appendParagraph(autoMerge?.commitTitle)
             }
             // case 4 new comment or event for issue
-            else -> buildMessageChain {
+            else -> buildString {
                 val repo = repo(full = FULL_REGEX.find(Url(htmlUrl).encodedPath)!!.value)
 
                 val reviews = repo.pulls.comments(number = number) {
@@ -622,7 +622,7 @@ public suspend fun Pull.toMessage(contact: Contact, format: Format, notice: Stri
                     appendLine(review.reactions)
                     appendParagraph(review.text)
 
-                    return@buildMessageChain
+                    return@buildString
                 }
 
                 val comments = repo.issues.comments(number = number) {
@@ -640,7 +640,7 @@ public suspend fun Pull.toMessage(contact: Contact, format: Format, notice: Stri
                     appendLine(comment.reactions)
                     appendParagraph(comment.text)
 
-                    return@buildMessageChain
+                    return@buildString
                 }
 
                 val events = repo.issues.events(number = number).filter { it.createdAt >= since }
@@ -651,7 +651,7 @@ public suspend fun Pull.toMessage(contact: Contact, format: Format, notice: Stri
                         append(event.toMessage(contact)).appendLine()
                     }
 
-                    return@buildMessageChain
+                    return@buildString
                 }
 
                 appendLine("[$notice] Pull Request <$title> has change")
@@ -678,7 +678,7 @@ public suspend fun Pull.toMessage(contact: Contact, format: Format, notice: Stri
                     appendLine("milestone with ${milestone.title}")
                 }
             }
-        }
+        }.toPlainText()
         Format.FORWARD -> buildForwardMessage(contact) {
             displayStrategy = object : ForwardMessage.DisplayStrategy {
                 override fun generateTitle(forward: RawForwardMessage): String = title
@@ -783,14 +783,14 @@ public suspend fun Release.toMessage(contact: Contact, format: Format, notice: S
             if (reactions != null) appendLine(reactions)
             if (text != null && text.length < TextMaxLength) appendLine(text)
         }
-        Format.TEXT -> buildMessageChain {
+        Format.TEXT -> buildString {
             appendLine(author.avatar(contact))
             appendLine("[$notice] New release <${name ?: tagName}> opened by ${author?.nameOrLogin}")
             appendLine(htmlUrl)
             appendLine(reactions)
             assets.joinTo(buffer = this, prefix = "assets: ") { it.name }.appendLine()
             appendParagraph(text)
-        }
+        }.toPlainText()
         Format.FORWARD -> buildForwardMessage(contact) {
             displayStrategy = object : ForwardMessage.DisplayStrategy {
                 override fun generateTitle(forward: RawForwardMessage): String = name ?: tagName
@@ -861,7 +861,7 @@ public suspend fun Commit.toMessage(contact: Contact, type: Format, notice: Stri
         }
         Format.TEXT -> when {
             // case 1 new open commit
-            detail.commentCount == 0 -> buildMessageChain {
+            detail.commentCount == 0 -> buildString {
                 appendLine(author.avatar(contact))
                 appendLine("[$notice] New commit $key by $ownerNameOrLogin")
                 appendLine(htmlUrl)
@@ -869,7 +869,7 @@ public suspend fun Commit.toMessage(contact: Contact, type: Format, notice: Stri
                 appendLine(detail.message)
             }
             // case 2 new comment for commit
-            else -> buildMessageChain {
+            else -> buildString {
                 val repo = repo(full = FULL_REGEX.find(Url(htmlUrl).encodedPath)!!.value)
                 val comment = repo.commit(sha = sha).comments().maxByOrNull { it.updatedAt }!!
 
@@ -880,7 +880,7 @@ public suspend fun Commit.toMessage(contact: Contact, type: Format, notice: Stri
                 appendLine(comment.reactions)
                 appendParagraph(comment.text)
             }
-        }
+        }.toPlainText()
         Format.FORWARD -> buildForwardMessage(contact) {
             displayStrategy = object : ForwardMessage.DisplayStrategy {
                 override fun generateTitle(forward: RawForwardMessage): String = "[$notice] commit $key"
@@ -946,7 +946,7 @@ public suspend fun Repo.toMessage(contact: Contact, type: Format, notice: String
         }
         Format.TEXT -> when {
             // case 1 new open repo
-            createdAt == updatedAt -> buildMessageChain {
+            createdAt == updatedAt -> buildString {
                 appendLine("[$fullName] created at $createdAt")
                 appendLine(htmlUrl)
                 when {
@@ -956,7 +956,7 @@ public suspend fun Repo.toMessage(contact: Contact, type: Format, notice: String
                 appendParagraph(description)
             }
             // case 2 has update repo
-            else -> buildMessageChain {
+            else -> buildString {
                 appendLine("[$fullName] updated at $updatedAt")
                 appendLine(htmlUrl)
                 when {
@@ -967,7 +967,7 @@ public suspend fun Repo.toMessage(contact: Contact, type: Format, notice: String
                 appendLine(topics.joinToString())
                 appendParagraph(description)
             }
-        }
+        }.toPlainText()
         Format.FORWARD -> buildForwardMessage(contact) {
             displayStrategy = object : ForwardMessage.DisplayStrategy {
                 override fun generateTitle(forward: RawForwardMessage): String = "[$fullName] updated at $updatedAt"
@@ -1056,7 +1056,7 @@ public suspend fun Milestone.toMessage(contact: Contact, type: Format, notice: S
         }
         Format.TEXT -> when {
             // case 1 new open milestone
-            createdAt == updatedAt -> buildMessageChain {
+            createdAt == updatedAt -> buildString {
                 appendLine(creator.avatar(contact))
                 appendLine("[$notice] New milestone $title opened by ${creator?.nameOrLogin}")
                 appendLine(htmlUrl)
@@ -1064,18 +1064,18 @@ public suspend fun Milestone.toMessage(contact: Contact, type: Format, notice: S
                 appendParagraph(description)
             }
             // case 2 milestone closed
-            state == State.closed -> buildMessageChain {
+            state == State.closed -> buildString {
                 appendLine("[$notice] Milestone $title closed at $closedAt")
                 appendLine(htmlUrl)
                 appendLine("${openIssues + closedIssues} issues, $openIssues open, $closedIssues closed")
             }
             // case 3 milestone updated
-            else -> buildMessageChain {
+            else -> buildString {
                 appendLine("[$notice] Milestone $title update at $updatedAt")
                 appendLine(htmlUrl)
                 appendLine("${openIssues + closedIssues} issues, $openIssues open, $closedIssues closed")
             }
-        }
+        }.toPlainText()
         Format.FORWARD -> buildForwardMessage(contact) {
             displayStrategy = object : ForwardMessage.DisplayStrategy {
                 override fun generateTitle(forward: RawForwardMessage): String = title
