@@ -33,6 +33,7 @@ dependencies {
     //
     implementation(platform("net.mamoe:mirai-bom:2.13.2"))
     compileOnly("net.mamoe:mirai-console-compiler-common")
+    testImplementation("net.mamoe:mirai-core-mock")
     testImplementation("net.mamoe:mirai-logging-slf4j")
     //
     implementation(platform("io.ktor:ktor-bom:2.1.3"))
