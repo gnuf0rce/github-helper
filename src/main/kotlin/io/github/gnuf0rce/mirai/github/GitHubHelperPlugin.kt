@@ -29,7 +29,7 @@ public object GitHubHelperPlugin : KotlinPlugin(
     JvmPluginDescription(
         id = "io.github.gnuf0rce.github-helper",
         name = "github-helper",
-        version = "1.2.9",
+        version = "1.2.10",
     ) {
         author("cssxsh")
 
@@ -47,18 +47,24 @@ public object GitHubHelperPlugin : KotlinPlugin(
         }
     }
 
-    @Suppress("INVISIBLE_MEMBER")
-    private inline fun <reified T : Any> spi(): Lazy<List<T>> = lazy {
-        with(net.mamoe.mirai.console.internal.util.PluginServiceHelper) {
-            jvmPluginClasspath.pluginClassLoader
-                .findServices<T>()
-                .loadAllServices()
+    private inline fun <reified T : Any> spi(): Lazy<List<T>> {
+        return try {
+            services()
+        } catch (_: NoSuchMethodError) {
+            lazy {
+                @Suppress("INVISIBLE_MEMBER")
+                with(net.mamoe.mirai.console.internal.util.PluginServiceHelper) {
+                    jvmPluginClasspath.pluginClassLoader
+                        .findServices<T>()
+                        .loadAllServices()
+                }
+            }
         }
     }
 
-    private val commands: List<Command> by services()
-    private val data: List<PluginData> by services()
-    private val config: List<PluginConfig> by services()
+    private val commands: List<Command> by spi()
+    private val data: List<PluginData> by spi()
+    private val config: List<PluginConfig> by spi()
 
     override fun onEnable() {
         // XXX: mirai console version check
