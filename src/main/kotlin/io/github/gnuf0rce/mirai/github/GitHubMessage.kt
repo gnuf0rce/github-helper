@@ -34,16 +34,27 @@ import org.openqa.selenium.*
 import xyz.cssxsh.selenium.*
 import java.io.File
 import java.time.*
+import java.util.*
+
+private val contacts: MutableMap<Long, Contact> = WeakHashMap()
 
 internal fun Contact(id: Long): Contact {
+    val contact = contacts[id]
+    if (contact != null) return contact
     for (bot in Bot.instances.shuffled()) {
         for (friend in bot.friends) {
-            if (friend.id == id) return friend
+            if (friend.id == id) {
+                contacts[id] = friend
+                return friend
+            }
         }
         for (group in bot.groups) {
             if (group.id == id) return group
             for (member in group.members) {
-                if (member.id == id) return member
+                if (member.id == id) {
+                    contacts[id] = member
+                    return member
+                }
             }
         }
     }
@@ -519,7 +530,8 @@ public suspend fun IssueEvent.toMessage(contact: Contact): Message = buildMessag
         "renamed" -> {
             append(" <").append(rename?.from).append("> to <").append(rename?.to).append(">")
         }
-        "labeled", "unlabeled" -> {
+        "labeled",
+        "unlabeled" -> {
             append(" ").append(label?.name)
         }
         "assigned" -> {
@@ -531,7 +543,8 @@ public suspend fun IssueEvent.toMessage(contact: Contact): Message = buildMessag
         "demilestoned" -> {
             append(" from ").append(milestone?.title)
         }
-        "merged", "referenced" -> {
+        "merged",
+        "referenced" -> {
             append(" on ").append(commitId)
         }
         "locked" -> {
@@ -545,14 +558,23 @@ public suspend fun IssueEvent.toMessage(contact: Contact): Message = buildMessag
         "connected",
         "mentioned",
         "subscribed",
-        "pined",
+        "pinned",
+        "unpinned",
+        "transferred",
         "reopened" -> {
             //
         }
-        "review_requested", "review_request_removed" -> {
+        "review_requested",
+        "review_request_removed" -> {
             append(" from ").append(requestedReviewer.avatar(contact)).append(requestedReviewer?.nameOrLogin)
         }
         "added_to_project" -> {
+            append(" ").append(projectCard?.projectId).append(" column ").append(projectCard?.columnName)
+            if (projectCard?.previousColumnName != null) {
+                append(" from ").append(projectCard.previousColumnName)
+            }
+        }
+        "moved_columns_in_project" -> {
             append(" ").append(projectCard?.projectId).append(" column ").append(projectCard?.columnName)
             if (projectCard?.previousColumnName != null) {
                 append(" from ").append(projectCard.previousColumnName)

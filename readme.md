@@ -5,6 +5,7 @@
 [![Release](https://img.shields.io/github/v/release/gnuf0rce/github-helper)](https://github.com/gnuf0rce/github-helper/releases)
 [![Downloads](https://img.shields.io/github/downloads/gnuf0rce/github-helper/total)](https://repo1.maven.org/maven2/io/github/gnuf0rce/mirai-content-censor/)
 [![MiraiForum](https://img.shields.io/badge/post-on%20MiraiForum-yellow)](https://mirai.mamoe.net/topic/554)
+[![GitHub Client Test](https://github.com/gnuf0rce/github-helper/actions/workflows/test.yml/badge.svg)](https://github.com/gnuf0rce/github-helper/actions/workflows/test.yml)
 
 **使用前应该查阅的相关文档或项目**
 
