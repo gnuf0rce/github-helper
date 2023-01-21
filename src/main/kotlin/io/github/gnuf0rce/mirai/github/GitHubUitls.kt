@@ -1,5 +1,5 @@
 /*
- * Copyright 2021-2022 dsstudio Technologies and contributors.
+ * Copyright 2021-2023 dsstudio Technologies and contributors.
  *
  *  此源代码的使用受 GNU AFFERO GENERAL PUBLIC LICENSE version 3 许可证的约束, 可以在以下链接找到该许可证.
  *  Use of this source code is governed by the GNU AGPLv3 license that can be found through the following link.
@@ -24,6 +24,8 @@ import kotlin.coroutines.*
 
 internal const val IMAGE_FOLDER_PROPERTY = "io.github.gnuf0rce.mirai.github.image"
 
+internal const val CACHE_FOLDER_PROPERTY = "io.github.gnuf0rce.mirai.github.image"
+
 /**
  * @see [GitHubHelperPlugin.logger]
  */
@@ -43,6 +45,16 @@ internal val ImageFolder by lazy {
     val path = System.getProperty(IMAGE_FOLDER_PROPERTY)
     (if (path.isNullOrBlank()) GitHubHelperPlugin.dataFolder else File(path)).resolve("image")
 }
+
+/**
+ * @see [CACHE_FOLDER_PROPERTY]
+ * @see [GitHubHelperPlugin.dataFolder]
+ */
+internal val CacheFolder by lazy {
+    val path = System.getProperty(CACHE_FOLDER_PROPERTY)
+    (if (path.isNullOrBlank()) GitHubHelperPlugin.dataFolder else File(path)).resolve("cache")
+}
+
 
 internal const val UserAvatarSize = 50
 
@@ -73,10 +85,15 @@ internal val github by lazy {
                     true
                 }
                 is IOException -> {
-                    if (it.message == "Connection reset") {
-                        logger.warning { "HttpClient Ignore ${it.message}" }
-                    } else {
-                        logger.warning({ "HttpClient Ignore" }, it)
+                    val message = it.message
+                    when {
+                        message == null -> Unit
+                        message == "Connection reset" -> {
+                            logger.warning { "HttpClient Ignore ${it.message}" }
+                        }
+                        message.startsWith("Failed to connect to") -> {
+                            logger.warning { "HttpClient Ignore ${it.message}" }
+                        }
                     }
                     true
                 }

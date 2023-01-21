@@ -840,11 +840,14 @@ public suspend fun Release.toMessage(contact: Contact, format: Format, notice: S
 public suspend fun Release.uploadTo(contact: FileSupported) {
     val (owner, repo) = FULL_REGEX.find(Url(htmlUrl).encodedPath)!!.destructured
     val folder = with(contact.files.root) {
-        resolveFolder("${repo}@${owner}") ?: try {
-            createFolder("${repo}@${owner}")
-        } catch (_: PermissionDeniedException) {
-            this
-        }
+        resolveFolder("${repo}@${owner}")
+            ?: resolveFolder(repo)
+            ?: resolveFolder(owner)
+            ?: try {
+                createFolder("${repo}@${owner}")
+            } catch (_: PermissionDeniedException) {
+                this
+            }
     }
     for (asset in assets) {
         // TODO: 上传大小上限
@@ -860,11 +863,16 @@ public suspend fun Release.Asset.toMessage(contact: Contact): Message = buildMes
 }
 
 public suspend fun Release.Asset.uploadTo(folder: AbsoluteFolder) {
-    github.useHttpClient { http ->
-        val response = http.get(browserDownloadUrl)
-        response.body<ByteArray>().toExternalResource().use { resource ->
-            folder.uploadNewFile(name, resource)
+    val asset = CacheFolder.resolve("release").resolve(nodeId).resolve(name)
+    if (asset.exists()) {
+        asset.parentFile.mkdirs()
+        github.useHttpClient { http ->
+            val response = http.get(browserDownloadUrl)
+            asset.writeBytes(response.body())
         }
+    }
+    asset.toExternalResource().use { resource ->
+        folder.uploadNewFile(name, resource)
     }
 }
 
