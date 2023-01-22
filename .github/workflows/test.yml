@@ -4,7 +4,17 @@ on: [ push, pull_request ]
 jobs:
   check:
     runs-on: ubuntu-latest
-    permissions: {}
+    permissions:
+      actions: read
+      checks: read
+      contents: read
+      deployments: read
+      issues: read
+      packages: read
+      pull-requests: read
+      repository-projects: read
+      security-events: read
+      statuses: read
     steps:
 
       - name: Checkout
