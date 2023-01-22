@@ -6,12 +6,14 @@ import io.github.gnuf0rce.mirai.github.data.*
 import kotlinx.coroutines.*
 import net.mamoe.mirai.message.data.*
 import org.junit.jupiter.api.*
+import org.junit.jupiter.api.condition.*
 import java.time.*
 
 internal class GitHubCurrentTest : GitHubSubscriberTest<Issue>() {
     private val current = github.current()
 
     @Test
+    @DisabledIfEnvironmentVariable(named = "CI", matches = "true")
     fun issues(): Unit = runBlocking {
         val now = OffsetDateTime.now()
         for (issue in current.issues()) {
@@ -27,6 +29,7 @@ internal class GitHubCurrentTest : GitHubSubscriberTest<Issue>() {
     }
 
     @Test
+    @DisabledIfEnvironmentVariable(named = "CI", matches = "true")
     fun user(): Unit = runBlocking {
         val user = current.user()
         val message = user.toMessage(group, Format.OLD)
