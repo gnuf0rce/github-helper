@@ -39,6 +39,7 @@ dependencies {
     implementation(platform("io.ktor:ktor-bom:2.1.3"))
     implementation("io.ktor:ktor-client-okhttp")
     implementation("io.ktor:ktor-client-encoding")
+    implementation("io.ktor:ktor-client-auth")
     implementation("io.ktor:ktor-client-content-negotiation")
     implementation("io.ktor:ktor-serialization-kotlinx-json")
     //

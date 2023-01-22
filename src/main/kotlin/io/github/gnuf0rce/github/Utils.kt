@@ -21,6 +21,8 @@ import java.time.format.*
 
 internal const val IGNORE_UNKNOWN_KEYS = "io.github.gnuf0rce.github.ignore"
 
+internal const val GITHUB_API_VERSION = "io.github.gnuf0rce.github.version"
+
 internal fun GitHubClient() = GitHubClient(token = System.getenv("GITHUB_TOKEN"))
 
 internal val GitHubJson = Json {

@@ -16,10 +16,11 @@ import io.ktor.client.*
 import io.ktor.client.call.*
 import io.ktor.client.engine.okhttp.*
 import io.ktor.client.plugins.*
+import io.ktor.client.plugins.auth.*
+import io.ktor.client.plugins.auth.providers.*
 import io.ktor.client.plugins.compression.*
 import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.client.request.*
-import io.ktor.http.*
 import io.ktor.serialization.kotlinx.json.*
 import kotlinx.coroutines.*
 import okhttp3.HttpUrl.Companion.toHttpUrl
@@ -39,6 +40,24 @@ public open class GitHubClient(public open val token: String?) : CoroutineScope,
 
     protected open val ipv6: Boolean = false
 
+    protected open val auth: Auth.() -> Unit = {
+        val tokens = token?.let { BearerTokens(accessToken = it, refreshToken = "") }
+        bearer {
+            loadTokens {
+                tokens
+            }
+            sendWithoutRequest { request ->
+                if (request.url.host == "api.github.com") {
+                    request.accept(GitHubJsonContentType)
+                    request.header("X-GitHub-Api-Version", System.getProperty(GITHUB_API_VERSION))
+                    true
+                } else {
+                    false
+                }
+            }
+        }
+    }
+
     protected open val client: HttpClient = HttpClient(OkHttp) {
         BrowserUserAgent()
         ContentEncoding()
@@ -50,12 +69,7 @@ public open class GitHubClient(public open val token: String?) : CoroutineScope,
         install(ContentNegotiation) {
             json(json = GitHubJson)
         }
-        defaultRequest {
-            accept(ContentType.Text.Html)
-            accept(ContentType.Text.Plain)
-            accept(GitHubJsonContentType)
-            header(HttpHeaders.Authorization, token?.let { "token $it" })
-        }
+        Auth(block = auth)
         expectSuccess = true
         HttpResponseValidator {
             handleResponseExceptionWithRequest { cause, _ ->
