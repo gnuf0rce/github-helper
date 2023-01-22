@@ -16,6 +16,7 @@ import io.github.gnuf0rce.github.exception.*
 import io.github.gnuf0rce.mirai.github.data.*
 import io.ktor.client.call.*
 import io.ktor.client.request.*
+import io.ktor.client.statement.*
 import io.ktor.http.*
 import kotlinx.coroutines.*
 import kotlinx.serialization.*
@@ -206,7 +207,7 @@ internal suspend fun User.trophy(contact: Contact): Message {
 public enum class Format { OLD, TEXT, FORWARD, GRAPH }
 
 internal suspend fun Owner?.avatar(contact: Contact, size: Int = UserAvatarSize, client: GitHubClient = github): Image {
-    val avatarUrl = this?.avatarUrl ?: "https://avatars.githubusercontent.com/u/0"
+    val avatarUrl = this?.avatarUrl ?: "https://avatars.githubusercontent.com/u/10137"
     val login = this?.login ?: "ghost"
 
     val folder = ImageFolder.resolve("avatar")
@@ -217,11 +218,24 @@ internal suspend fun Owner?.avatar(contact: Contact, size: Int = UserAvatarSize,
     }
 
     val file = client.useHttpClient { http ->
-        val response = http.get(avatarUrl) { url.parameters["s"] = size.toString() }
+        val response = http.get(avatarUrl) {
+            parameter("s", size)
+        }
         val format = response.contentType()?.contentSubtype ?: "jpg"
         val file = folder.resolve("${login}.${size}.${format}")
 
         file.writeBytes(response.body())
+
+        // XXX: handle default avatar
+        runInterruptible(Dispatchers.IO) {
+            val input = javax.imageio.ImageIO.read(file)
+            if (input.width > size || input.height > size) {
+                logger.info { "avatar miss: ${response.request.url}" }
+                val output = java.awt.image.BufferedImage(size, size, input.type.coerceAtLeast(2))
+                output.graphics.drawImage(input, 0, 0, size, size, null)
+                javax.imageio.ImageIO.write(output, format, file)
+            }
+        }
 
         file
     }
