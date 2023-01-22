@@ -28,3 +28,13 @@ jobs:
         run: ./gradlew test --tests "io.github.gnuf0rce.mirai.github.GitHubOwnerTest" --scan --info
         env:
           GITHUB_TOKEN: ${{ github.token }}
+
+      - name: GitHub Current Test
+        run: ./gradlew test --tests "io.github.gnuf0rce.mirai.github.GitHubCurrentTest" --scan --info
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+
+      - name: GitHub Repo Test
+        run: ./gradlew test --tests "io.github.gnuf0rce.mirai.github.GitHubRepoTest" --scan --info
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
