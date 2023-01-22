@@ -25,16 +25,16 @@ jobs:
         run: ./gradlew assemble --scan
 
       - name: GitHub Owner Test
-        run: ./gradlew test --tests "io.github.gnuf0rce.mirai.github.GitHubOwnerTest" --scan --info
         env:
-          GITHUB_TOKEN: ${{ secrets.github_token }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: ./gradlew test --tests "io.github.gnuf0rce.mirai.github.GitHubOwnerTest" --scan --info
 
       - name: GitHub Current Test
-        run: ./gradlew test --tests "io.github.gnuf0rce.mirai.github.GitHubCurrentTest" --scan --info
         env:
-          GITHUB_TOKEN: ${{ secrets.github_token }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: ./gradlew test --tests "io.github.gnuf0rce.mirai.github.GitHubCurrentTest" --scan --info
 
       - name: GitHub Repo Test
-        run: ./gradlew test --tests "io.github.gnuf0rce.mirai.github.GitHubRepoTest" --scan --info
         env:
-          GITHUB_TOKEN: ${{ secrets.github_token }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: ./gradlew test --tests "io.github.gnuf0rce.mirai.github.GitHubRepoTest" --scan --info
