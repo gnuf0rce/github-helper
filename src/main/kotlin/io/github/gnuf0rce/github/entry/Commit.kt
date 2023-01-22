@@ -10,6 +10,7 @@
 
 package io.github.gnuf0rce.github.entry
 
+import io.github.gnuf0rce.github.*
 import kotlinx.serialization.*
 import java.time.*
 
@@ -39,6 +40,9 @@ public data class Commit(
     @SerialName("files")
     val files: List<File> = emptyList()
 ) : Entry, Record, LifeCycle, WebPage, Product {
+
+    public override val graphUrl: String
+        get() = "https://opengraph.githubassets.com/0/${FULL_REGEX.find(htmlUrl)?.value}/commit/${sha}"
 
     override val owner: User?
         get() = author

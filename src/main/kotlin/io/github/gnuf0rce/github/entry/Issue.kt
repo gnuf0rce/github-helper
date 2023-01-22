@@ -92,8 +92,8 @@ public data class Issue(
     val performedViaGithubApp: GithubAppInfo? = null
 ) : Entry, ControlRecord() {
 
-    public val graph: String
-        get() = "https://opengraph.githubassets.com/${System.currentTimeMillis()}/${owner?.name}/${repository?.name}/issues/$number"
+    public override val graphUrl: String
+        get() = "https://opengraph.githubassets.com/${updatedAt.toEpochSecond()}/${repository?.fullName}/issues/$number"
 
     @Serializable
     public data class PullRequest(

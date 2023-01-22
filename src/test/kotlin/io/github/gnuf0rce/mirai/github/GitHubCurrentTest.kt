@@ -18,9 +18,11 @@ internal class GitHubCurrentTest : GitHubSubscriberTest<Issue>() {
             val message = issue.toMessage(group, Format.OLD, "有新 Issue", now)
             Assertions.assertTrue(message is MessageChain)
             val text = issue.toMessage(group, Format.TEXT, "有新 Issue", now)
-            Assertions.assertTrue(text is PlainText)
+            Assertions.assertTrue(text is MessageChain)
             val forward = issue.toMessage(group, Format.FORWARD, "有新 Issue", now)
             Assertions.assertTrue(forward is ForwardMessage)
+            val graph = issue.toMessage(group, Format.GRAPH, "有新 Issue", now)
+            Assertions.assertTrue(graph is Image)
         }
     }
 
@@ -30,7 +32,7 @@ internal class GitHubCurrentTest : GitHubSubscriberTest<Issue>() {
         val message = user.toMessage(group, Format.OLD)
         Assertions.assertTrue(message is MessageChain)
         val text = user.toMessage(group, Format.TEXT)
-        Assertions.assertTrue(text is PlainText)
+        Assertions.assertTrue(text is MessageChain)
         val forward = user.toMessage(group, Format.FORWARD)
         Assertions.assertTrue(forward is ForwardMessage)
     }

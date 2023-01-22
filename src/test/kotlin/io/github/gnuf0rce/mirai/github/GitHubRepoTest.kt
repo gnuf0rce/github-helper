@@ -65,13 +65,9 @@ internal class GitHubRepoTest : GitHubClientTest() {
             val releases = repo.releases.list(page = page)
             if (releases.isEmpty()) break
             releases.forEach { release ->
-                if (release.author != null) {
-                    Assertions.assertEquals("cssxsh", release.author!!.nameOrLogin)
-                }
+                Assertions.assertEquals("cssxsh", release.author?.nameOrLogin)
                 release.assets.forEach { asset ->
-                    if (asset.uploader != null) {
-                        Assertions.assertEquals("cssxsh", asset.uploader!!.nameOrLogin)
-                    }
+                    Assertions.assertEquals("cssxsh", asset.uploader?.nameOrLogin)
                 }
             }
         }

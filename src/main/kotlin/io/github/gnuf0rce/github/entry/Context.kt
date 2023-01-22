@@ -36,6 +36,7 @@ public sealed interface Entry {
 
 public sealed interface WebPage {
     public val htmlUrl: String
+    public val graphUrl: String? get() = null
 }
 
 public sealed interface Content {

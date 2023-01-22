@@ -203,7 +203,7 @@ internal suspend fun User.trophy(contact: Contact): Message {
 // region WebPage
 
 @Serializable
-public enum class Format { OLD, TEXT, FORWARD }
+public enum class Format { OLD, TEXT, FORWARD, GRAPH }
 
 internal suspend fun Owner?.avatar(contact: Contact, size: Int = UserAvatarSize, client: GitHubClient = github): Image {
     val avatarUrl = this?.avatarUrl ?: "https://avatars.githubusercontent.com/u/0"
@@ -227,6 +227,39 @@ internal suspend fun Owner?.avatar(contact: Contact, size: Int = UserAvatarSize,
     }
 
     return file.uploadAsImage(contact)
+}
+
+internal suspend fun <T> T.graph(contact: Contact, client: GitHubClient = github): Image
+    where T : WebPage, T : Entry {
+    return when (this) {
+        is Repo, is Issue, is Pull, is Commit -> {
+            val graph = ImageFolder.resolve("graph").resolve("${nodeId}.png")
+            val imageUrl = graphUrl as String
+            if (graph.exists().not()) {
+                graph.parentFile.mkdirs()
+                client.useHttpClient { http ->
+                    val response = http.get(imageUrl)
+                    graph.writeBytes(response.body())
+                }
+            }
+            graph.uploadAsImage(contact)
+        }
+        else -> {
+            val screenshot = ImageFolder.resolve("screenshot").resolve("${nodeId}.png")
+            if (screenshot.exists().not() || (System.currentTimeMillis() - screenshot.lastModified()) >= 86400_000) {
+                screenshot.parentFile.mkdirs()
+                if (selenium.not()) throw IllegalArgumentException("Selenium 未安装，无法截图")
+                val bytes = useRemoteWebDriver { driver ->
+                    driver.manage().window().size = Dimension(1920, 1080)
+                    driver.get(htmlUrl)
+                    delay(10_000)
+                    driver.getScreenshotAs(OutputType.BYTES)
+                }
+                screenshot.writeBytes(bytes)
+            }
+            screenshot.uploadAsImage(contact)
+        }
+    }
 }
 
 internal fun MessageChainBuilder.appendLine(image: Image) = append(image).appendLine()
@@ -323,6 +356,7 @@ public suspend fun User.toMessage(contact: Contact, format: Format): Message {
 
             // TODO: more info for user
         }
+        Format.GRAPH -> graph(contact)
     }
 }
 
@@ -369,6 +403,7 @@ public suspend fun Organization.toMessage(contact: Contact, format: Format): Mes
 
             // TODO: more info for org
         }
+        Format.GRAPH -> graph(contact)
     }
 }
 
@@ -514,6 +549,7 @@ public suspend fun Issue.toMessage(contact: Contact, format: Format, notice: Str
                 contact.bot named "event" at event.createdAt says event.toMessage(contact)
             }
         }
+        Format.GRAPH -> graph(contact)
     }
 }
 
@@ -772,6 +808,7 @@ public suspend fun Pull.toMessage(contact: Contact, format: Format, notice: Stri
                 contact.bot named "event" at event.createdAt says event.toMessage(contact)
             }
         }
+        Format.GRAPH -> graph(contact)
     }
 }
 
@@ -834,6 +871,7 @@ public suspend fun Release.toMessage(contact: Contact, format: Format, notice: S
                 contact.bot named "asset" at asset.createdAt says asset.toMessage(contact)
             }
         }
+        Format.GRAPH -> graph(contact)
     }
 }
 
@@ -943,6 +981,7 @@ public suspend fun Commit.toMessage(contact: Contact, type: Format, notice: Stri
                 }
             }
         }
+        Format.GRAPH -> graph(contact)
     }
 }
 
@@ -1065,6 +1104,7 @@ public suspend fun Repo.toMessage(contact: Contact, type: Format, notice: String
                 }
             }
         }
+        Format.GRAPH -> graph(contact)
     }
 }
 
@@ -1131,6 +1171,7 @@ public suspend fun Milestone.toMessage(contact: Contact, type: Format, notice: S
 
             // TODO: show open issue
         }
+        Format.GRAPH -> graph(contact)
     }
 }
 
