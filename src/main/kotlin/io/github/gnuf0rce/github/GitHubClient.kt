@@ -23,9 +23,6 @@ import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.client.request.*
 import io.ktor.serialization.kotlinx.json.*
 import kotlinx.coroutines.*
-import okhttp3.HttpUrl.Companion.toHttpUrl
-import okhttp3.OkHttpClient
-import okhttp3.dnsoverhttps.DnsOverHttps
 import java.io.*
 import java.net.*
 import kotlin.coroutines.*
@@ -93,14 +90,7 @@ public open class GitHubClient(public open val token: String?) : CoroutineScope,
         engine {
             config {
                 proxy(this@GitHubClient.proxy)
-                if (doh.isNotEmpty()) {
-                    dns(DnsOverHttps.Builder()
-                        .client(OkHttpClient())
-                        .url(doh.toHttpUrl())
-                        .includeIPv6(ipv6)
-                        .build()
-                    )
-                }
+                doh(urlString = this@GitHubClient.doh, ipv6 = this@GitHubClient.ipv6)
             }
         }
     }
