@@ -87,6 +87,10 @@ public object GitHubHelperPlugin : KotlinPlugin(
                 regex findingReply replier
             }
         }
+        val target = resolveConfigFile("update.dict.json")
+        logger.info { "1.3.0 起提供从 github 更新<其他插件>的功能, 如有需要, 请编辑:\n $target" }
+        GitHubReleasePluginUpdater.reload(target)
+        GitHubReleasePluginUpdater.update()
     }
 
     override fun onDisable() {
