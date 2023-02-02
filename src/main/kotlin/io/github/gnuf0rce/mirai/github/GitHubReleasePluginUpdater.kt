@@ -11,8 +11,10 @@
 package io.github.gnuf0rce.mirai.github
 
 import io.github.gnuf0rce.github.*
+import io.github.gnuf0rce.github.exception.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
+import io.ktor.http.*
 import io.ktor.util.cio.*
 import io.ktor.utils.io.*
 import kotlinx.coroutines.*
@@ -50,30 +52,34 @@ public object GitHubReleasePluginUpdater {
         "io.github.samarium150.mirai.plugin.mirai-console-loafers-calendar" to "Samarium150/mirai-console-loafers-calendar",
         "io.github.samarium150.mirai.plugin.mirai-console-lolicon" to "Samarium150/mirai-console-lolicon",
 
+        "indi.eiriksgata.rulateday-dice" to "Eiriksgata/mirai-rulateday-dice",
+
         "me.jie65535.mirai-console-jnr-plugin" to "jie65535/mirai-console-jnr-plugin",
 
-        "me.stageguard.obms.OsuMapSuggester" to "StageGuard/OsuMapSuggester",
+        "me.sagiri.mirai.plugin.QShell" to "EroSagiri/QShell",
+
+//        "me.stageguard.obms.OsuMapSuggester" to "StageGuard/OsuMapSuggester",
         "me.stageguard.sctimetable" to "StageGuard/SuperCourseTimetableBot",
 
-        "org.laolittle.plugin.SkikoMirai" to "LaoLittle/SkikoMirai",
         "org.laolittle.plugin.draw.DrawMeme" to "LaoLittle/DrawMeme",
+        "org.laolittle.plugin.SkikoMirai" to "LaoLittle/SkikoMirai",
 
         "top.colter.bilibili-dynamic-mirai-plugin" to "Colter23/bilibili-dynamic-mirai-plugin",
         "top.colter.genshin-sign" to "Colter23/genshin-sign-mirai-plugin",
 
         "top.cutestar.antiRecall" to "Pmaru-top/AntiRecall",
 
+        "top.jie65535.jcf" to "jie65535/mirai-console-jcf-plugin",
+        "top.jie65535.j24" to "jie65535/mirai-console-j24-plugin",
+        "top.jie65535.mail-notify" to "jie65535/JMailNotify",
+        "top.jie65535.mirai.grasscutter-command" to "jie65535/JGrasscutterCommand",
+        "top.jie65535.mirai-console-jcc-plugin" to "jie65535/mirai-console-jcc-plugin",
+        "top.jie65535.mirai-console-jcr-plugin" to "jie65535/mirai-console-jcr-plugin",
+        "top.jie65535.mirai-console-jms-plugin" to "jie65535/mirai-console-jms-plugin",
+
         "top.limbang.mcmod" to "limbang/mirai-console-mcmod-plugin",
         "top.limbang.mcsm" to "limbang/mirai-console-mcsm-plugin",
         "top.limbang.minecraft" to "limbang/mirai-console-minecraft-plugin",
-
-        "top.jie65535.mirai.grasscutter-command" to "jie65535/JGrasscutterCommand",
-        "top.jie65535.mail-notify" to "jie65535/JMailNotify",
-        "top.jie65535.mirai-console-jms-plugin" to "jie65535/mirai-console-jms-plugin",
-        "top.jie65535.jcf" to "jie65535/mirai-console-jcf-plugin",
-        "top.jie65535.mirai-console-jcr-plugin" to "jie65535/mirai-console-jcr-plugin",
-        "top.jie65535.mirai-console-jhr-plugin" to "jie65535/mirai-console-jhr-plugin",
-        "top.jie65535.mirai-console-jcab-arg-plugin" to "jie65535/mirai-console-jcab-arg-plugin",
 
         "xmmt.dituon.petpet" to "Dituon/petpet",
 
@@ -87,14 +93,6 @@ public object GitHubReleasePluginUpdater {
             dict.putAll(GitHubJson.decodeFromString(file.readText()))
         } else {
             file.writeText(GitHubJson.encodeToString(dict))
-            val last = file.lastModified()
-            runBlocking {
-                ConsoleInput.requestInput(hint = "update.dict.json 已生成，你可以打开浏览一下 (输入回车结束等待)")
-            }
-            if (last < file.lastModified()) {
-                dict.clear()
-                dict.putAll(GitHubJson.decodeFromString(file.readText()))
-            }
         }
     }
 
@@ -113,7 +111,16 @@ public object GitHubReleasePluginUpdater {
             var target = PluginManager.pluginsFolder.resolve(plugin.description.id)
 
             plugin.launch {
-                val latest = github.repo(id).releases.latest()
+                val latest = try {
+                    github.repo(id).releases.latest()
+                } catch (exception: GitHubApiException) {
+                    if (exception.cause.response.status == HttpStatusCode.NotFound) {
+                        plugin.logger.warning("项目未设置 Release Latest!")
+                    } else {
+                        plugin.logger.warning("GitHub API 异常", exception)
+                    }
+                    return@launch
+                }
                 val jar = latest.assets.find { it.name.endsWith(".mirai2.jar") }
                     ?: latest.assets.find { it.name.endsWith(".mirai.jar") }
                     ?: latest.assets.find { it.name.endsWith(".jar") }

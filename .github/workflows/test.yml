@@ -49,3 +49,8 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: ./gradlew test --tests "io.github.gnuf0rce.mirai.github.GitHubRepoTest" --scan --info
+
+      - name: GitHub Release Plugin Updater Test
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: ./gradlew test --tests "io.github.gnuf0rce.mirai.github.GitHubReleasePluginUpdaterTest" --scan --info
