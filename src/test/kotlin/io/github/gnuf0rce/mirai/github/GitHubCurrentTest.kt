@@ -16,7 +16,7 @@ internal class GitHubCurrentTest : GitHubSubscriberTest<Issue>() {
     @DisabledIfEnvironmentVariable(named = "CI", matches = "true")
     fun issues(): Unit = runBlocking {
         val now = OffsetDateTime.now()
-        for (issue in current.issues()) {
+        for (issue in current.issues(per = 100)) {
             val message = issue.toMessage(group, Format.OLD, "有新 Issue", now)
             Assertions.assertTrue(message is MessageChain)
             val text = issue.toMessage(group, Format.TEXT, "有新 Issue", now)
@@ -38,6 +38,10 @@ internal class GitHubCurrentTest : GitHubSubscriberTest<Issue>() {
         Assertions.assertTrue(text is MessageChain)
         val forward = user.toMessage(group, Format.FORWARD)
         Assertions.assertTrue(forward is ForwardMessage)
+        val miss = github.user("hundun000").load()
+        miss.avatar(group)
+        val ghost = github.user("ghost").load()
+        ghost.avatar(group)
     }
 
     @Test

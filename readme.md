@@ -27,6 +27,9 @@
 `[contact]?`是可选的参数，会自动由当前环境填充，例如群聊填充群号，私聊填充QQ号  
 `[type]` 消息的格式，可选值为 `OLD`, `TEXT`, `FORWARD`
 
+**1.3.0** 版本起，添加从 GitHub Release Latest 更新插件的功能  
+其配置文件位于 `config/update.dict.json`
+
 ### GitHubIssuesCommand
 
 | 指令                                   | 描述       |
@@ -124,7 +127,7 @@
 ### MCL 指令安装
 
 **请确认 mcl.jar 的版本是 2.1.0+**  
-`./mcl --update-package io.github.gnuf0rce:github-helper --channel maven-stable --type plugin`
+`./mcl --update-package io.github.gnuf0rce:github-helper --channel maven-stable --type plugins`
 
 ### 手动安装
 
