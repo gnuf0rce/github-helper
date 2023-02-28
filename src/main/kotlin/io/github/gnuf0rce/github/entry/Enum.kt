@@ -1,5 +1,5 @@
 /*
- * Copyright 2021-2022 dsstudio Technologies and contributors.
+ * Copyright 2021-2023 dsstudio Technologies and contributors.
  *
  *  此源代码的使用受 GNU AFFERO GENERAL PUBLIC LICENSE version 3 许可证的约束, 可以在以下链接找到该许可证.
  *  Use of this source code is governed by the GNU AGPLv3 license that can be found through the following link.
@@ -30,7 +30,7 @@ public enum class Direction { asc, desc }
 public enum class Affiliation { outside, direct, all }
 
 @Serializable
-public enum class Association { OWNER, MEMBER, CONTRIBUTOR, NONE }
+public enum class Association { COLLABORATOR, CONTRIBUTOR, FIRST_TIMER, FIRST_TIME_CONTRIBUTOR, MANNEQUIN, MEMBER, NONE, OWNER }
 
 @Serializable
 public enum class IssueFilter { assigned, created, mentioned, subscribed, repos, all }
@@ -52,9 +52,6 @@ public enum class RepoPermission { pull, push, admin }
 
 @Serializable
 public enum class ReleaseState { uploaded, open }
-
-@Serializable
-public enum class AuthorAssociation { COLLABORATOR, CONTRIBUTOR, FIRST_TIMER, FIRST_TIME_CONTRIBUTOR, MANNEQUIN, MEMBER, NONE, OWNER }
 
 @Serializable
 public enum class Side { LEFT, RIGHT }
