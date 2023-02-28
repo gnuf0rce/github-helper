@@ -66,19 +66,19 @@ internal fun Contact(id: Long): Contact {
 
 private const val STATS_API = "https://github-readme-stats.vercel.app/api"
 
-private val RANK_REGEX = """(?<=rank-text[^>]{0,1024}>[^>]{0,1024}>\W{0,1024})[\w+-]+""".toRegex()
+private const val RANK_REGEX = """(?<=rank-text[^>]{0,1024}>[^>]{0,1024}>\W{0,1024})[\w+-]+"""
 
-private val STARS_REGEX = """(?<=stars[^>]{0,1024}>\W{0,1024})[^<\s]+""".toRegex()
+private const val STARS_REGEX = """(?<=stars[^>]{0,1024}>\W{0,1024})[^<\s]+"""
 
-private val COMMITS_REGEX = """(?<=commits[^>]{0,1024}>\W{0,1024})[^<\s]+""".toRegex()
+private const val COMMITS_REGEX = """(?<=commits[^>]{0,1024}>\W{0,1024})[^<\s]+"""
 
-private val PRS_REGEX = """(?<=prs[^>]{0,1024}>\W{0,1024})[^<\s]+""".toRegex()
+private const val PRS_REGEX = """(?<=prs[^>]{0,1024}>\W{0,1024})[^<\s]+"""
 
-private val ISSUES_REGEX = """(?<=issues[^>]{0,1024}>\W{0,1024})[^<\s]+""".toRegex()
+private const val ISSUES_REGEX = """(?<=issues[^>]{0,1024}>\W{0,1024})[^<\s]+"""
 
-private val CONTRIB_REGEX = """(?<=contribs[^>]{0,1024}>\W{0,1024})[^<\s]+""".toRegex()
+private const val CONTRIB_REGEX = """(?<=contribs[^>]{0,1024}>\W{0,1024})[^<\s]+"""
 
-private val OFFSET_REGEX = """(?<=dashoffset: )\d+\.?\d+""".toRegex()
+private const val OFFSET_REGEX = """(?<=dashoffset: )\d+\.?\d+"""
 
 public data class UserStats(
     /**
@@ -121,15 +121,15 @@ internal suspend fun User.stats(flush: Long = 86400_000, client: GitHubClient = 
 
     return try {
         UserStats(
-            rank = requireNotNull(RANK_REGEX.find(xml)) { "UserStats 解析 rank 失败" }.value,
-            stars = requireNotNull(STARS_REGEX.find(xml)) { "UserStats 解析 stars 失败" }.value,
-            commits = requireNotNull(COMMITS_REGEX.find(xml)) { "UserStats 解析 commits 失败" }.value,
-            prs = requireNotNull(PRS_REGEX.find(xml)) { "UserStats 解析 prs 失败" }.value,
-            issues = requireNotNull(ISSUES_REGEX.find(xml)) { "UserStats 解析 issues 失败" }.value,
-            contrib = requireNotNull(CONTRIB_REGEX.find(xml)) { "UserStats 解析 contrib 失败" }.value,
+            rank = requireNotNull(RANK_REGEX.toRegex().find(xml)) { "UserStats 解析 rank 失败" }.value,
+            stars = requireNotNull(STARS_REGEX.toRegex().find(xml)) { "UserStats 解析 stars 失败" }.value,
+            commits = requireNotNull(COMMITS_REGEX.toRegex().find(xml)) { "UserStats 解析 commits 失败" }.value,
+            prs = requireNotNull(PRS_REGEX.toRegex().find(xml)) { "UserStats 解析 prs 失败" }.value,
+            issues = requireNotNull(ISSUES_REGEX.toRegex().find(xml)) { "UserStats 解析 issues 失败" }.value,
+            contrib = requireNotNull(CONTRIB_REGEX.toRegex().find(xml)) { "UserStats 解析 contrib 失败" }.value,
             percentage = kotlin.run {
-                val pre = requireNotNull(OFFSET_REGEX.find(xml)) { "UserStats 解析 percentage 失败" }
-                val next = requireNotNull(OFFSET_REGEX.find(xml, pre.range.last)) { "UserStats 解析 percentage 失败" }
+                val pre = requireNotNull(OFFSET_REGEX.toRegex().find(xml)) { "UserStats 解析 percentage 失败" }
+                val next = requireNotNull(OFFSET_REGEX.toRegex().find(xml, pre.range.last)) { "UserStats 解析 percentage 失败" }
                 ((1 - next.value.toDouble() / pre.value.toDouble()) * 100).toInt()
             }
         )
