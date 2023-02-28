@@ -18,12 +18,12 @@ import java.net.*
 
 internal fun OkHttpClient.Builder.doh(urlString: String, ipv6: Boolean) {
     if (urlString.isEmpty()) return
-    val doh = DnsOverHttps.Builder()
-        .client(OkHttpClient())
-        .url(urlString.toHttpUrl())
-        .includeIPv6(ipv6)
-        .build()
     dns(dns = object : Dns {
+        val doh = DnsOverHttps.Builder()
+            .client(OkHttpClient())
+            .url(urlString.toHttpUrl())
+            .includeIPv6(ipv6)
+            .build()
         override fun lookup(hostname: String): List<InetAddress> {
             return try {
                 doh.lookup(hostname)
