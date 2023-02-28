@@ -921,7 +921,12 @@ public suspend fun Release.Asset.uploadTo(folder: AbsoluteFolder) {
         asset.parentFile.mkdirs()
         github.useHttpClient { http ->
             val response = http.get(browserDownloadUrl)
-            asset.writeBytes(response.body())
+            try {
+                response.bodyAsChannel().copyAndClose(asset.writeChannel())
+            } finally {
+                if (asset.length() != size) asset.delete()
+            }
+            asset.setLastModified(updatedAt.toInstant().toEpochMilli())
         }
     }
     asset.toExternalResource().use { resource ->
