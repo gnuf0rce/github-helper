@@ -39,6 +39,25 @@ private fun MessageEvent.hasReplierPermission() = toCommandSender().hasPermissio
 
 private val REPLIER_FORMAT get() = GitHubConfig.replier
 
+private val tools = setOf(
+    "search",
+    "explore",
+    "topics",
+    "trending",
+    "collections",
+    "events",
+    "sponsors",
+    "issues",
+    "pulls",
+    "codespaces",
+    "marketplace",
+    "settings",
+    "discussions",
+    "account",
+    "organizations",
+    ""
+)
+
 /**
  * 1. [https://github.com/{owner}/]
  */
@@ -49,6 +68,7 @@ internal val OwnerReplier: MessageReplier = replier@{ result ->
     if (hasReplierPermission().not()) return@replier null
     try {
         val (owner) = result.destructured
+        if (owner in tools) return@replier null
         val entry = github.user(owner).load().takeIf { it.type == "User" }
             ?: github.organization(owner).load()
         entry.toMessage(subject, REPLIER_FORMAT, "replier", OffsetDateTime.MIN)
@@ -68,6 +88,7 @@ internal val RepoReplier: MessageReplier = replier@{ result ->
     if (hasReplierPermission().not()) return@replier null
     try {
         val (owner, repo) = result.destructured
+        if (owner in tools) return@replier null
         val entry = repo(owner, repo).load()
         entry.toMessage(subject, REPLIER_FORMAT, "replier")
     } catch (cause: Exception) {
