@@ -31,7 +31,7 @@ public open class CurrentMapper(parent: Url) :
     /**
      * [get-the-authenticated-user](https://docs.github.com/en/rest/users/users#get-the-authenticated-user)
      */
-    public suspend fun user(): Owner = get(path = "user")
+    public suspend fun user(): User = get<Owner>(path = "user") as User
 
     /**
      * [get-rate-limit-status-for-the-authenticated-user](https://docs.github.com/en/rest/rate-limit#get-rate-limit-status-for-the-authenticated-user)
