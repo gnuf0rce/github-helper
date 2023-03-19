@@ -613,7 +613,8 @@ public suspend fun IssueEvent.toMessage(contact: Contact): Message = buildMessag
         "pinned",
         "unpinned",
         "transferred",
-        "reopened" -> {
+        "reopened",
+        "unlocked" -> {
             //
         }
         "review_requested",
