@@ -26,6 +26,8 @@ public data class Repo(
     val allowRebaseMerge: Boolean = false,
     @SerialName("allow_squash_merge")
     val allowSquashMerge: Boolean = false,
+    @SerialName("allow_update_branch")
+    val allowUpdateBranch: Boolean = false,
     @SerialName("archive_url")
     val archiveUrl: String,
     @SerialName("archived")
@@ -198,19 +200,30 @@ public data class Repo(
     @SerialName("watchers_count")
     val watchersCount: Int,
     @SerialName("organization")
-    val organization: Organization? = null,
+    val organization: Owner? = null,
     @SerialName("role_name")
     val roleName: String = "",
     @SerialName("web_commit_signoff_required")
-    val webCommitSignoffRequired: Boolean = false
+    val webCommitSignoffRequired: Boolean = false,
+    @SerialName("use_squash_pr_title_as_default")
+    val useSquashPrTitleAsDefault: Boolean = false,
+    @SerialName("squash_merge_commit_message")
+    val squashMergeCommitMessage: String = "",
+    @SerialName("squash_merge_commit_title")
+    val squashMergeCommitTitle: String = "",
+    @SerialName("merge_commit_message")
+    val mergeCommitMessage: String = "",
+    @SerialName("merge_commit_title")
+    val mergeCommitTitle: String = "",
+    @SerialName("security_and_analysis")
+    val securityAndAnalysis: Map<String, RepoSecurityAndAnalysis> = emptyMap()
 ) : Entry, LifeCycle, WebPage, Product {
 
     public override val graphUrl: String
         get() = "https://opengraph.githubassets.com/${updatedAt.toEpochSecond()}/${fullName}"
 
-    @Deprecated("Repo No Closed", ReplaceWith("null"))
     override val closedAt: OffsetDateTime?
-        get() = null
+        get() = if (archived || disabled) updatedAt else null
 
     /**
      * @see [pushedAt]

@@ -50,8 +50,6 @@ public data class User(
     val subscriptionsUrl: String,
     @SerialName("url")
     override val url: String,
-    @SerialName("type")
-    override val type: String,
     @SerialName("name")
     override val name: String? = null,
     @SerialName("company")
@@ -98,6 +96,9 @@ public data class User(
     @SerialName("plan")
     val plan: Plan? = null
 ) : Owner() {
+
+    override val type: String
+        get() = "User"
 
     @Serializable
     public data class Plan(

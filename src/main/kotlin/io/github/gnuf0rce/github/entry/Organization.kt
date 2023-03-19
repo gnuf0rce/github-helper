@@ -60,8 +60,6 @@ public data class Organization(
     val description: String? = null,
     @SerialName("url")
     override val url: String,
-    @SerialName("type")
-    override val type: String,
     @SerialName("name")
     override val name: String? = null,
     @SerialName("company")
@@ -88,10 +86,17 @@ public data class Organization(
     val hasOrganizationProjects: Boolean = false,
     @SerialName("has_repository_projects")
     val hasRepositoryProjects: Boolean = false,
+    @SerialName("hireable")
+    val hireable: Boolean? = null,
+    @SerialName("bio")
+    val bio: String? = null,
     @Contextual
     @SerialName("created_at")
     override val createdAt: OffsetDateTime = OffsetDateTime.MIN,
     @Contextual
     @SerialName("updated_at")
     override val updatedAt: OffsetDateTime = OffsetDateTime.MIN
-) : Owner()
+) : Owner() {
+    override val type: String
+        get() = "Organization"
+}

@@ -12,6 +12,7 @@ package io.github.gnuf0rce.mirai.github.spi
 
 import io.github.gnuf0rce.github.exception.*
 import io.github.gnuf0rce.github.*
+import io.github.gnuf0rce.github.entry.*
 import io.github.gnuf0rce.mirai.github.data.*
 import io.github.gnuf0rce.mirai.github.*
 import net.mamoe.mirai.console.util.ContactUtils.render
@@ -39,7 +40,7 @@ public class GithubMemberApproverService : MemberApprover {
                 return ApproveResult.Reject(message = "<${login}> 已存在于 ${group.render()}")
             }
 
-            val user = github.user(login = login).load()
+            val user = github.user(login = login).load() as User
             val stats = user.stats()
             if (stats.percentage >= percentage) {
                 logger.info { "同意 $comer - $login - ${stats.rank}/${stats.percentage}" }
