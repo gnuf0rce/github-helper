@@ -41,7 +41,7 @@ public data class IssueComment(
     @SerialName("url")
     override val url: String,
     @SerialName("user")
-    override val user: Owner?,
+    override val owner: Owner?,
     @SerialName("reactions")
     override val reactions: Reactions?,
     @SerialName("performed_via_github_app")

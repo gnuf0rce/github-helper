@@ -39,7 +39,7 @@ public data class PullRequestReviewComment(
     @SerialName("url")
     override val url: String,
     @SerialName("user")
-    override val user: Owner?,
+    override val owner: Owner?,
     @SerialName("reactions")
     override val reactions: Reactions? = null,
     @SerialName("pull_request_review_id")

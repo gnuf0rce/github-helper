@@ -23,6 +23,7 @@ import io.ktor.utils.io.*
 import kotlinx.coroutines.*
 import kotlinx.serialization.*
 import net.mamoe.mirai.*
+import net.mamoe.mirai.Bot as MiraiBot
 import net.mamoe.mirai.console.util.ContactUtils.render
 import net.mamoe.mirai.contact.Contact
 import net.mamoe.mirai.contact.FileSupported
@@ -44,7 +45,7 @@ private val contacts: MutableMap<Long, Contact> = WeakHashMap()
 internal fun Contact(id: Long): Contact {
     val contact = contacts[id]
     if (contact != null) return contact
-    for (bot in Bot.instances.shuffled()) {
+    for (bot in MiraiBot.instances.shuffled()) {
         for (friend in bot.friends) {
             if (friend.id == id) {
                 contacts[id] = friend
@@ -324,6 +325,7 @@ public suspend fun WebPage.toMessage(contact: Contact, format: Format, notice: S
         is Milestone -> toMessage(contact, format, notice)
         is User -> toMessage(contact, format)
         is Organization -> toMessage(contact, format)
+        is Bot -> htmlUrl.toPlainText()
         is License -> htmlUrl.toPlainText()
         is Readme -> toMessage(contact)
         is Team -> htmlUrl.toPlainText()

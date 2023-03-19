@@ -22,7 +22,7 @@ public data class Release(
     @SerialName("assets_url")
     val assetsUrl: String,
     @SerialName("author")
-    val author: Owner?,
+    override val owner: Owner?,
     @SerialName("body")
     override val body: String?,
     @SerialName("body_text")
@@ -66,9 +66,6 @@ public data class Release(
     @SerialName("zipball_url")
     val zipballUrl: String?
 ) : Entry, LifeCycle, WebPage, Content, Product {
-
-    override val owner: Owner?
-        get() = author
 
     /**
      * @see publishedAt
@@ -115,14 +112,14 @@ public data class Release(
         @SerialName("updated_at")
         override val updatedAt: OffsetDateTime,
         @SerialName("uploader")
-        val uploader: Owner?,
+        override val owner: Owner?,
         @Contextual
         @SerialName("url")
         override val url: String
     ) : Entry, LifeCycle, Product {
 
-        override val owner: Owner?
-            get() = uploader
+        public val uploader: User?
+            get() = owner as? User
 
         @Deprecated("Asset No Closed", ReplaceWith("null"))
         override val closedAt: OffsetDateTime?

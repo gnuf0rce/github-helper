@@ -85,7 +85,7 @@ public data class Issue(
     @SerialName("url")
     override val url: String,
     @SerialName("user")
-    override val user: Owner?,
+    override val owner: Owner?,
     @SerialName("repository")
     override val repository: Repo? = null,
     @SerialName("performed_via_github_app")

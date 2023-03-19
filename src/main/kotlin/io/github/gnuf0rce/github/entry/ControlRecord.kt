@@ -19,7 +19,7 @@ import kotlinx.serialization.*
 @Serializable
 public sealed class ControlRecord : Entry, LifeCycle, WebPage, Content, Product {
     public abstract val title: String
-    public abstract val user: Owner?
+    public abstract override val owner: Owner?
     public abstract val assignee: Owner?
     public abstract val assignees: List<Owner>
     public abstract val closedBy: Owner?
@@ -34,8 +34,4 @@ public sealed class ControlRecord : Entry, LifeCycle, WebPage, Content, Product 
     public abstract val draft: Boolean
     public abstract val locked: Boolean
     public abstract val repository: Repo?
-
-    override val owner: Owner?
-        get() = user
-
 }

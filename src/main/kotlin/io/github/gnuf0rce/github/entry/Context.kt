@@ -49,4 +49,7 @@ public sealed interface Content {
 public sealed interface Product {
     public val owner: Owner?
     public val ownerNameOrLogin: String get() = owner?.name ?: owner?.login ?: "ghost"
+    public val user: Owner? get() = owner as? User
+    public val author: Owner? get() = owner as? User
+    public val creator: User? get() = owner as? User
 }

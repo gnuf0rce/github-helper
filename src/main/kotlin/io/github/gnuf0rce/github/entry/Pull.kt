@@ -123,7 +123,7 @@ public data class Pull(
     @SerialName("url")
     override val url: String,
     @SerialName("user")
-    override val user: Owner?,
+    override val owner: Owner?,
     @SerialName("repository")
     override val repository: Repo? = null,
     @SerialName("performed_via_github_app")
@@ -144,12 +144,8 @@ public data class Pull(
         @SerialName("sha")
         val sha: String,
         @SerialName("user")
-        val user: Owner?
-    ) : Product {
-
         override val owner: Owner?
-            get() = user
-    }
+    ) : Product
 
     @Serializable
     public data class AutoMerge(
