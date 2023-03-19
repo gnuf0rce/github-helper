@@ -1,5 +1,5 @@
 /*
- * Copyright 2021-2022 dsstudio Technologies and contributors.
+ * Copyright 2021-2023 dsstudio Technologies and contributors.
  *
  *  此源代码的使用受 GNU AFFERO GENERAL PUBLIC LICENSE version 3 许可证的约束, 可以在以下链接找到该许可证.
  *  Use of this source code is governed by the GNU AGPLv3 license that can be found through the following link.
@@ -22,7 +22,7 @@ public data class Release(
     @SerialName("assets_url")
     val assetsUrl: String,
     @SerialName("author")
-    val author: User?,
+    val author: Owner?,
     @SerialName("body")
     override val body: String?,
     @SerialName("body_text")
@@ -67,7 +67,7 @@ public data class Release(
     val zipballUrl: String?
 ) : Entry, LifeCycle, WebPage, Content, Product {
 
-    override val owner: User?
+    override val owner: Owner?
         get() = author
 
     /**
@@ -115,13 +115,13 @@ public data class Release(
         @SerialName("updated_at")
         override val updatedAt: OffsetDateTime,
         @SerialName("uploader")
-        val uploader: User?,
+        val uploader: Owner?,
         @Contextual
         @SerialName("url")
         override val url: String
     ) : Entry, LifeCycle, Product {
 
-        override val owner: User?
+        override val owner: Owner?
             get() = uploader
 
         @Deprecated("Asset No Closed", ReplaceWith("null"))

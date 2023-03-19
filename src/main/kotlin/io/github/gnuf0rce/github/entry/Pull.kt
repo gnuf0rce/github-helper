@@ -1,5 +1,5 @@
 /*
- * Copyright 2021-2022 dsstudio Technologies and contributors.
+ * Copyright 2021-2023 dsstudio Technologies and contributors.
  *
  *  此源代码的使用受 GNU AFFERO GENERAL PUBLIC LICENSE version 3 许可证的约束, 可以在以下链接找到该许可证.
  *  Use of this source code is governed by the GNU AGPLv3 license that can be found through the following link.
@@ -21,9 +21,9 @@ public data class Pull(
     @SerialName("additions")
     val additions: Int = 0,
     @SerialName("assignee")
-    override val assignee: User? = null,
+    override val assignee: Owner? = null,
     @SerialName("assignees")
-    override val assignees: List<User> = emptyList(),
+    override val assignees: List<Owner> = emptyList(),
     @SerialName("author_association")
     override val association: Association,
     @SerialName("auto_merge")
@@ -42,7 +42,7 @@ public data class Pull(
     @SerialName("closed_at")
     override val closedAt: OffsetDateTime?,
     @SerialName("closed_by")
-    override val closedBy: User? = null,
+    override val closedBy: Owner? = null,
     @SerialName("comments")
     override val comments: Int = 0,
     @SerialName("comments_url")
@@ -83,7 +83,7 @@ public data class Pull(
     @SerialName("merged")
     val merged: Boolean = false,
     @SerialName("merged_by")
-    override val mergedBy: User? = null,
+    override val mergedBy: Owner? = null,
     @SerialName("merge_commit_sha")
     val mergeCommitSha: String,
     @Contextual
@@ -123,7 +123,7 @@ public data class Pull(
     @SerialName("url")
     override val url: String,
     @SerialName("user")
-    override val user: User?,
+    override val user: Owner?,
     @SerialName("repository")
     override val repository: Repo? = null,
     @SerialName("performed_via_github_app")
@@ -153,7 +153,7 @@ public data class Pull(
 
     @Serializable
     public data class AutoMerge(
-        val enabledBy: User,
+        val enabledBy: Owner,
         val mergeMethod: MergeMethod,
         val commitTitle: String,
         val commitMessage: String

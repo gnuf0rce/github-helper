@@ -47,7 +47,7 @@ public data class CommitComment(
     @SerialName("url")
     override val url: String,
     @SerialName("user")
-    override val user: User?,
+    override val user: Owner?,
     @SerialName("reactions")
     override val reactions: Reactions? = null
 ) : Entry, Comment()

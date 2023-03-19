@@ -20,9 +20,9 @@ public sealed class Comment : Entry, LifeCycle, WebPage, Content, Product {
     abstract override val text: String
     abstract override val html: String
     abstract override val url: String
-    public abstract val user: User?
+    public abstract val user: Owner?
 
-    override val owner: User?
+    override val owner: Owner?
         get() = user
 
     @Deprecated("Comment No Closed", ReplaceWith("null"))
