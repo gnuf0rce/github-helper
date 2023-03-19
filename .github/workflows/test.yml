@@ -32,7 +32,7 @@ jobs:
       - name: Init gradle project
         run: ./gradlew clean --scan
 
-      - name: Build all
+      - name: Assemble
         run: ./gradlew assemble --scan
 
       - name: GitHub Owner Test

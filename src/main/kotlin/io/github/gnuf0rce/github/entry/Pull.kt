@@ -102,7 +102,7 @@ public data class Pull(
     @SerialName("rebaseable")
     val rebaseable: Boolean? = null,
     @SerialName("requested_reviewers")
-    val requestedReviewers: List<User> = emptyList(),
+    val requestedReviewers: List<Owner> = emptyList(),
     @SerialName("requested_teams")
     val requestedTeams: List<Team> = emptyList(),
     @SerialName("review_comment_url")
