@@ -54,3 +54,12 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: ./gradlew test --tests "io.github.gnuf0rce.mirai.github.GitHubReleasePluginUpdaterTest" --scan --info
+
+      - name: BuildPlugin
+        run: ./gradlew buildPlugin
+
+      - name: Upload
+        uses: actions/upload-artifact@v3
+        with:
+          name: build
+          path: build/mirai/*
