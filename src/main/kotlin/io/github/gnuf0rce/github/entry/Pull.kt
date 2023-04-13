@@ -85,7 +85,7 @@ public data class Pull(
     @SerialName("merged_by")
     override val mergedBy: Owner? = null,
     @SerialName("merge_commit_sha")
-    val mergeCommitSha: String,
+    val mergeCommitSha: String? = null,
     @Contextual
     @SerialName("merged_at")
     override val mergedAt: OffsetDateTime? = null,
