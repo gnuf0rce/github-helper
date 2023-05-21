@@ -612,6 +612,7 @@ public suspend fun IssueEvent.toMessage(contact: Contact): Message = buildMessag
         "connected",
         "mentioned",
         "subscribed",
+        "unsubscribed",
         "pinned",
         "unpinned",
         "transferred",
