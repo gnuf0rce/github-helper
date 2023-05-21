@@ -7,7 +7,7 @@ plugins {
 }
 
 group = "io.github.gnuf0rce"
-version = "1.3.1"
+version = "1.3.2"
 
 mavenCentralPublish {
     useCentralS01()
@@ -21,7 +21,7 @@ mavenCentralPublish {
 }
 
 repositories {
-    mavenLocal()
+    maven("https://repo.huaweicloud.com/repository/maven/")
     mavenCentral()
 }
 
