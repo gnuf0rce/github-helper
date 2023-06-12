@@ -550,6 +550,10 @@ public suspend fun Issue.toMessage(contact: Contact, format: Format, notice: Str
                 if (closedBy != null) {
                     append(closedBy.avatar(contact)).appendLine("closed at $closedAt by ${closedBy.nameOrLogin}")
                 }
+                build()
+                ifEmpty {
+                    appendLine("created")
+                }
             }
             val repo = repo(full = FULL_REGEX.find(Url(htmlUrl).encodedPath)!!.value)
             if (comments > 0) {
@@ -800,6 +804,10 @@ public suspend fun Pull.toMessage(contact: Contact, format: Format, notice: Stri
                 }
                 if (milestone != null) {
                     appendLine("milestone with ${milestone.title}")
+                }
+                build()
+                ifEmpty {
+                    appendLine("created")
                 }
             }
             val repo = repo(full = FULL_REGEX.find(Url(htmlUrl).encodedPath)!!.value)
