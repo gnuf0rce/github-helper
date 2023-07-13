@@ -27,8 +27,4 @@ public sealed class Owner : Entry, LifeCycle, WebPage {
     @Deprecated("Owner No Merged", ReplaceWith("null"))
     override val mergedAt: OffsetDateTime?
         get() = null
-
-    @Deprecated("Owner No Closed", ReplaceWith("null"))
-    override val closedAt: OffsetDateTime?
-        get() = null
 }

@@ -95,8 +95,14 @@ public data class Organization(
     override val createdAt: OffsetDateTime = OffsetDateTime.MIN,
     @Contextual
     @SerialName("updated_at")
-    override val updatedAt: OffsetDateTime = OffsetDateTime.MIN
+    override val updatedAt: OffsetDateTime = OffsetDateTime.MIN,
+    @Contextual
+    @SerialName("archived_at")
+    val archivedAt: OffsetDateTime? = null,
 ) : Owner() {
+    override val closedAt: OffsetDateTime?
+        get() = archivedAt
+
     override val type: String
         get() = "Organization"
 }

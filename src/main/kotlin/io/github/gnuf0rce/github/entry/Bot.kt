@@ -59,6 +59,9 @@ public data class Bot(
     @SerialName("updated_at")
     override val updatedAt: OffsetDateTime = OffsetDateTime.MIN,
 ) : Owner() {
+    override val closedAt: OffsetDateTime?
+        get() = null
+
     override val type: String
         get() = "Bot"
 }

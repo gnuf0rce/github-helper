@@ -96,6 +96,8 @@ public data class User(
     @SerialName("plan")
     val plan: Plan? = null
 ) : Owner() {
+    override val closedAt: OffsetDateTime?
+        get() = null
 
     override val type: String
         get() = "User"
