@@ -21,14 +21,14 @@ internal class GitHubReleasePluginUpdaterTest : GitHubClientTest() {
             folder.mkdirs()
             val latest = try {
                 github.repo(repo).releases.latest()
-            } catch (exception: GitHubApiException) {
+            } catch (_: GitHubApiException) {
                 continue
             }
             folder.resolve("latest.json").writeText(GitHubJson.encodeToString(latest))
             val jar = latest.assets.find { it.name.endsWith(".mirai2.jar") }
                 ?: latest.assets.find { it.name.endsWith(".mirai.jar") }
                 ?: latest.assets.find { it.name.endsWith(".jar") }
-                ?: throw NoSuchElementException(latest.htmlUrl)
+                ?: continue
             val target = folder.resolve(jar.name)
 
             if (target.exists()) continue

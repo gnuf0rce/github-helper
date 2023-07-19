@@ -142,25 +142,21 @@ public object GitHubReleasePluginUpdater {
                     delay(1_000)
                 }
                 check(download.length() == jar.size) {
-                    download.delete()
                     "从 ${jar.browserDownloadUrl} 下载失败(文件大小校验失败 ${download.length()}!=${jar.size})"
                 }
                 val target = PluginManager.pluginsFolder.resolve(jar.name)
                 check(download.renameTo(target)) {
-                    download.delete()
                     "重命名到 ${jar.name} 失败"
                 }
                 target.setLastModified(updated)
-                source.delete()
                 plugin.logger.info("从 ${latest.htmlUrl} 升级成功")
 
             }.invokeOnCompletion { cause ->
                 if (cause != null) {
                     plugin.logger.warning("从 $id 升级失败")
                     download.deleteOnExit()
-                } else if (needUpdate && source.exists()) {
-                    plugin.logger.warning("旧版插件 ${source.name} 删除失败，将尝试添加退出时删除，请在下次启动时手动检查")
-                    // source.deleteOnExit()
+                } else if (needUpdate) {
+                    plugin.logger.info("旧版插件 ${source.name} 将尝试添加退出时删除，请在下次启动时手动检查")
                     Runtime.getRuntime().addShutdownHook(Thread {
                         classLoader.close()
                         source.delete()
