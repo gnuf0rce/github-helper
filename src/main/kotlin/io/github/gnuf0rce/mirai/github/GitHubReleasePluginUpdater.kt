@@ -108,9 +108,9 @@ public object GitHubReleasePluginUpdater {
                 ?.let { File(it.path) }
                 ?: continue
             var needUpdate = false
-            var target = PluginManager.pluginsFolder.resolve(plugin.description.id)
+            val download = PluginManager.pluginsFolder.resolve(plugin.description.id + ".download")
 
-            plugin.launch {
+            plugin.launch(CoroutineName("update from github")) {
                 val latest = try {
                     github.repo(id).releases.latest()
                 } catch (exception: GitHubApiException) {
@@ -134,16 +134,21 @@ public object GitHubReleasePluginUpdater {
 
                 if (needUpdate.not()) return@launch
 
-                plugin.logger.info("从 ${latest.htmlUrl} 尝试升级")
-                target = PluginManager.pluginsFolder.resolve(jar.name)
+                plugin.logger.info("从 ${plugin.description.version} 到 ${latest.htmlUrl} 尝试升级")
                 github.useHttpClient { http ->
                     http.get(jar.browserDownloadUrl)
                         .bodyAsChannel()
-                        .copyAndClose(target.writeChannel())
+                        .copyAndClose(download.writeChannel())
+                    delay(1_000)
                 }
-                check(target.length() == jar.size) {
-                    target.delete()
-                    "从 ${jar.browserDownloadUrl} 下载失败(文件大小校验失败 ${target.length()}!=${jar.size})"
+                check(download.length() == jar.size) {
+                    download.delete()
+                    "从 ${jar.browserDownloadUrl} 下载失败(文件大小校验失败 ${download.length()}!=${jar.size})"
+                }
+                val target = PluginManager.pluginsFolder.resolve(jar.name)
+                check(download.renameTo(target)) {
+                    download.delete()
+                    "重命名到 ${jar.name} 失败"
                 }
                 target.setLastModified(updated)
                 source.delete()
@@ -152,13 +157,10 @@ public object GitHubReleasePluginUpdater {
             }.invokeOnCompletion { cause ->
                 if (cause != null) {
                     plugin.logger.warning("从 $id 升级失败")
-                    target.deleteOnExit()
-                    Runtime.getRuntime().addShutdownHook(Thread {
-                        target.delete()
-                    })
+                    download.deleteOnExit()
                 } else if (needUpdate && source.exists()) {
                     plugin.logger.warning("旧版插件 ${source.name} 删除失败，将尝试添加退出时删除，请在下次启动时手动检查")
-                    source.deleteOnExit()
+                    // source.deleteOnExit()
                     Runtime.getRuntime().addShutdownHook(Thread {
                         classLoader.close()
                         source.delete()
