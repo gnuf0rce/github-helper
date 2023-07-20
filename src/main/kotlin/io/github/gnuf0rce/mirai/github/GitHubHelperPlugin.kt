@@ -25,11 +25,12 @@ import net.mamoe.mirai.console.util.*
 import net.mamoe.mirai.event.*
 import net.mamoe.mirai.utils.*
 
-public object GitHubHelperPlugin : KotlinPlugin(
+@PublishedApi
+internal object GitHubHelperPlugin : KotlinPlugin(
     JvmPluginDescription(
         id = "io.github.gnuf0rce.github-helper",
         name = "github-helper",
-        version = "1.3.2",
+        version = "1.4.0",
     ) {
         author("cssxsh")
 
@@ -47,29 +48,14 @@ public object GitHubHelperPlugin : KotlinPlugin(
         }
     }
 
-    private inline fun <reified T : Any> spi(): Lazy<List<T>> {
-        return try {
-            services()
-        } catch (_: NoSuchMethodError) {
-            lazy {
-                @Suppress("INVISIBLE_MEMBER")
-                with(net.mamoe.mirai.console.internal.util.PluginServiceHelper) {
-                    jvmPluginClasspath.pluginClassLoader
-                        .findServices<T>()
-                        .loadAllServices()
-                }
-            }
-        }
-    }
-
-    private val commands: List<Command> by spi()
-    private val data: List<PluginData> by spi()
-    private val config: List<PluginConfig> by spi()
+    private val commands: List<Command> by services()
+    private val data: List<PluginData> by services()
+    private val config: List<PluginConfig> by services()
 
     override fun onEnable() {
         // XXX: mirai console version check
-        check(SemVersion.parseRangeRequirement(">= 2.12.0-RC").test(MiraiConsole.version)) {
-            "$name $version 需要 Mirai-Console 版本 >= 2.12.0，目前版本是 ${MiraiConsole.version}"
+        check(SemVersion.parseRangeRequirement(">= 2.14.0").test(MiraiConsole.version)) {
+            "$name $version 需要 Mirai-Console 版本 >= 2.14.0，目前版本是 ${MiraiConsole.version}"
         }
 
         GitHubConfig.reload()

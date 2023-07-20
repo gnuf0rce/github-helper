@@ -148,7 +148,10 @@ public object GitHubReleasePluginUpdater {
                     append(latest.body ?: "<empty>")
                 })
 
-                plugin.logger.info("尝试从 ${plugin.description.version} 升级到 ${latest.tagName}")
+                plugin.logger.info("尝试从 v${plugin.description.version} 升级到 ${latest.tagName}")
+                runInterruptible(Dispatchers.IO) {
+                    download.createNewFile()
+                }
                 github.useHttpClient { http ->
                     http.get(jar.browserDownloadUrl)
                         .bodyAsChannel()
