@@ -27,7 +27,7 @@ import java.io.File
 public object GitHubReleasePluginUpdater {
 
     @JvmStatic
-    public val dict: MutableMap<String, String> = hashMapOf(
+    public val dict: MutableMap<String, String> = sortedMapOf(
         "cn.whitrayhb.grasspics" to "NLR-DevTeam/GrassPictures",
 
         "com.evolvedghost.mirai.steamhelper.steamhelper" to "EvolvedGhost/Steamhelper",
@@ -81,6 +81,8 @@ public object GitHubReleasePluginUpdater {
         "top.limbang.mcsm" to "limbang/mirai-console-mcsm-plugin",
         "top.limbang.minecraft" to "limbang/mirai-console-minecraft-plugin",
 
+        "top.mrxiaom.qrlogin" to "MrXiaoM/mirai-console-dev-qrlogin",
+
         "xmmt.dituon.petpet" to "Dituon/petpet",
 
         "xyz.cssxsh.mirai.plugin.novelai-helper" to "cssxsh/novelai-helper",
@@ -121,10 +123,14 @@ public object GitHubReleasePluginUpdater {
                     }
                     return@launch
                 }
+                plugin.logger.info("online latest version ${latest.tagName}")
                 val jar = latest.assets.find { it.name.endsWith(".mirai2.jar") }
                     ?: latest.assets.find { it.name.endsWith(".mirai.jar") }
                     ?: latest.assets.find { it.name.endsWith(".jar") }
-                    ?: return@launch
+                    ?: kotlin.run {
+                        plugin.logger.warning("没有在 ${latest.htmlUrl} 中找到插件文件")
+                        return@launch
+                    }
                 val updated = jar.updatedAt.toInstant().toEpochMilli()
                 needUpdate = try {
                     SemVersion(latest.tagName.removeSuffix("v")) > plugin.description.version
