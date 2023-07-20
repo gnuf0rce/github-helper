@@ -76,7 +76,9 @@ internal object GitHubHelperPlugin : KotlinPlugin(
         val target = resolveConfigFile("update.dict.json")
         logger.info { "1.3.0 起提供从 github 更新<其他插件>的功能, 如有需要, 请编辑:\n ${target.toPath().toUri()}" }
         GitHubReleasePluginUpdater.reload(target)
-        GitHubReleasePluginUpdater.update()
+        if (GitHubConfig.update) {
+            GitHubReleasePluginUpdater.update()
+        }
     }
 
     override fun onDisable() {

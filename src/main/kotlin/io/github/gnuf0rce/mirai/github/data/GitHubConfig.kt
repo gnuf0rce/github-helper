@@ -60,4 +60,8 @@ public object GitHubConfig : ReadOnlyPluginConfig("GithubConfig") {
             "include_all_commits" to "true"
         )
     )
+
+    @ValueName("auto_update")
+    @ValueDescription("启动时检查插件更新")
+    public val update: Boolean by value(true)
 }

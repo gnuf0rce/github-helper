@@ -95,6 +95,12 @@
 | `/<stats> <contribution> [name]` | 查看贡献 |
 | `/<stats> <trophy> [name]`       | 查看奖杯 |
 
+### GitHubUpdateCommand
+
+| 指令          | 描述     |
+|:------------|:-------|
+| `/<update>` | 检查插件更新 |
+
 ## 自动通过加群问题放行开发者
 
 `1.1.7` 起对接到 [mirai-administrator](https://github.com/cssxsh/mirai-administrator) 实现此功能
@@ -121,6 +127,7 @@
 *   `percentages` 加群放行 GitHub 活跃等级（百分制），默认0，不开启功能
 *   `sign_member_join` 加群放行提示信息
 *   `github_readme_stats` stats card 绘制参数
+*   `auto_update` 启动时检查插件更新
 
 ## 安装
 
