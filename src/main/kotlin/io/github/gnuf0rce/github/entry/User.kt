@@ -97,7 +97,7 @@ public data class User(
     val plan: Plan? = null
 ) : Owner() {
     override val closedAt: OffsetDateTime?
-        get() = null
+        get() = suspendedAt
 
     override val type: String
         get() = "User"
