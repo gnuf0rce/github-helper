@@ -85,6 +85,7 @@ public object GitHubReleasePluginUpdater {
 
         "xmmt.dituon.petpet" to "Dituon/petpet",
 
+        "xyz.cssxsh.mirai.fix-protocol-version" to "cssxsh/fix-protocol-version",
         "xyz.cssxsh.mirai.plugin.novelai-helper" to "cssxsh/novelai-helper",
         "xyz.cssxsh.mirai.plugin.pixiv-helper" to "cssxsh/pixiv-helper"
     )
