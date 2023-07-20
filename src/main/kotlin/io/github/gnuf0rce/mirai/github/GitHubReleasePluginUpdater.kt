@@ -111,7 +111,8 @@ public object GitHubReleasePluginUpdater {
                 ?.let { File(it.path) }
                 ?: continue
             var needUpdate = false
-            val download = PluginManager.pluginsFolder.resolve(plugin.description.id + ".download")
+            val download = PluginManager.pluginsFolder.resolve("${plugin.description.id}.download")
+            val backup = PluginManager.pluginsFolder.resolve("${source.name}.bak")
 
             plugin.launch(CoroutineName("update from github")) {
                 val latest = try {
@@ -173,10 +174,10 @@ public object GitHubReleasePluginUpdater {
                     plugin.logger.warning("从 $id 升级失败")
                     download.deleteOnExit()
                 } else if (needUpdate) {
-                    plugin.logger.info("旧版插件 ${source.name} 将尝试添加退出时删除，请在下次启动时手动检查")
+                    plugin.logger.info("旧版插件 ${source.name} 将尝试添加退出时删除(备份)，请在下次启动时手动检查")
                     Runtime.getRuntime().addShutdownHook(Thread {
                         classLoader.close()
-                        source.delete()
+                        source.renameTo(backup)
                     })
                 }
             }
