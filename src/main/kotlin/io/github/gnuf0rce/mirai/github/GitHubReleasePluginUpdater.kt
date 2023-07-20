@@ -48,11 +48,11 @@ public object GitHubReleasePluginUpdater {
 
         "com.xtex.repeater" to "xtexChooser/mirai-repeater",
 
+        "indi.eiriksgata.rulateday-dice" to "Eiriksgata/mirai-rulateday-dice",
+
         "io.github.samarium150.mirai.plugin.mirai-console-drift-bottle" to "Samarium150/mirai-console-drift-bottle",
         "io.github.samarium150.mirai.plugin.mirai-console-loafers-calendar" to "Samarium150/mirai-console-loafers-calendar",
         "io.github.samarium150.mirai.plugin.mirai-console-lolicon" to "Samarium150/mirai-console-lolicon",
-
-        "indi.eiriksgata.rulateday-dice" to "Eiriksgata/mirai-rulateday-dice",
 
         "me.jie65535.mirai-console-jnr-plugin" to "jie65535/mirai-console-jnr-plugin",
 
@@ -69,13 +69,13 @@ public object GitHubReleasePluginUpdater {
 
         "top.cutestar.antiRecall" to "Pmaru-top/AntiRecall",
 
-        "top.jie65535.jcf" to "jie65535/mirai-console-jcf-plugin",
         "top.jie65535.j24" to "jie65535/mirai-console-j24-plugin",
+        "top.jie65535.jcf" to "jie65535/mirai-console-jcf-plugin",
         "top.jie65535.mail-notify" to "jie65535/JMailNotify",
-        "top.jie65535.mirai.grasscutter-command" to "jie65535/JGrasscutterCommand",
         "top.jie65535.mirai-console-jcc-plugin" to "jie65535/mirai-console-jcc-plugin",
         "top.jie65535.mirai-console-jcr-plugin" to "jie65535/mirai-console-jcr-plugin",
         "top.jie65535.mirai-console-jms-plugin" to "jie65535/mirai-console-jms-plugin",
+        "top.jie65535.mirai.grasscutter-command" to "jie65535/JGrasscutterCommand",
 
         "top.limbang.mcmod" to "limbang/mirai-console-mcmod-plugin",
         "top.limbang.mcsm" to "limbang/mirai-console-mcsm-plugin",
@@ -123,7 +123,8 @@ public object GitHubReleasePluginUpdater {
                     }
                     return@launch
                 }
-                plugin.logger.info("online latest version ${latest.tagName}")
+                plugin.logger.info("github latest version ${latest.tagName}")
+
                 val jar = latest.assets.find { it.name.endsWith(".mirai2.jar") }
                     ?: latest.assets.find { it.name.endsWith(".mirai.jar") }
                     ?: latest.assets.find { it.name.endsWith(".jar") }
@@ -140,7 +141,13 @@ public object GitHubReleasePluginUpdater {
 
                 if (needUpdate.not()) return@launch
 
-                plugin.logger.info("从 ${plugin.description.version} 到 ${latest.htmlUrl} 尝试升级")
+                plugin.logger.info(buildString {
+                    append("github latest release note:").append('\n')
+                    append(latest.htmlUrl).append('\n')
+                    append(latest.body ?: "<empty>")
+                })
+
+                plugin.logger.info("尝试从 ${plugin.description.version} 升级到 ${latest.tagName}")
                 github.useHttpClient { http ->
                     http.get(jar.browserDownloadUrl)
                         .bodyAsChannel()
