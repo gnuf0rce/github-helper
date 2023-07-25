@@ -174,10 +174,12 @@ public object GitHubReleasePluginUpdater {
                     plugin.logger.warning("从 $id 升级失败")
                     download.deleteOnExit()
                 } else if (needUpdate) {
-                    plugin.logger.info("旧版插件 ${source.name} 将尝试添加退出时删除(备份)，请在下次启动时手动检查")
+                    plugin.logger.info("旧版插件 ${source.name} 将尝试添加退出时重命名(备份)，请在下次启动时手动检查")
                     Runtime.getRuntime().addShutdownHook(Thread {
                         classLoader.close()
-                        source.renameTo(backup)
+                        if (source.renameTo(backup).not()) {
+                            println("重命名失败，${source.toPath().toUri()}")
+                        }
                     })
                 }
             }
