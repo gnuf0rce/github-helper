@@ -136,7 +136,7 @@ public object GitHubReleasePluginUpdater {
                     }
                 val updated = jar.updatedAt.toInstant().toEpochMilli()
                 needUpdate = try {
-                    SemVersion(latest.tagName.removeSuffix("v")) > plugin.description.version
+                    SemVersion(latest.tagName.removePrefix("v")) > plugin.description.version
                 } catch (_: IllegalArgumentException) {
                     updated > source.lastModified()
                 }
