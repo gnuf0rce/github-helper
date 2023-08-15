@@ -142,6 +142,8 @@ public abstract class GitHubSubscriber<T>(private val name: String) : CoroutineS
                     current.sendMessage(record)
                 }
                 compute(current.id) { last = records.maxOfOrNull { it.updatedAt } ?: current.last }
+            } catch (_: CancellationException) {
+                // ignored
             } catch (cause: GitHubApiException) {
                 logger.warning { "$name with $id api fail, ${cause.json}" }
             } catch (cause: Exception) {
