@@ -18,7 +18,7 @@ import java.time.*
 @SerialName("Commit")
 public data class Commit(
     @SerialName("author")
-    override val owner: Owner?,
+    override val author: Owner?,
     @SerialName("comments_url")
     val commentsUrl: String,
     @SerialName("commit")
@@ -40,6 +40,9 @@ public data class Commit(
     @SerialName("files")
     val files: List<File> = emptyList()
 ) : Entry, Record, LifeCycle, WebPage, Product {
+
+    override val owner: Owner?
+        get() = author
 
     public override val graphUrl: String
         get() = "https://opengraph.githubassets.com/0/${FULL_REGEX.find(htmlUrl)?.value}/commit/${sha}"

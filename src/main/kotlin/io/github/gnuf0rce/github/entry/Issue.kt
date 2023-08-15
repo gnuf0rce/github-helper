@@ -85,12 +85,15 @@ public data class Issue(
     @SerialName("url")
     override val url: String,
     @SerialName("user")
-    override val owner: Owner?,
+    override val user: Owner?,
     @SerialName("repository")
     override val repository: Repo? = null,
     @SerialName("performed_via_github_app")
     val performedViaGithubApp: GithubAppInfo? = null
 ) : Entry, ControlRecord() {
+
+    override val owner: Owner?
+        get() = user
 
     public override val graphUrl: String
         get() = "https://opengraph.githubassets.com/${updatedAt.toEpochSecond()}/${repository?.fullName}/issues/$number"

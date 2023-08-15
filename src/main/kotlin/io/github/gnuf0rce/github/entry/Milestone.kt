@@ -25,7 +25,7 @@ public data class Milestone(
     @SerialName("created_at")
     override val createdAt: OffsetDateTime,
     @SerialName("creator")
-    override val owner: Owner?,
+    override val creator: Owner?,
     @SerialName("description")
     val description: String?,
     @Contextual
@@ -53,6 +53,9 @@ public data class Milestone(
     @SerialName("url")
     override val url: String
 ) : Entry, LifeCycle, WebPage, Product {
+
+    override val owner: Owner?
+        get() = creator
 
     /**
      * @see dueOn

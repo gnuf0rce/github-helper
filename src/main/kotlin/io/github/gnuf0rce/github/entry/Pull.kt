@@ -123,12 +123,15 @@ public data class Pull(
     @SerialName("url")
     override val url: String,
     @SerialName("user")
-    override val owner: Owner?,
+    override val user: Owner?,
     @SerialName("repository")
     override val repository: Repo? = null,
     @SerialName("performed_via_github_app")
     val performedViaGithubApp: GithubAppInfo? = null
 ) : Entry, ControlRecord() {
+
+    override val owner: Owner?
+        get() = user
 
     public override val graphUrl: String
         get() = "https://opengraph.githubassets.com/${updatedAt.toEpochSecond()}/${repository?.fullName}/pulls/$number"
@@ -144,8 +147,12 @@ public data class Pull(
         @SerialName("sha")
         val sha: String,
         @SerialName("user")
+        override val user: Owner?
+    ) : Product {
+
         override val owner: Owner?
-    ) : Product
+            get() = user
+    }
 
     @Serializable
     public data class AutoMerge(
