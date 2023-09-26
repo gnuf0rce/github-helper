@@ -22,7 +22,7 @@ public open class OrganizationMapper(parent: Url, public val org: String) :
 
     override val github: GitHubClient = GitHubClient()
 
-    public open suspend fun load(): Organization = get<Owner>() as Organization
+    public open suspend fun load(): Owner = get<Owner>()
 
     public open suspend fun repos(page: Int, per: Int = 30): List<Repo> = page(page = page, per = per, path = "repos")
 }

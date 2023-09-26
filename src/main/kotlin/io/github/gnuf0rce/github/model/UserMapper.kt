@@ -27,7 +27,7 @@ public open class UserMapper(parent: Url, public val user: String) :
     /**
      * [about-the-users-api](https://docs.github.com/en/rest/users/users#about-the-users-api)
      */
-    public open suspend fun load(): User = get<Owner>() as User
+    public open suspend fun load(): Owner = get<Owner>()
 
     /**
      * [list-repositories-for-a-user](https://docs.github.com/en/rest/repos/repos#list-repositories-for-a-user)
