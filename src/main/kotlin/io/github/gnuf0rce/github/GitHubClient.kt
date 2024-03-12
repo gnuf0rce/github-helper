@@ -1,5 +1,5 @@
 /*
- * Copyright 2021-2022 dsstudio Technologies and contributors.
+ * Copyright 2021-2024 dsstudio Technologies and contributors.
  *
  *  此源代码的使用受 GNU AFFERO GENERAL PUBLIC LICENSE version 3 许可证的约束, 可以在以下链接找到该许可证.
  *  Use of this source code is governed by the GNU AGPLv3 license that can be found through the following link.
@@ -21,6 +21,7 @@ import io.ktor.client.plugins.auth.providers.*
 import io.ktor.client.plugins.compression.*
 import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.client.request.*
+import io.ktor.http.*
 import io.ktor.serialization.kotlinx.json.*
 import kotlinx.coroutines.*
 import java.io.*
@@ -45,7 +46,7 @@ public open class GitHubClient(public open val token: String?) : CoroutineScope,
             }
             sendWithoutRequest { request ->
                 if (request.url.host == "api.github.com") {
-                    request.accept(GitHubJsonContentType)
+                    request.accept(ContentType.parse("application/vnd.github.v3.full+json"))
                     request.header("X-GitHub-Api-Version", System.getProperty(GITHUB_API_VERSION))
                     true
                 } else {
@@ -105,21 +106,19 @@ public open class GitHubClient(public open val token: String?) : CoroutineScope,
 
     public suspend fun <T> useHttpClient(block: suspend (HttpClient) -> T): T = supervisorScope {
         var count = 0
-        var current: Throwable? = null
+        val exception = CancellationException("github http api")
         while (isActive) {
             try {
                 return@supervisorScope block(client)
             } catch (cause: Throwable) {
-                current = cause
-                if (isActive && ignore(cause)) {
-                    if (++count > maxIgnoreCount) {
-                        throw cause
-                    }
-                } else {
+                if (ignore(cause).not()) {
+                    cause.addSuppressed(exception = exception)
                     throw cause
                 }
+                exception.addSuppressed(exception = cause)
+                if (++count > maxIgnoreCount) break
             }
         }
-        throw CancellationException(null, current)
+        throw exception
     }
 }
