@@ -178,7 +178,7 @@ public object GitHubReleasePluginUpdater {
                     Runtime.getRuntime().addShutdownHook(Thread {
                         classLoader.close()
                         if (source.renameTo(backup).not()) {
-                            println("重命名失败，${source.toPath().toUri()}")
+                            System.err.println("重命名失败，${source.toPath().toUri()}")
                         }
                     })
                 }
