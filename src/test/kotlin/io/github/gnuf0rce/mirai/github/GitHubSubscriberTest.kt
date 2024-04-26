@@ -2,10 +2,8 @@ package io.github.gnuf0rce.mirai.github
 
 import io.github.gnuf0rce.github.*
 import io.github.gnuf0rce.github.entry.*
-import io.ktor.utils.io.errors.*
 import kotlinx.coroutines.*
 import net.mamoe.mirai.mock.*
-import net.mamoe.mirai.utils.*
 import org.junit.jupiter.api.*
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -13,7 +11,8 @@ internal abstract class GitHubSubscriberTest<T> : GitHubClientTest()
     where T : LifeCycle, T : WebPage {
 
     init {
-        System.setProperty(IMAGE_FOLDER_PROPERTY, "run")
+        System.setProperty(IMAGE_FOLDER_PROPERTY, "./run/image")
+        System.setProperty(CACHE_FOLDER_PROPERTY, "./run/cache")
     }
 
     protected val bot = MockBotFactory.newMockBotBuilder().create()

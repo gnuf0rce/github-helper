@@ -7,7 +7,8 @@ import org.junit.jupiter.api.*
 internal class GitHubOwnerTest : GitHubClientTest() {
 
     init {
-        System.setProperty(IMAGE_FOLDER_PROPERTY, "run")
+        System.setProperty(IMAGE_FOLDER_PROPERTY, "./run/image")
+        System.setProperty(CACHE_FOLDER_PROPERTY, "./run/cache")
     }
 
     @Test

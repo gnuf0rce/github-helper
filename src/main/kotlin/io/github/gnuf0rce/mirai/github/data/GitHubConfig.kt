@@ -1,5 +1,5 @@
 /*
- * Copyright 2021-2023 dsstudio Technologies and contributors.
+ * Copyright 2021-2024 dsstudio Technologies and contributors.
  *
  *  此源代码的使用受 GNU AFFERO GENERAL PUBLIC LICENSE version 3 许可证的约束, 可以在以下链接找到该许可证.
  *  Use of this source code is governed by the GNU AGPLv3 license that can be found through the following link.
@@ -12,6 +12,8 @@ package io.github.gnuf0rce.mirai.github.data
 
 import io.github.gnuf0rce.mirai.github.*
 import net.mamoe.mirai.console.data.*
+import net.mamoe.mirai.console.plugin.jvm.*
+import net.mamoe.mirai.console.util.*
 
 public object GitHubConfig : ReadOnlyPluginConfig("GithubConfig") {
     @ValueName("proxy")
@@ -64,4 +66,11 @@ public object GitHubConfig : ReadOnlyPluginConfig("GithubConfig") {
     @ValueName("auto_update")
     @ValueDescription("启动时检查插件更新")
     public val update: Boolean by value(true)
+
+    @ConsoleExperimentalApi
+    override fun onInit(owner: PluginDataHolder, storage: PluginDataStorage) {
+        val plugin = owner as? JvmPlugin ?: return
+        System.setProperty(IMAGE_FOLDER_PROPERTY, plugin.resolveDataFile("image").path)
+        System.setProperty(CACHE_FOLDER_PROPERTY, plugin.resolveDataFile("cache").path)
+    }
 }
