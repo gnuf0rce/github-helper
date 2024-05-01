@@ -132,12 +132,12 @@ public open class ReposMapper(parent: Url, public val owner: String, public val 
     /**
      * [download-a-repository-archive-tar](https://docs.github.com/en/rest/repos/contents#download-a-repository-archive-tar)
      */
-    public open suspend fun tar(ref: String): Readme = get(path = "tarball/$ref")
+    public open suspend fun tar(ref: String): ByteArray = get(path = "tarball/$ref")
 
     /**
      * [download-a-repository-archive-zip](https://docs.github.com/en/rest/repos/contents#download-a-repository-archive-zip)
      */
-    public open suspend fun zip(ref: String): Readme = get(path = "zipball/$ref")
+    public open suspend fun zip(ref: String): ByteArray = get(path = "zipball/$ref")
 
     // endregion
 }
