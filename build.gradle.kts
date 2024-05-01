@@ -51,6 +51,9 @@ dependencies {
 
 mirai {
     jvmTarget = JavaVersion.VERSION_11
+    if (System.getenv("CI").toBoolean()) {
+        useTestConsoleFrontEnd = null
+    }
 }
 
 kotlin {
