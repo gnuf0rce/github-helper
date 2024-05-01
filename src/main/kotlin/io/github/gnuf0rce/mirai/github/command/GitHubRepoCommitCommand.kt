@@ -19,7 +19,7 @@ import java.time.*
 
 public object GitHubRepoCommitCommand : CompositeCommand(
     owner = GitHubHelperPlugin,
-    "repo-commit",
+    primaryName = "repo-commit",
     description = "Repo Commit Notice"
 ) {
     private val subscriber = object : GitHubSubscriber<Commit>(primaryName) {

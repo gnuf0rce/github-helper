@@ -65,6 +65,8 @@
 | `/<repo-issue> <list> [contact]?`               | 查看订阅列表   |
 | `/<repo-issue> <test> [repo] [type] [contact]?` | 测试订阅     |
 
+* since 1.5.0 在 `repo` 后可补充分支名，例如 `/repo-issue add Moyuyanli/HuYanSession:dev`
+
 ### GitHubRepoPullCommand
 
 | 指令                                             | 描述       |

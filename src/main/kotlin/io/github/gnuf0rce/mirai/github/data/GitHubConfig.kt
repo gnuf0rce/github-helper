@@ -15,7 +15,7 @@ import net.mamoe.mirai.console.data.*
 import net.mamoe.mirai.console.plugin.jvm.*
 import net.mamoe.mirai.console.util.*
 
-public object GitHubConfig : ReadOnlyPluginConfig("GithubConfig") {
+public object GitHubConfig : ReadOnlyPluginConfig(saveName = "GithubConfig") {
     @ValueName("proxy")
     @ValueDescription("Proxy Format http://127.0.0.1:8080 or socks://127.0.0.1:1080")
     public val proxy: String by value("")
@@ -70,7 +70,7 @@ public object GitHubConfig : ReadOnlyPluginConfig("GithubConfig") {
     @ConsoleExperimentalApi
     override fun onInit(owner: PluginDataHolder, storage: PluginDataStorage) {
         val plugin = owner as? JvmPlugin ?: return
-        System.setProperty(IMAGE_FOLDER_PROPERTY, plugin.resolveDataFile("image").path)
-        System.setProperty(CACHE_FOLDER_PROPERTY, plugin.resolveDataFile("cache").path)
+        System.setProperty(IMAGE_FOLDER_PROPERTY, plugin.resolveDataFile(relativePath = "image").path)
+        System.setProperty(CACHE_FOLDER_PROPERTY, plugin.resolveDataFile(relativePath = "cache").path)
     }
 }
