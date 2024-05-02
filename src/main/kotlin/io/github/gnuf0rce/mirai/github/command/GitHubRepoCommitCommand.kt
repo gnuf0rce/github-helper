@@ -24,6 +24,7 @@ public object GitHubRepoCommitCommand : CompositeCommand(
 ) {
     private val subscriber = object : GitHubSubscriber<Commit>(primaryName) {
         override val tasks: MutableMap<String, GitHubTask> by GitHubRepoTaskData::commits
+        override val regex: Regex = """([\w-.]+)/([\w-.]+)(?::(.+))?""".toRegex()
 
         override suspend fun GitHubTask.load(per: Int, since: OffsetDateTime): List<Commit> {
             val tree = id.substringAfter(':').ifEmpty { null }

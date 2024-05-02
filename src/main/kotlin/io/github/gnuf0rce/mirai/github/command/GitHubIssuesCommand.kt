@@ -24,7 +24,6 @@ public object GitHubIssuesCommand : CompositeCommand(
 ) {
     private val subscriber = object : GitHubSubscriber<Issue>(primaryName) {
         override val tasks: MutableMap<String, GitHubTask> by GitHubTaskData::issues
-
         override val regex: Regex? = null
 
         override suspend fun GitHubTask.load(per: Int, since: OffsetDateTime): List<Issue> {
