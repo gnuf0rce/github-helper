@@ -147,6 +147,8 @@ public data class Repo(
     val openIssuesCount: Int,
     @SerialName("owner")
     override val owner: Owner?,
+    @SerialName("parent")
+    val parent: Repo? = null,
     @SerialName("permissions")
     val permissions: Map<String, Boolean> = emptyMap(),
     @SerialName("private")

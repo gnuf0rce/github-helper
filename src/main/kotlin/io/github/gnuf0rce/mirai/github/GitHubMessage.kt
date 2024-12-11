@@ -1,5 +1,5 @@
 /*
- * Copyright 2021-2023 dsstudio Technologies and contributors.
+ * Copyright 2021-2024 dsstudio Technologies and contributors.
  *
  *  此源代码的使用受 GNU AFFERO GENERAL PUBLIC LICENSE version 3 许可证的约束, 可以在以下链接找到该许可证.
  *  Use of this source code is governed by the GNU AGPLv3 license that can be found through the following link.
@@ -1054,7 +1054,7 @@ public suspend fun Repo.toMessage(contact: Contact, type: Format, notice: String
                 appendLine(htmlUrl)
                 when {
                     templateRepository != null -> appendLine("from template [${templateRepository.fullName}]")
-                    fork -> appendLine("from fork [...]")
+                    fork -> appendLine("from fork [${parent?.fullName}]")
                 }
                 appendParagraph(description)
             }
