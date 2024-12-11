@@ -39,10 +39,12 @@ public open class GitHubClient(public open val token: String?) : CoroutineScope,
     protected open val ipv6: Boolean = false
 
     protected open val auth: Auth.() -> Unit = {
-        val tokens = token?.let { BearerTokens(accessToken = it, refreshToken = "") }
         bearer {
             loadTokens {
-                tokens
+                token?.let { BearerTokens(accessToken = it, refreshToken = "") }
+            }
+            refreshTokens {
+                token?.let { BearerTokens(accessToken = it, refreshToken = "") }
             }
             sendWithoutRequest { request ->
                 if (request.url.host == "api.github.com") {
@@ -90,7 +92,7 @@ public open class GitHubClient(public open val token: String?) : CoroutineScope,
         }
         engine {
             config {
-                proxy(this@GitHubClient.proxy)
+                proxy(proxy = this@GitHubClient.proxy)
                 doh(urlString = this@GitHubClient.doh, ipv6 = this@GitHubClient.ipv6)
             }
         }
