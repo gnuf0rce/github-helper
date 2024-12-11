@@ -28,7 +28,7 @@ public object GitHubRepoCommitCommand : CompositeCommand(
 
         override suspend fun GitHubTask.load(per: Int, since: OffsetDateTime): List<Commit> {
             val tree = id.substringAfter(':').ifEmpty { null }
-            return repo.commits(per = per, sha = tree).filter { it.createdAt > since }
+            return repo.commits(per = per, sha = tree).filter { it.updatedAt > since }
         }
     }
 

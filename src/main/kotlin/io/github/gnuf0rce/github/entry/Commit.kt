@@ -1,5 +1,5 @@
 /*
- * Copyright 2021-2023 dsstudio Technologies and contributors.
+ * Copyright 2021-2024 dsstudio Technologies and contributors.
  *
  *  此源代码的使用受 GNU AFFERO GENERAL PUBLIC LICENSE version 3 许可证的约束, 可以在以下链接找到该许可证.
  *  Use of this source code is governed by the GNU AGPLv3 license that can be found through the following link.
@@ -11,6 +11,7 @@
 package io.github.gnuf0rce.github.entry
 
 import io.github.gnuf0rce.github.*
+import io.ktor.http.*
 import kotlinx.serialization.*
 import java.time.*
 
@@ -45,7 +46,7 @@ public data class Commit(
         get() = author
 
     public override val graphUrl: String
-        get() = "https://opengraph.githubassets.com/0/${FULL_REGEX.find(htmlUrl)?.value}/commit/${sha}"
+        get() = "https://opengraph.githubassets.com/0/${FULL_REGEX.find(Url(htmlUrl).encodedPath)!!.value}/commit/${sha}"
 
     override val ownerNameOrLogin: String
         get() = author?.nameOrLogin ?: detail.author?.email ?: "ghost"
@@ -58,9 +59,8 @@ public data class Commit(
     override val mergedAt: OffsetDateTime?
         get() = null
 
-    @Deprecated("Commit No Updated", ReplaceWith("null"))
     override val updatedAt: OffsetDateTime
-        get() = createdAt.plusSeconds(detail.commentCount.toLong())
+        get() = detail.committer?.date ?: createdAt
 
     override val createdAt: OffsetDateTime
         get() = detail.author?.date ?: OffsetDateTime.MIN
