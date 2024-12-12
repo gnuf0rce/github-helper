@@ -63,7 +63,7 @@ public data class Commit(
         get() = detail.committer?.date ?: createdAt
 
     override val createdAt: OffsetDateTime
-        get() = detail.author?.date ?: OffsetDateTime.MIN
+        get() = detail.author?.date ?: detail.verification.verifiedAt ?: OffsetDateTime.MIN
 
     @Serializable
     public data class Tree(
@@ -102,7 +102,10 @@ public data class Commit(
         @SerialName("signature")
         val signature: String?,
         @SerialName("verified")
-        val verified: Boolean
+        val verified: Boolean,
+        @Contextual
+        @SerialName("verified_at")
+        val verifiedAt: OffsetDateTime? = null
     )
 
     @Serializable
