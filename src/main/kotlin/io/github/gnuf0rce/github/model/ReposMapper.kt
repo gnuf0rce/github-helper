@@ -92,6 +92,10 @@ public open class ReposMapper(parent: Url, public val owner: String, public val 
         override val github: GitHubClient get() = this@ReposMapper.github
     }
 
+    public open val action: ActionMapper = object : ActionMapper(parent = base) {
+        override val github: GitHubClient get() = this@ReposMapper.github
+    }
+
     public open val milestones: MilestonesMapper = object : MilestonesMapper(parent = base) {
         override val github: GitHubClient get() = this@ReposMapper.github
     }
