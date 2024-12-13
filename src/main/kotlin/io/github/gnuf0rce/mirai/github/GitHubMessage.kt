@@ -29,7 +29,6 @@ import net.mamoe.mirai.contact.Contact
 import net.mamoe.mirai.contact.FileSupported
 import net.mamoe.mirai.contact.PermissionDeniedException
 import net.mamoe.mirai.contact.file.*
-import net.mamoe.mirai.message.*
 import net.mamoe.mirai.message.data.*
 import net.mamoe.mirai.utils.ExternalResource.Companion.uploadAsImage
 import net.mamoe.mirai.utils.ExternalResource.Companion.toExternalResource
@@ -316,6 +315,7 @@ public suspend fun WebPage.toMessage(contact: Contact, format: Format, notice: S
         is Pull -> toMessage(contact, format, notice, since)
         is PullRequestReviewComment -> toMessage(contact)
         is Release -> toMessage(contact, format, notice)
+        is ActionsArtifact -> toMessage(contact, format, notice)
         is Commit -> toMessage(contact, format, notice)
         is Commit.Tree -> htmlUrl.toPlainText()
         is Commit.File -> toMessage()
@@ -872,8 +872,14 @@ public suspend fun Release.toMessage(contact: Contact, format: Format, notice: S
             appendLine("[$notice] New release <${name ?: tagName}> opened by ${author?.nameOrLogin}")
             appendLine(htmlUrl)
             appendLine(reactions)
-            assets.joinTo(buffer = this, prefix = "assets: ") { it.name }.appendLine()
             appendParagraph(text)
+            if (assets.isEmpty().not()) {
+                appendLine()
+                appendLine("assets: ")
+                for (asset in assets) {
+                    appendLine(asset.name)
+                }
+            }
         }
         Format.FORWARD -> buildForwardMessage(contact) {
             displayStrategy = object : ForwardMessage.DisplayStrategy {
@@ -902,6 +908,7 @@ public suspend fun Release.toMessage(contact: Contact, format: Format, notice: S
 
 public suspend fun Release.uploadTo(contact: FileSupported) {
     if (assets.isEmpty()) return
+    logger.info("try upload assets for $htmlUrl")
     val (owner, repo) = FULL_REGEX.find(Url(htmlUrl).encodedPath)!!.destructured
     val folder = with(contact.files.root) {
         resolveFolder("${repo}@${owner}")
@@ -937,8 +944,8 @@ public suspend fun Release.Asset.uploadTo(folder: AbsoluteFolder) {
             } finally {
                 if (asset.length() != size) asset.delete()
             }
-            asset.setLastModified(updatedAt.toInstant().toEpochMilli())
         }
+        asset.setLastModified(updatedAt.toInstant().toEpochMilli())
     }
     asset.toExternalResource().use { resource ->
         folder.uploadNewFile(name, resource)
@@ -1253,6 +1260,81 @@ public fun Readme.markdown(flush: Boolean = false): File {
             parentFile.mkdirs()
             writeText(decode())
         }
+    }
+}
+
+// endregion
+
+// region Action
+
+public suspend fun ActionsArtifact.toMessage(contact: Contact, format: Format, notice: String): Message {
+    if (contact is FileSupported) {
+        supervisorScope {
+            launch {
+                uploadTo(contact)
+            }
+        }
+    }
+
+    return when (format) {
+        Format.OLD -> buildMessageChain {
+            appendLine("$notice with artifact by ${run.headBranch} ")
+            appendLine("NAME: $name ")
+            appendLine("CREATED_AT: $createdAt ")
+            appendLine("EXPIRES_AT: $expiresAt ")
+            appendLine("URL: $htmlUrl ")
+        }
+        Format.TEXT -> buildMessageChain {
+            appendLine("[$notice] New artifact <${name}> opened by ${run.headBranch}")
+            appendLine(htmlUrl)
+            appendLine(archiveDownloadUrl)
+        }
+        Format.FORWARD -> buildForwardMessage(contact) {
+            displayStrategy = object : ForwardMessage.DisplayStrategy {
+                override fun generateTitle(forward: RawForwardMessage): String = name
+                override fun generatePreview(forward: RawForwardMessage): List<String> = listOf(
+                    "$notice release $name by ${run.headBranch}",
+                    "expires at $expiresAt"
+                )
+            }
+
+            contact.bot named run.headBranch at createdAt says {
+                appendLine(htmlUrl)
+                appendLine(archiveDownloadUrl)
+            }
+        }
+        Format.GRAPH -> graph(contact)
+    }
+}
+
+public suspend fun ActionsArtifact.uploadTo(contact: FileSupported) {
+    logger.info("try upload artifact for $htmlUrl")
+    val (owner, repo) = FULL_REGEX.find(Url(htmlUrl).encodedPath)!!.destructured
+    val folder = with(contact.files.root) {
+        resolveFolder("${repo}@${owner}")
+            ?: resolveFolder(repo)
+            ?: resolveFolder(owner)
+            ?: try {
+                createFolder("${repo}@${owner}")
+            } catch (_: PermissionDeniedException) {
+                this
+            }
+    }
+    val archive = CacheFolder.resolve("action").resolve(nodeId).resolve(name)
+    if (archive.exists().not()) {
+        archive.parentFile.mkdirs()
+        github.useHttpClient { http ->
+            val response = http.get(archiveDownloadUrl)
+            try {
+                response.bodyAsChannel().copyAndClose(archive.writeChannel())
+            } finally {
+                if (archive.length() != size) archive.delete()
+            }
+        }
+        archive.setLastModified(updatedAt.toInstant().toEpochMilli())
+    }
+    archive.toExternalResource().use { resource ->
+        folder.uploadNewFile(name, resource)
     }
 }
 
