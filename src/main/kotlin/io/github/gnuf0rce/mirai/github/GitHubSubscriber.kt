@@ -1,5 +1,5 @@
 /*
- * Copyright 2021-2023 dsstudio Technologies and contributors.
+ * Copyright 2021-2024 dsstudio Technologies and contributors.
  *
  *  此源代码的使用受 GNU AFFERO GENERAL PUBLIC LICENSE version 3 许可证的约束, 可以在以下链接找到该许可证.
  *  Use of this source code is governed by the GNU AGPLv3 license that can be found through the following link.
@@ -119,7 +119,26 @@ public abstract class GitHubSubscriber<T>(private val name: String) : CoroutineS
     private suspend fun GitHubTask.sendMessage(record: T) {
         for (cid in contacts) {
             try {
-                Contact(cid).sendEntry(entry = record, notice = id, format = format, since = last)
+                val contact = Contact(cid)
+                val message = record.toMessage(contact = contact, notice = id, format = format, since = last)
+                contact.sendMessage(message = message)
+            } catch (cause: Exception) {
+                logger.warning("发送信息失败(${name})", cause)
+            }
+        }
+    }
+
+    private suspend fun GitHubTask.sendMessage(records: List<T>) {
+        for (cid in contacts) {
+            try {
+                val contact = Contact(cid)
+                val message = buildForwardMessage(context = contact) {
+                    for (record in records) {
+                        val message = record.toMessage(contact = contact, notice = id, format = format, since = last)
+                        contact.bot says message
+                    }
+                }
+                contact.sendMessage(message = message)
             } catch (cause: Exception) {
                 logger.warning("发送信息失败(${name})", cause)
             }
@@ -138,8 +157,10 @@ public abstract class GitHubSubscriber<T>(private val name: String) : CoroutineS
             val current = task(id) ?: break
             try {
                 val records = current.load(per = PER_PAGE, since = current.last)
-                for (record in records) {
-                    current.sendMessage(record)
+                when (records.size) {
+                    0 -> Unit
+                    1 -> current.sendMessage(record = records.single())
+                    else -> current.sendMessage(records = records)
                 }
                 compute(current.id) { last = records.maxOfOrNull { it.updatedAt } ?: current.last }
             } catch (_: CancellationException) {

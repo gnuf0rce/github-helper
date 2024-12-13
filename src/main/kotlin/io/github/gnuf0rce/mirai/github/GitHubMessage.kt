@@ -333,9 +333,6 @@ public suspend fun WebPage.toMessage(contact: Contact, format: Format, notice: S
     }
 }
 
-public suspend fun Contact.sendEntry(entry: WebPage, notice: String, format: Format, since: OffsetDateTime)
-    : MessageReceipt<Contact> = sendMessage(entry.toMessage(this, format, notice, since))
-
 
 // region User
 
