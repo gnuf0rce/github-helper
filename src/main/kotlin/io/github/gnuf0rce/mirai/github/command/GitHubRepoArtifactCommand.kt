@@ -23,7 +23,7 @@ public object GitHubRepoArtifactCommand : CompositeCommand(
     description = "Repo Artifact Notice"
 ) {
     private val subscriber = object : GitHubSubscriber<ActionsArtifact>(primaryName) {
-        override val tasks: MutableMap<String, GitHubTask> by GitHubRepoTaskData::releases
+        override val tasks: MutableMap<String, GitHubTask> by GitHubRepoTaskData::artifacts
 
         override suspend fun GitHubTask.load(per: Int, since: OffsetDateTime): List<ActionsArtifact> {
             return repo.action.artifacts(per = per).filter { it.updatedAt > since }

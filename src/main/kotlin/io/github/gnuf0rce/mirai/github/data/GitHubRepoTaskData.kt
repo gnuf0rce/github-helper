@@ -24,4 +24,7 @@ public object GitHubRepoTaskData : AutoSavePluginData(saveName = "RepoTaskData")
 
     @ValueName("releases")
     public val releases: MutableMap<String, GitHubTask> by value()
+
+    @ValueName("artifacts")
+    public val artifacts: MutableMap<String, GitHubTask> by value()
 }
