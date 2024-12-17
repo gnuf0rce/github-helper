@@ -1325,6 +1325,7 @@ public suspend fun ActionsArtifact.uploadTo(contact: FileSupported) {
         archive.parentFile.mkdirs()
         github.useHttpClient { http ->
             val response = http.get(archiveDownloadUrl)
+            response.headers.fixContentType()
             try {
                 response.bodyAsChannel().copyAndClose(archive.writeChannel())
             } finally {
